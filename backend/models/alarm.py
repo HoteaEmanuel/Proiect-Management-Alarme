@@ -4,7 +4,7 @@ from database import Base
 from enums import Status,AlarmType,CategoryType,SubCategoryType,Details
      
 class Alarm(Base):
-   __tablename__="alarms" 
+   __tablename__="Alarms" 
    alarm_number = Column(String(200),primary_key=True,index=True)
    status = Column(String(200),default=Status.ACTIVE.value, nullable=False)
    severity = Column(String(50),nullable=False)
