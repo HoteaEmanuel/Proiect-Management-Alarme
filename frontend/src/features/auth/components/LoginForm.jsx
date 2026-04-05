@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import Input from "../../components/Input";
-import Button from "../../components/Button";
+import Input from "../../../components/Input";
+import Button from "../../../components/Button";
 
 import { FaEye } from "react-icons/fa";
 
 import { FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "../../../store/authStore";
 
 const LoginForm = () => {
   const navigate = useNavigate();
