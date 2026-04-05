@@ -2,7 +2,7 @@ import "./styles/App.css";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound.jsx";
-import Login from "./pages/auth/Login.jsx";
+import Login from "./pages/Auth/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Rootlayout from "./layouts/Rootlayout.jsx";
 import UnauthRoute from "./components/UnauthRoute.jsx";
