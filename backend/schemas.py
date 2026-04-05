@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -37,3 +39,22 @@ class AlarmPaginationResponse(BaseModel):
     total_pages: int
     current_page: int
     alarms: list[AlarmResponse]
+
+@dataclass
+class RequestFilters:
+    current_page: int = 1 
+    page_size: int = 10 
+    sort_by: str = "alarm_number"
+    sort_order: str = "asc"
+    status: str | None = None
+    severity: str | None = None
+    type: str | None = None
+    alert_group: str | None = None
+    server_name: str | None = None
+    project: str | None = None
+    date_column_to_filter: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    summary_like: str | None = None
+    alert_description_like: str | None = None
+    server_name_like: str | None = None
