@@ -1,5 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
+
+class SeverityResponse(BaseModel):
+    id: int
+    name: str
+    class Config:
+        from_attributes: True
+
 class AlarmResponse(BaseModel):
     alarm_number:str
     status:str
@@ -24,4 +31,9 @@ class AlarmResponse(BaseModel):
     class Config:
         from_attributes: True
         
-    
+
+class AlarmPaginationResponse(BaseModel):
+    total_alarms: int
+    total_pages: int
+    current_page: int
+    alarms: list[AlarmResponse]
