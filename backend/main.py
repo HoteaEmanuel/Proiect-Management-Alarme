@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from routers import alarms, auth
-from database import get_db
+from database import get_db, engine
+import models.users
+
+models.users.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
