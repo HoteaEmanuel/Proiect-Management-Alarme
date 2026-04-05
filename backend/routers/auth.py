@@ -1,7 +1,7 @@
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from database import get_db
-from models import Users
+from models.users import Users
 from sqlalchemy.orm import Session
 from typing import Annotated
 from fastapi import Depends, APIRouter, HTTPException
