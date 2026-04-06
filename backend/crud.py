@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from models import Severity
 from models.alarm import Alarm
-from schemas import RequestFilters
-from sqlalchemy import or_
+from models.severity import Severity
+from schemas import RequestFilters, AlarmCreate, AlarmUpdate
+from fastapi import HTTPException
 
 def get_filtered_alarms(db: Session, filters: RequestFilters):
     query = db.query(Alarm)
@@ -58,3 +58,61 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
     query = query.offset(offset).limit(filters.page_size)
 
     return query.all()
+
+def create_alarm(db: Session, alarm_data: AlarmCreate):
+    #verific daca exista deja alarma
+    existing_alarm = db.query(Alarm).filter(Alarm.alarm_number == alarm_data.alarm_number).first()
+    if existing_alarm:
+        raise HTTPException(status_code=400, detail="Alarm with this number already exists")
+    
+    #verific daca exista severitatea specificata
+    severity = db.query(Severity).filter(Severity.id == alarm_data.severity_id).first()
+    if not severity:
+        raise HTTPException(status_code=400, detail="Invalid severity ID")
+    
+    new_alarm = Alarm(
+        alarm_number=alarm_data.alarm_number,
+        status=alarm_data.status,
+        severity_id=alarm_data.severity_id,
+        company=alarm_data.company,
+        project=alarm_data.project,
+        server_name=alarm_data.server_name,
+        alert_description=alarm_data.alert_description,
+        alert_key=alarm_data.alert_key,
+        node=alarm_data.node,
+        summary=alarm_data.summary,
+        type=alarm_data.type,
+        alert_group=alarm_data.alert_group,
+        first_occurence_datetime=alarm_data.first_occurence_datetime,
+        last_occurence_datetime=alarm_data.last_occurence_datetime,
+        clear_occurence_datetime=alarm_data.clear_occurence_datetime,
+        deleted_datetime=alarm_data.deleted_datetime,
+        category_tier_1=alarm_data.category_tier_1,
+        category_tier_2=alarm_data.category_tier_2,
+        category_tier_3=alarm_data.category_tier_3,
+    )
+    
+    db.add(new_alarm)
+    db.commit()
+    db.refresh(new_alarm)
+    return new_alarm
+
+def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
+    #verific daca exista alarma pe care doresc sa o modific
+    alarm=db.query(Alarm).filter(Alarm.alarm_number==alarm_number).first()
+    if not alarm:
+        raise HTTPException(status_code=404, detail="Alarm not found")
+    
+    update_data = alarm_data.model_dump(exclude_unset=True)
+    
+    if "severity_id" in update_data:
+        severity = db.query(Severity).filter(Severity.id == update_data["severity_id"]).first()
+        if not severity:
+            raise HTTPException(status_code=400, detail="Invalid severity ID")
+        
+    for field, value in update_data.items():
+        setattr(alarm, field, value)
+    
+    db.commit()
+    db.refresh(alarm)
+    return alarm

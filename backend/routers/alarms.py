@@ -2,10 +2,10 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from crud import get_filtered_alarms
+from crud import get_filtered_alarms, create_alarm, update_alarm
 from database import get_db
 from models.alarm import Alarm
-from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters
+from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
 router=APIRouter()
 
 @router.get("/",response_model=list[AlarmResponse])
@@ -44,3 +44,20 @@ def getAlarmByNumber(number:str,db:Session = Depends(get_db)):
     return alarm
     # return "An alarm"
 
+@router.post("/",response_model=AlarmResponse,status_code=201)
+def add_alarm(alarm_data: AlarmCreate, db: Session = Depends(get_db)):
+    try:
+        new_alarm = create_alarm(db, alarm_data)
+        return new_alarm
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@router.put("/{number}",response_model=AlarmResponse)
+def edit_alarm(number:str, alarm_data: AlarmUpdate, db: Session = Depends(get_db)):
+    try:
+        updated_alarm = update_alarm(db, number, alarm_data)
+        return updated_alarm
+    except ValueError as e:
+        if str(e) == "Alarm not found":
+            raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
