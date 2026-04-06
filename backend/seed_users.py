@@ -4,7 +4,7 @@
 # - hash-uieste parola folosind bcrypt
 # - insereaza doar userii care nu exista deja
 
-# Se ruleaza cu: "python seed_users.py"g
+# Se ruleaza cu: "python seed_users.py"
 
 from passlib.context import CryptContext
 from database import SessionLocal
