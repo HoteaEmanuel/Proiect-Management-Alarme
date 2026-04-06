@@ -6,6 +6,7 @@ from fastapi import HTTPException
 
 def get_filtered_alarms(db: Session, filters: RequestFilters):
     query = db.query(Alarm)
+
     #filtrez dupa fiecare camp, daca nu e gol
     if filters.status:
         query = query.filter(Alarm.status == filters.status)
@@ -28,12 +29,9 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
     
     #filtrez si dupa data, daca am primit toate datele necesare
     if filters.date_column_to_filter and filters.start_date and filters.end_date:
-        print("FILTRARE DATA")
         if filters.start_date > filters.end_date:
             raise ValueError("Start date cannot be greater than end date.")
         date_column = getattr(Alarm, filters.date_column_to_filter, None)
-        print("DATE COLUMN")
-        print(date_column)
         if date_column is not None:
             if filters.start_date:
                 query = query.filter(date_column >= filters.start_date)
@@ -70,6 +68,7 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
     if not severity:
         raise HTTPException(status_code=400, detail="Invalid severity ID")
     
+    #creez alarma
     new_alarm = Alarm(
         alarm_number=alarm_data.alarm_number,
         status=alarm_data.status,
@@ -91,7 +90,7 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
         category_tier_2=alarm_data.category_tier_2,
         category_tier_3=alarm_data.category_tier_3,
     )
-    
+    #adaug alarma in baza de date
     db.add(new_alarm)
     db.commit()
     db.refresh(new_alarm)
@@ -103,13 +102,17 @@ def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
     if not alarm:
         raise HTTPException(status_code=404, detail="Alarm not found")
     
+    #preiau doar campurile care au fost setate in request (cele care nu sunt None)
     update_data = alarm_data.model_dump(exclude_unset=True)
     
+    #verific daca severitatea specificata e valida (daca a fost specificata)
     if "severity_id" in update_data:
         severity = db.query(Severity).filter(Severity.id == update_data["severity_id"]).first()
         if not severity:
+            #daca severitatea nu exista, arunc HTTPException
             raise HTTPException(status_code=400, detail="Invalid severity ID")
-        
+    
+    #actualizez campurile alarmei cu noile valori
     for field, value in update_data.items():
         setattr(alarm, field, value)
     
