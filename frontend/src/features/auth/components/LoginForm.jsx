@@ -8,28 +8,27 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/authStore";
+import { authApi } from "../api/auth.api";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+
+  const { login } = authApi;
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { user, setUser } = useAuthStore();
+  
   const onSubmit = (data) => {
-    console.log("Submitted");
-    console.log(data);
-    // Handle log in !!
-    reset();
-
-    // SIMULATE USER LOGIN
-    setUser({ email: data.email, password: data.password });
+    login(data);
     console.log("AUTH USER: ");
     console.log(user);
+    reset();
     navigate("/dashboard");
   };
 
@@ -40,24 +39,26 @@ const LoginForm = () => {
       className=" w-2/3 h-2/3 md:w-1/4 md:h-1/2  flex flex-col justify-center items-center gap-4 border-2 rounded-2xl p-4 shadow-2xl has-focus:border-blue-800"
     >
       <h1 className="heading">Log in</h1>
-      <label htmlFor="email" className="w-full text-left">
-        Email
+      <label htmlFor="username" className="w-full text-left">
+        Username
       </label>
 
-      {errors.email && <p className="text-red-500 w-full">{errors.email.message}</p>}
+      {errors.username && (
+        <p className="text-red-500 w-full">{errors.username.message}</p>
+      )}
       <Input
-        {...register("email", {
+        {...register("username", {
           required: true,
-          pattern: { value: /\S+@\S+/, message: "Invalid email" },
-          validate: (email) => {
-            if (email.length > 100) return "Email must be less than 100 characters";
+          // pattern: { value: /\S+@\S+/, message: "Invalid email" },
+          validate: (username) => {
+            if (username.length > 100 || username.length < 3)
+              return "Username must be between 3-100 characters";
             return true;
           },
           maxLength: 100,
         })}
-        placeholder={"johndoe@gmail.com"}
-        id={"email"}
-        type={"email"}
+        placeholder={"johndoe"}
+        id={"username"}
       />
 
       <label htmlFor="password" className="w-full text-left">
@@ -70,10 +71,11 @@ const LoginForm = () => {
               required: true,
               minLength: 7,
               maxLength: 100,
-              validate:(value)=>{
-                if(value.lenght>100) return "The password should have less than 100 characters";
+              validate: (value) => {
+                if (value.lenght > 100)
+                  return "The password should have less than 100 characters";
                 return;
-              }
+              },
             })}
             id={"password"}
             type={passwordVisible ? "text" : "password"}
@@ -93,7 +95,9 @@ const LoginForm = () => {
         )}
       </div>
 
-      <button className="btn w-1/2">Log in</button>
+      <button className="btn w-1/2">
+        {isSubmitting ? "Submitting... " : "Log in"}
+      </button>
     </form>
   );
 };
