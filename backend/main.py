@@ -20,8 +20,8 @@ app.add_middleware(
 @app.get("/")
 def greet():
     return "Hello"
-
-app.include_router(alarms.router, prefix="/alarms", tags=["Alarms"])
 app.include_router(auth.router)
+app.include_router(alarms.router, prefix="/alarms", tags=["Alarms"])
+
 
 print("HELLO :)")

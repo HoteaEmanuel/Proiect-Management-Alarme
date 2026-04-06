@@ -7,9 +7,12 @@ from typing import Annotated
 from fastapi import Depends, APIRouter, HTTPException
 from starlette import status
 from datetime import timedelta, datetime, timezone
-from jose import jwt, JWTError
+from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi.security import OAuth2PasswordBearer
+from fastapi import Response,Cookie
 from dotenv import load_dotenv
+from fastapi.encoders import jsonable_encoder
+import time
 import os
 
 router = APIRouter(
@@ -38,9 +41,15 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-class Token(BaseModel):
+
+class UserResponse(BaseModel):
+    user_id:int
+    
+    
+class TokenResponse(BaseModel):
     access_token: str
-    token_type: str
+    user : UserResponse
+        
 
 #######################################################
 
@@ -79,7 +88,6 @@ async def create_user(create_user_request: CreateUserRequest, db: db_dependency)
 def authenticate_user(username: str, password: str, db: Session):
 
     user = db.query(Users).filter(Users.username == username).first()
-
     if user is None:
         return None
     
@@ -90,32 +98,47 @@ def authenticate_user(username: str, password: str, db: Session):
 
 
 # Creeaza un token JWT care contine username-ul si id-ul user-ului si timpul de expirare, apoi il semneaza folosind cheia secreta.
-def create_access_token(username: str, user_id: int, expires_delta: timedelta):
+def create_jwt_token(username: str, user_id: int, expires_delta: timedelta):
 
     payload = {"sub": username, "id": user_id}
     expires = datetime.now(timezone.utc) + expires_delta
     payload["exp"] = expires
-
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
+
 # Primeste datele de login, verifica utilizatorul in baza de date si returneaza un token daca autentificarea este valida.
-@router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
-async def login(login_request: LoginRequest, db: db_dependency):
+@router.post("/login", response_model= TokenResponse , status_code=status.HTTP_200_OK)
+async def login(response: Response,login_request: LoginRequest, db: db_dependency):
 
     user = authenticate_user(login_request.username, login_request.password, db)
-
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password"
         )
     
-    token = create_access_token(user.username, user.id, timedelta(minutes=30))
-
+    # Creare acces token + refresh token 
+    # Acces token ul se pastreaza in memorie => il returnez
+    accesToken = create_jwt_token(user.username, user.id, timedelta(minutes=15))
+    refreshToken = create_jwt_token(user.username, user.id, timedelta(days=30))
+    
+    
+    # Salvam refresh token in cookie HttpOnly pentru protectie
+    response.set_cookie(
+            key="refresh_token",
+            value=refreshToken,
+            httponly=True,
+            secure=True, 
+            samesite="none",
+            max_age=60 * 60 * 24 * 30 # 30 de zile
+        )
+    
+    
+    userResponse = UserResponse(user_id=user.id)
     return {
-        "access_token": token,
-        "token_type": "bearer"
+        "access_token": accesToken,
+        "user":jsonable_encoder(userResponse),
     }
 
 
@@ -123,28 +146,31 @@ async def login(login_request: LoginRequest, db: db_dependency):
 
 # Verifica tokenul primit, il decodeaza si extrage datele utilizatorului curent.
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
-
+    print("TOKEN ")
+    print(token)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
-
         if username is None or user_id is None:
+            print("USER NOT OK")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate user"
             )
-        
         return {"username": username, "id": user_id}
     
-
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Expired token"
+        )    
+        
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user"
-        )
-    
+        )   
 
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
@@ -152,4 +178,31 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 # Returneaza datele utilizatorului autentificat daca tokenul este valid.
 @router.get("/me", status_code=status.HTTP_200_OK)
 async def read_current_user(user: user_dependency):
+    print("AICI")
     return user
+
+@router.post("/refresh")
+async def refresh_token(
+    response: Response,
+    refresh_token: Annotated[str | None, Cookie()] = None
+):
+    
+    print("REFRESH TOKEN: ",refresh_token)
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail="No refresh token")
+
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        user_id  = payload.get("id")
+
+        if username is None or user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+        # genereaza un nou access token
+        new_acces_token = create_jwt_token(username, user_id, timedelta(minutes=15))
+
+        return { "accessToken": new_acces_token }
+
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
