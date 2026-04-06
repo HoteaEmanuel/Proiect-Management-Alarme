@@ -7,6 +7,16 @@ export const authApi = {
   },
   login: async (credentials) => {
     const response = await api.post(`${VITE_URL_APP}/auth/login`, credentials);
+    console.log(response);
+    return response.data;
+  },
+  refresh: async () => {
+    const response = await api.get(`${VITE_URL_APP}/auth/refresh`);
+    console.log(response);
+    return response.data;
+  },
+  me: async () => {
+    const response = await api.get(`${VITE_URL_APP}/auth/me`);
     return response.data;
   },
 };

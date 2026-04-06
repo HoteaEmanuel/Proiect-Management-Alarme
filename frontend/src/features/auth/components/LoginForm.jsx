@@ -17,19 +17,27 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
     reset,
     formState: { errors, isSubmitting },
   } = useForm();
 
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const { user, setUser } = useAuthStore();
-  
-  const onSubmit = (data) => {
-    login(data);
-    console.log("AUTH USER: ");
-    console.log(user);
-    reset();
-    navigate("/dashboard");
+  // const [error, setError] = useState(undefined);
+  const { setAuth} = useAuthStore();
+  const onSubmit = async (data) => {
+    try {
+      const response = await login(data);
+      console.log(response);
+      setAuth(response.user,response.access_token);
+      reset();
+      navigate("/dashboard");
+      
+    } catch (err) {
+      setError("server",{
+        message:err.response.data.detail
+      });
+    }
   };
 
   console.log(errors);
@@ -39,6 +47,7 @@ const LoginForm = () => {
       className=" w-2/3 h-2/3 md:w-1/4 md:h-1/2  flex flex-col justify-center items-center gap-4 border-2 rounded-2xl p-4 shadow-2xl has-focus:border-blue-800"
     >
       <h1 className="heading">Log in</h1>
+      {errors.server && <p className="text-red-500"> {errors.server.message}</p>}
       <label htmlFor="username" className="w-full text-left">
         Username
       </label>
