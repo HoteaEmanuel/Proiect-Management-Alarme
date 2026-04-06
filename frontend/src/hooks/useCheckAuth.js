@@ -4,10 +4,12 @@ import { authApi } from "../features/auth/api/auth.api";
 
 const useCheckAuth = () => {
   const { setUser, clearAuth } = useAuthStore();
-
-  console.log("AICI")
   useEffect(() => {
-    authApi.me();
+    try {
+      authApi.me();
+    } catch (err) {
+      clearAuth();
+    }
   }, []);
 };
 

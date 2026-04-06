@@ -6,7 +6,6 @@ from sqlalchemy import or_
 
 def get_filtered_alarms(db: Session, filters: RequestFilters):
     query = db.query(Alarm)
-
     #filtrez dupa fiecare camp, daca nu e gol
     if filters.status:
         query = query.filter(Alarm.status == filters.status)
@@ -29,9 +28,12 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
     
     #filtrez si dupa data, daca am primit toate datele necesare
     if filters.date_column_to_filter and filters.start_date and filters.end_date:
+        print("FILTRARE DATA")
         if filters.start_date > filters.end_date:
             raise ValueError("Start date cannot be greater than end date.")
         date_column = getattr(Alarm, filters.date_column_to_filter, None)
+        print("DATE COLUMN")
+        print(date_column)
         if date_column is not None:
             if filters.start_date:
                 query = query.filter(date_column >= filters.start_date)

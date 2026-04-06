@@ -7,3 +7,11 @@ export const useGetAllAlarms = () => {
     queryKey: ["alarms"],
   });
 };
+
+export const useGetFilteredAlarms=(filters)=>{
+  const { getFilteredAlarms } = alarmsApi;
+  return useQuery({
+    queryFn:()=>getFilteredAlarms(filters),
+    queryKey:["filtered_alarms"]
+  })
+}

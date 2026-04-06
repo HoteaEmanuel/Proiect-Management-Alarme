@@ -44,6 +44,9 @@ class LoginRequest(BaseModel):
 
 class UserResponse(BaseModel):
     user_id:int
+    username:str
+    first_name:str
+    last_name:str
     
     
 class TokenResponse(BaseModel):
@@ -135,7 +138,7 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
         )
     
     
-    userResponse = UserResponse(user_id=user.id)
+    userResponse = UserResponse(user_id=user.id, username=user.username, first_name=user.first_name,last_name=user.last_name)
     return {
         "access_token": accesToken,
         "user":jsonable_encoder(userResponse),

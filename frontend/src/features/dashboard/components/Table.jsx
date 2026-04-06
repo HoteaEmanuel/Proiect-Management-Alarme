@@ -46,7 +46,7 @@ const columns = [
             : getValue().toLowerCase() === "warning"
               ? "bg-yellow-300 text-yellow-700"
               : getValue().toLowerCase() === "major"
-                ? "bg-green-100 text-green-700"
+                ? "bg-orange-100 text-orange-700"
                 : "bg-yellow-100 "
         }`}
       >
@@ -82,7 +82,9 @@ const columns = [
 
 export const AlarmsTable = (data) => {
   const [sorting, setSorting] = useState([]);
+
   //   const { data:alarms, isPending: } = useGetAllAlarms();
+  console.log(data);
   const alarms = data.data;
   console.log("ALARMS:");
   console.log(alarms);
