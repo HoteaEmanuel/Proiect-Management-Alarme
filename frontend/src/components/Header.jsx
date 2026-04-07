@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <div className="w-screen h-1/10 flex items-center justify-end p-2 border-2">
       <h1>
-        Welcome: <span className="font-bold">{user.first_name + ' ' +user.last_name}</span>
+        Welcome: <span className="font-bold">{user.username}</span>
       </h1>
     </div>
   );

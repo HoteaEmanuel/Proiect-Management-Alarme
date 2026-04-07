@@ -6,7 +6,7 @@ const ProtectedRoute = () => {
   const { user, accessToken } = useAuthStore();
 
   console.log(user,accessToken);
-  if (user == null) return <Navigate to={"/login"} />;
+  if (user == null || accessToken==null) return <Navigate to={"/login"} />;
   return <div>
     <Outlet/>
   </div>
