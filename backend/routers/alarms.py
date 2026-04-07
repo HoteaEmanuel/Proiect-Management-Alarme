@@ -23,10 +23,12 @@ def get_resources(filters: RequestFilters = Depends(), db: Session = Depends(get
         raise HTTPException(status_code=400, detail="Invalid page number")
     
     #preiau alarmele filtrate, sortate si paginate
-    alarms_list = get_filtered_alarms(db, filters)
+    try:
+        total_alarms, alarms_list = get_filtered_alarms(db, filters)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     #calculez numarul de pagini (pe baza numarului total de alarme)  
-    total_alarms = alarms_list.__len__()
     total_pages = (total_alarms + filters.page_size - 1) // filters.page_size
 
     return {

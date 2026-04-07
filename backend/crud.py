@@ -54,11 +54,14 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
     else:
         query = query.order_by(sorting_column.desc())
 
+    #nr total de rezultate
+    total_alarms = query.count()
+
     #paginez rezultatele
     offset = (filters.current_page - 1) * filters.page_size
     query = query.offset(offset).limit(filters.page_size)
 
-    return query.all()
+    return total_alarms, query.all()
 
 def create_alarm(db: Session, alarm_data: AlarmCreate):
     #verific daca exista deja alarma
