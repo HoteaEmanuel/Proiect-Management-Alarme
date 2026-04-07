@@ -45,8 +45,6 @@ class LoginRequest(BaseModel):
 class UserResponse(BaseModel):
     user_id:int
     username:str
-    first_name:str
-    last_name:str
     
     
 class TokenResponse(BaseModel):
@@ -124,7 +122,7 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
     # Creare acces token + refresh token 
     # Acces token ul se pastreaza in memorie => il returnez
     accesToken = create_jwt_token(user.username, user.id, timedelta(minutes=15))
-    refreshToken = create_jwt_token(user.username, user.id, timedelta(days=30))
+    refreshToken = create_jwt_token(user.username, user.id, timedelta(days=7))
     
     
     # Salvam refresh token in cookie HttpOnly pentru protectie
@@ -138,7 +136,7 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
         )
     
     
-    userResponse = UserResponse(user_id=user.id, username=user.username, first_name=user.first_name,last_name=user.last_name)
+    userResponse = UserResponse(user_id=user.id, username=user.username)
     return {
         "access_token": accesToken,
         "user":jsonable_encoder(userResponse),
@@ -161,6 +159,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate user"
             )
+        # Returnez userul
         return {"username": username, "id": user_id}
     
     except ExpiredSignatureError:
@@ -204,8 +203,10 @@ async def refresh_token(
 
         # genereaza un nou access token
         new_acces_token = create_jwt_token(username, user_id, timedelta(minutes=15))
-
-        return { "accessToken": new_acces_token }
+        userResponse = UserResponse(user_id=user_id, username=username)
+        return { "accessToken": new_acces_token, "user": userResponse }
 
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Refresh token expired")

@@ -1,11 +1,15 @@
 // src/features/alarms/components/AlarmsTable.jsx
+import { useGetAllAlarms, useGetFilteredAlarms } from "../hooks/alarms.queries";
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   flexRender,
+  getPaginationRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { useState, useMemo } from "react";
+import { formatDate } from "../../../utils/formatDate";
 
 const columns = [
   {
@@ -66,6 +70,22 @@ const columns = [
       </span>
     ),
   },
+  {
+    accessorKey: "summary",
+    header: "Alarm Summary",
+    cell: ({ getValue }) => <span>{getValue()}</span>,
+  },
+  {
+    accessorKey: "first_occurence_datetime",
+    header: "First Occurence",
+    cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
+  },
+
+  {
+    accessorKey: "last_occurence_datetime",
+    header: "Last Occurence",
+    cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
+  },
   //   {
   //     id: "actions",
   //     header: "Actiuni",
@@ -80,25 +100,40 @@ const columns = [
   //   },
 ];
 
-export const AlarmsTable = (data) => {
+export const AlarmsTable = ({ data,totalCount, pagination, onPaginationChange }) => {
   const [sorting, setSorting] = useState([]);
-
-  //   const { data:alarms, isPending: } = useGetAllAlarms();
   console.log(data);
-  const alarms = data.data;
-  console.log("ALARMS:");
-  console.log(alarms);
+  console.log(pagination);
+  console.log(totalCount)
+  const alarms = data;
   const table = useReactTable({
     data: alarms,
     columns,
-    state: { sorting },
+    state: { pagination },
+    manualPagination: true,
+    rowCount: totalCount,
+    onPaginationChange,
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
+
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const {
+    getHeaderGroups,
+    getRowModel,
+    firstPage,
+    previousPage,
+    lastPage,
+    nextPage,
+    getCanNextPage,
+    getCanPreviousPage,
+  } = table;
+
   return (
-    <div className="rounded-xl border border-gray-200 overflow-hidden">
+    <div className="rounded-xl border border-gray-200">
       <table className="w-full text-sm">
         <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
           {table.getHeaderGroups().map((headerGroup) => (
@@ -107,7 +142,7 @@ export const AlarmsTable = (data) => {
                 <th
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
-                  className="px-4 py-3 text-left font-medium cursor-pointer select-none hover:text-gray-700"
+                  className="px-4 py-3 text-left font-mediumcursor-pointer select-none hover:text-gray-700"
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -136,6 +171,28 @@ export const AlarmsTable = (data) => {
           ))}
         </tbody>
       </table>
+
+      <div className="flex w-full gap-4 bg-red-100">
+        <button onClick={() => firstPage()} className="btn">
+          First page
+        </button>
+
+        <button
+          onClick={() => previousPage()}
+          disabled={!getCanPreviousPage()}
+          className="btn"
+        >
+          Previous page
+        </button>
+
+        <button
+          onClick={() => nextPage()}
+          disabled={!getCanNextPage()}
+          className="btn"
+        >
+          Next page
+        </button>
+      </div>
 
       {data.length === 0 && (
         <div className="text-center py-12 text-gray-400">Nu exista date</div>

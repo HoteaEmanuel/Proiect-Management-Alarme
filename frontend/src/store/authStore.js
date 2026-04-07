@@ -16,7 +16,10 @@ export const useAuthStore = create(
         accessToken: token,
         isAuthenticated: true,
       }),
-      setAccessToken:(token)=>set({accessToken:token}),
+      setAccessToken:(token)=>{
+        console.log("AICEA MAI")
+        set({accessToken:token})
+      },
 
       setLoading: (val) => set({ isLoading: val }),
       setError: (err) => set({ error: err }),

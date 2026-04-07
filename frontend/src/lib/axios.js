@@ -6,49 +6,50 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials:true
+  withCredentials: true,
 });
 const refreshClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true
+  withCredentials: true,
 });
 
 // Request in care trimitem acces okenul stocat in localStorage
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().accessToken
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
+  const token = useAuthStore.getState().accessToken;
+  console.log("TOKEN AICI: ", token);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
 });
 
-
+// Intercepteaza requestul si daca e unauthorized da request la refresh pentru a actualiza acces tokenul
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-
     const originalRequest = error.config;
 
     if (
       error.response?.status === 401 &&
-      !originalRequest._retry && !originalRequest.url.includes("/auth/refresh")
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh")
     ) {
       originalRequest._retry = true;
 
-      const refreshResponse = await refreshClient.post("/auth/refresh");
-
-      const newToken = refreshResponse.data.accessToken;
-
-      useAuthStore().getState().setAccesToken(newToken);
-
-      originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-      return api(originalRequest);
+      try {
+        const refreshResponse = await refreshClient.post("/auth/refresh");
+        const newToken = refreshResponse.data.accessToken;
+        const user = refreshResponse.data.user;
+        console.log("REFRESH OK : ", newToken, user);
+        useAuthStore.getState().setAuth(user, newToken);
+        console.log("AICEA");
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        console.log("AICI S A AJUNS");
+        return api(originalRequest);
+      } catch (err) {
+        // Refresh failed => log the user out
+        // Refresh token expired or other problem
+        useAuthStore.getState().clearAuth();
+      }
     }
-
     return Promise.reject(error);
-  }
+  },
 );
-
-
-
-
-
