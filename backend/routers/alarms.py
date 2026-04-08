@@ -1,8 +1,8 @@
 from datetime import datetime
-
+from sqlalchemy import text
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from crud import get_filtered_alarms, create_alarm, update_alarm
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from database import get_db
 from models.alarm import Alarm
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
@@ -37,6 +37,17 @@ def get_resources(filters: RequestFilters = Depends(), db: Session = Depends(get
         "current_page": filters.current_page,
         "alarms": alarms_list
     }
+
+@router.get("/kpi-stats", response_model=dict[str, dict[str, int | float]])
+def read_kpi_stats(db: Session = Depends(get_db)):
+
+    try:
+        stats = get_kpi_stats(db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    return stats
+
 
 @router.get("/{number}",response_model=AlarmResponse)
 def getAlarmByNumber(number:str,db:Session = Depends(get_db)):
