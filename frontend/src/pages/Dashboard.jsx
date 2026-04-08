@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useAuthStore } from "../store/authStore";
 import { data, useNavigate } from "react-router-dom";
 import {
   useGetAllAlarms,
@@ -8,6 +7,7 @@ import {
 import { AlarmsTable } from "../features/dashboard/components/Table";
 import { useState } from "react";
 import { alarmsApi } from "../features/dashboard/api/alarms.api";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
@@ -39,12 +39,17 @@ const Dashboard = () => {
           <input
             type="date"
             className="border"
-            onChange={(e) =>
+            onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 startDate: e.target.value,
-              }))
-            }
+              }));
+
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
           />
         </div>
 
@@ -53,24 +58,32 @@ const Dashboard = () => {
           <input
             type="date"
             className="border"
-            onChange={(e) =>
+            onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 endDate: e.target.value,
-              }))
-            }
+              }));
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
           />
         </div>
 
         <div className="flex flex-col">
           Status
           <select
-            onChange={(e) =>
+            onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 status: e.target.value,
-              }))
-            }
+              }));
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
             className="border p-2"
           >
             <option value="">All</option>
@@ -84,12 +97,17 @@ const Dashboard = () => {
         <div className="flex flex-col">
           Severity
           <select
-            onChange={(e) =>
+            onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 severity: e.target.value,
-              }))
-            }
+              }));
+
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
             className="border p-2"
           >
             {/* <option value="">Status</option> */}
@@ -103,17 +121,17 @@ const Dashboard = () => {
         </div>
       </div>
       <AlarmsTable
-        data={filteredAlarms?.alarms?.length ? filteredAlarms.alarms : alarms}
-        totalCount={100}
+        data={filteredAlarms?.alarms}
+        totalCount={filteredAlarms?.total_alarms}
         pagination={pagination}
         onPaginationChange={setPagination}
       />
 
-      <div className="flex w-full gap-4">
+      <div className="flex w-full gap-4 justify-end">
         <h1>Total alarms: {alarms?.length}</h1>
         <h1>Total filteredAlarms: {filteredAlarms?.alarms?.length}</h1>
         <h1>
-          Page: {pagination.pageIndex + 1} /{" "}
+          Page: <span className="font-bold">{pagination.pageIndex + 1} </span> /{" "}
           {filteredAlarms?.total_pages}
         </h1>
       </div>

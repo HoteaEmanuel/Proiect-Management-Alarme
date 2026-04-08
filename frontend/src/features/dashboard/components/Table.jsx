@@ -1,5 +1,3 @@
-// src/features/alarms/components/AlarmsTable.jsx
-import { useGetAllAlarms, useGetFilteredAlarms } from "../hooks/alarms.queries";
 import {
   useReactTable,
   getCoreRowModel,
@@ -7,10 +5,11 @@ import {
   flexRender,
   getPaginationRowModel,
   getFilteredRowModel,
+  ColumnFaceting,
 } from "@tanstack/react-table";
 import { useState, useMemo } from "react";
-import { formatDate } from "../../../utils/formatDate";
-
+import { formatDate } from "../../../utils/formatDate.js";
+import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 const columns = [
   {
     accessorKey: "alarm_number",
@@ -100,11 +99,17 @@ const columns = [
   //   },
 ];
 
-export const AlarmsTable = ({ data,totalCount, pagination, onPaginationChange }) => {
+export const AlarmsTable = ({
+  data,
+  totalCount,
+  pagination,
+  onPaginationChange,
+}) => {
   const [sorting, setSorting] = useState([]);
   console.log(data);
   console.log(pagination);
-  console.log(totalCount)
+  console.log(totalCount);
+  console.log(data.length);
   const alarms = data;
   const table = useReactTable({
     data: alarms,
@@ -177,24 +182,25 @@ export const AlarmsTable = ({ data,totalCount, pagination, onPaginationChange })
           First page
         </button>
 
-        <button
-          onClick={() => previousPage()}
-          disabled={!getCanPreviousPage()}
-          className="btn"
-        >
-          Previous page
+        <button onClick={() => previousPage()} disabled={!getCanPreviousPage()}>
+          {getCanPreviousPage() && (
+            <MdNavigateBefore className="size-7 hover:scale-110 cursor-pointer" />
+          )}
         </button>
 
         <button
           onClick={() => nextPage()}
           disabled={!getCanNextPage()}
-          className="btn"
+
+          // className="btn"
         >
-          Next page
+          {getCanNextPage() && (
+            <MdNavigateNext className="size-7 hover:scale-110 cursor-pointer" />
+          )}
         </button>
       </div>
 
-      {data.length === 0 && (
+      {totalCount === 0 && (
         <div className="text-center py-12 text-gray-400">Nu exista date</div>
       )}
     </div>
