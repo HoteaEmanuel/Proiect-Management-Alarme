@@ -41,8 +41,7 @@ class AlarmPaginationResponse(BaseModel):
     current_page: int
     alarms: list[AlarmResponse]
 
-@dataclass
-class RequestFilters:
+class RequestFilters(BaseModel):
     current_page: int = 1 
     page_size: int = 10 
     sort_by: str = "alarm_number"
