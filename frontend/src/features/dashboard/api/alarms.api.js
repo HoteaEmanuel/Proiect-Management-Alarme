@@ -12,9 +12,10 @@ export const alarmsApi = {
     }
   },
 
-  getFilteredAlarms: async ({ filters, pagination }) => {
+  getFilteredAlarms: async ({ filters, pagination, sorting }) => {
     console.log("FILTERS: ", filters);
     console.log(pagination);
+    console.log(sorting[0]);
     let url = `${VITE_URL_APP}/alarms/resources?`;
     if (filters?.startDate) url += "start_date=" + filters.startDate + "&&";
     if (filters?.endDate) url += "end_date=" + filters.endDate + "&&";
@@ -25,6 +26,8 @@ export const alarmsApi = {
       (pagination.pageIndex+1) +
       "&&page_size=" +
       pagination.pageSize;
+
+    if(sorting[0]?.id) url+="&&sort_by="+sorting[0].id+"&&sort_order=" +(sorting[0].desc===false ? "asc":"desc");
 
     console.log(url);
     const response = await api.get(url);

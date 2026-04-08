@@ -5,9 +5,7 @@ import {
   flexRender,
   getPaginationRowModel,
   getFilteredRowModel,
-  ColumnFaceting,
 } from "@tanstack/react-table";
-import { useState, useMemo } from "react";
 import { formatDate } from "../../../utils/formatDate.js";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 const columns = [
@@ -72,7 +70,7 @@ const columns = [
   {
     accessorKey: "summary",
     header: "Alarm Summary",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
+    // cell: ({ getValue }) => <span>{getValue()}</span>,
   },
   {
     accessorKey: "first_occurence_datetime",
@@ -85,18 +83,6 @@ const columns = [
     header: "Last Occurence",
     cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
   },
-  //   {
-  //     id: "actions",
-  //     header: "Actiuni",
-  //     cell: ({ row }) => (
-  //       <button
-  //         onClick={() => console.log(row.original)}
-  //         className="text-sm text-blue-500 hover:underline"
-  //       >
-  //         Vezi
-  //       </button>
-  //     ),
-  //   },
 ];
 
 export const AlarmsTable = ({
@@ -104,34 +90,41 @@ export const AlarmsTable = ({
   totalCount,
   pagination,
   onPaginationChange,
+  sorting,
+  onSortingChange,
 }) => {
-  const [sorting, setSorting] = useState([]);
   console.log(data);
   console.log(pagination);
   console.log(totalCount);
-  console.log(data.length);
+  console.log(data?.length);
   const alarms = data;
   const table = useReactTable({
     data: alarms,
     columns,
-    state: { pagination },
+    state: { pagination, sorting: sorting ?? [] },
     manualPagination: true,
     rowCount: totalCount,
-    onPaginationChange,
+    onPaginationChange: onPaginationChange,
+    manualSorting: true,
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-
+    onSortingChange: (updater) => {
+      const newSort = typeof updater === "function" ? updater(sorting) : updater;
+      const safeSort = Array.isArray(newSort) ? newSort : [];
+      onSortingChange?.(safeSort);
+      onPaginationChange((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    },
+    enableMultiSort: false,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
 
   const {
-    getHeaderGroups,
-    getRowModel,
     firstPage,
     previousPage,
-    lastPage,
     nextPage,
     getCanNextPage,
     getCanPreviousPage,
@@ -147,7 +140,7 @@ export const AlarmsTable = ({
                 <th
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
-                  className="px-4 py-3 text-left font-mediumcursor-pointer select-none hover:text-gray-700"
+                  className="px-4 py-3 text-left font-medium cursor-pointer select-none hover:text-gray-700"
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -200,7 +193,7 @@ export const AlarmsTable = ({
         </button>
       </div>
 
-      {totalCount === 0 && (
+      {alarms?.length === 0 && (
         <div className="text-center py-12 text-gray-400">Nu exista date</div>
       )}
     </div>

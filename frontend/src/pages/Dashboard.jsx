@@ -14,20 +14,25 @@ const Dashboard = () => {
   const [filters, setFilters] = useState(undefined);
 
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [sorting, setSorting] = useState([]);
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
   useEffect(() => {
     const fetchAlarms = async () => {
-      const data = await alarmsApi.getFilteredAlarms({ filters, pagination });
+      console.log("SORTING AICEA: ",sorting);
+      const data = await alarmsApi.getFilteredAlarms({ filters, pagination, sorting });
       setFilteredAlarms(data);
     };
 
     fetchAlarms();
-  }, [filters, pagination]);
+  }, [filters, pagination,sorting]);
   console.log("FILTERS: ", filters);
   console.log(filteredAlarms);
   console.log("PAGINATION");
   console.log(pagination);
+
+    console.log("SORTING");
+    console.log(sorting);
   if (isPendingAlarms) return <p>Loading...</p>;
   console.log(alarms);
   return (
@@ -125,6 +130,8 @@ const Dashboard = () => {
         totalCount={filteredAlarms?.total_alarms}
         pagination={pagination}
         onPaginationChange={setPagination}
+        sorting={sorting}
+        onSortingChange={setSorting}
       />
 
       <div className="flex w-full gap-4 justify-end">
