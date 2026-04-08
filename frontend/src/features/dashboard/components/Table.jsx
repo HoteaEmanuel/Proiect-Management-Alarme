@@ -14,27 +14,16 @@ const columns = [
     header: "Alarm number",
     cell: ({ getValue }) => <span>{getValue()}</span>,
   },
-
   {
-    accessorKey: "alert_group",
-    header: "Alert group",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-  },
-  {
-    accessorKey: "company",
-    header: "Company",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-  },
-  {
-    accessorKey: "project",
-    header: "Project",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-  },
-
-  {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ getValue }) => (
+      <span
+        className={`${getValue().toLowerCase() === "active" ? "bg-green-100 text-green-700" : getValue().toLowerCase() === "acknowledged" ? "bg-amber-100 text-yellow-700" : getValue().toLowerCase() === "cleared" ? "bg-green-50 text-green-800" : "bg-red-100 text-red-700"} p-1 rounded-xl`}
+      >
+        {getValue()}
+      </span>
+    ),
   },
   {
     accessorKey: "severity",
@@ -55,17 +44,10 @@ const columns = [
       </span>
     ),
   },
-
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ getValue }) => (
-      <span
-        className={`${getValue().toLowerCase() === "active" ? "bg-green-100 text-green-700" : getValue().toLowerCase() === "acknowledged" ? "bg-amber-100 text-yellow-700" : getValue().toLowerCase() === "cleared" ? "bg-green-50 text-green-800" : "bg-red-100 text-red-700"} p-1 rounded-xl`}
-      >
-        {getValue()}
-      </span>
-    ),
+    accessorKey: "server_name",
+    header: "Server",
+    // cell: ({ getValue }) => <span>{getValue()}</span>,
   },
   {
     accessorKey: "summary",
@@ -73,16 +55,37 @@ const columns = [
     // cell: ({ getValue }) => <span>{getValue()}</span>,
   },
   {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ getValue }) => <span>{getValue()}</span>,
+  },
+  {
+    accessorKey: "alert_group",
+    header: "Alert group",
+    cell: ({ getValue }) => <span>{getValue()}</span>,
+  },
+  {
     accessorKey: "first_occurence_datetime",
     header: "First Occurence",
     cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
   },
 
+  // {
+  //   accessorKey: "company",
+  //   header: "Company",
+  //   cell: ({ getValue }) => <span>{getValue()}</span>,
+  // },
   {
-    accessorKey: "last_occurence_datetime",
-    header: "Last Occurence",
-    cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
+    accessorKey: "project",
+    header: "Project",
+    cell: ({ getValue }) => <span>{getValue()}</span>,
   },
+
+  // {
+  //   accessorKey: "last_occurence_datetime",
+  //   header: "Last Occurence",
+  //   cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
+  // },
 ];
 
 export const AlarmsTable = ({
@@ -109,7 +112,8 @@ export const AlarmsTable = ({
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: (updater) => {
-      const newSort = typeof updater === "function" ? updater(sorting) : updater;
+      const newSort =
+        typeof updater === "function" ? updater(sorting) : updater;
       const safeSort = Array.isArray(newSort) ? newSort : [];
       onSortingChange?.(safeSort);
       onPaginationChange((prev) => ({

@@ -12,6 +12,17 @@ export const useGetFilteredAlarms=(filters)=>{
   const { getFilteredAlarms } = alarmsApi;
   return useQuery({
     queryFn:()=>getFilteredAlarms(filters),
-    queryKey:["filtered_alarms"]
+    queryKey:["filtered_alarms"],
+    staleTime:1000*30
+  })
+}
+
+
+export const useGetStatistics=()=>{
+  const { getStatistics} = alarmsApi;
+    return useQuery({
+    queryFn:()=>getStatistics(),
+    queryKey:["statistics"],
+    staleTime:1000*30
   })
 }

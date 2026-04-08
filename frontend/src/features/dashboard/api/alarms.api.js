@@ -1,4 +1,3 @@
-import axios from "axios";
 import { api } from "../../../lib/axios.js";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -21,17 +20,32 @@ export const alarmsApi = {
     if (filters?.endDate) url += "end_date=" + filters.endDate + "&&";
     if (filters?.status) url += "status=" + filters.status + "&&";
     if (filters?.severity) url += "severity=" + filters.severity + "&&";
+    if (filters?.type) url += "type=" + filters.type + "&&";
+    if (filters?.summary) url += "summary_like=" + filters.summary + "&&";
+
+    if(filters?.server) url += "server_name=" + filters.server+"&&";  
+     if(filters?.alert_description) url += "alert_description_like=" + filters.alert_description+"&&";  
     url +=
       "current_page=" +
-      (pagination.pageIndex+1) +
+      (pagination.pageIndex + 1) +
       "&&page_size=" +
       pagination.pageSize;
 
-    if(sorting[0]?.id) url+="&&sort_by="+sorting[0].id+"&&sort_order=" +(sorting[0].desc===false ? "asc":"desc");
+    if (sorting[0]?.id)
+      url +=
+        "&&sort_by=" +
+        sorting[0].id +
+        "&&sort_order=" +
+        (sorting[0].desc === false ? "asc" : "desc");
 
     console.log(url);
     const response = await api.get(url);
     console.log(response);
+    return response.data;
+  },
+
+  getStatistics: async () => {
+    const response = await api.get(`${VITE_URL_APP}/alarms/kpi-stats`);
     return response.data;
   },
 };

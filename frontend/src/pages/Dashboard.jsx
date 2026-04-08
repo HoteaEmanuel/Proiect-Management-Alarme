@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   useGetAllAlarms,
   useGetFilteredAlarms,
@@ -19,20 +19,24 @@ const Dashboard = () => {
   useGetFilteredAlarms;
   useEffect(() => {
     const fetchAlarms = async () => {
-      console.log("SORTING AICEA: ",sorting);
-      const data = await alarmsApi.getFilteredAlarms({ filters, pagination, sorting });
+      console.log("SORTING AICEA: ", sorting);
+      const data = await alarmsApi.getFilteredAlarms({
+        filters,
+        pagination,
+        sorting,
+      });
       setFilteredAlarms(data);
     };
 
     fetchAlarms();
-  }, [filters, pagination,sorting]);
+  }, [filters, pagination, sorting]);
   console.log("FILTERS: ", filters);
   console.log(filteredAlarms);
   console.log("PAGINATION");
   console.log(pagination);
 
-    console.log("SORTING");
-    console.log(sorting);
+  console.log("SORTING");
+  console.log(sorting);
   if (isPendingAlarms) return <p>Loading...</p>;
   console.log(alarms);
   return (
@@ -124,6 +128,82 @@ const Dashboard = () => {
             <option value="Info">Info</option>
           </select>
         </div>
+
+        <div className="flex flex-col">
+          Type
+          <select
+            onChange={(e) => {
+              setFilters((prev) => ({
+                ...prev,
+                type: e.target.value,
+              }));
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
+            className="border p-2"
+          >
+            <option value="">All</option>
+            <option value="System">System</option>
+            <option value="Application">Application</option>
+            <option value="Network">Network</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col">
+          Summary
+          <input
+            onChange={(e) => {
+              setFilters((prev) => ({
+                ...prev,
+                summary: e.target.value,
+              }));
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
+            placeholder="Summary"
+            className="border p-2"  
+          ></input>
+        </div>
+
+         <div className="flex flex-col">
+          Server
+          <input
+            onChange={(e) => {
+              setFilters((prev) => ({
+                ...prev,
+                server: e.target.value,
+              }));
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
+            placeholder="Server name"
+            className="border p-2"
+          ></input>
+        </div>
+
+        <div className="flex flex-col">
+          Description
+          <input
+            onChange={(e) => {
+              setFilters((prev) => ({
+                ...prev,
+                alert_description: e.target.value,
+              }));
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
+            placeholder="Description"
+            className="border p-2"
+          ></input>
+        </div>
       </div>
       <AlarmsTable
         data={filteredAlarms?.alarms}
@@ -141,6 +221,21 @@ const Dashboard = () => {
           Page: <span className="font-bold">{pagination.pageIndex + 1} </span> /{" "}
           {filteredAlarms?.total_pages}
         </h1>
+        <h1>Page size:</h1>
+        <select
+          value={pagination.pageSize}
+          onChange={(e) =>
+            setPagination({
+              pageIndex: 0,
+              pageSize: e.target.value,
+            })
+          }
+          className="flex gap-4 font-bold"
+        >
+          <option value={10}>10</option>
+          <option value={20}>25</option>
+          <option value={50}>50</option>
+        </select>
       </div>
     </div>
   );
