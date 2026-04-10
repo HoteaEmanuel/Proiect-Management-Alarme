@@ -5,7 +5,7 @@ from sqlalchemy import text
 from models.alarm import Alarm
 from models.severity import Severity
 from schemas import RequestFilters, AlarmCreate, AlarmUpdate
-from fastapi import HTTPException
+from models.exceptions import AppError
 
 #TODO: trebuie modificate toate HTTPException-urile sa fie custom, nu cele de HTTP
 #cele HTTP sa fie doar in /routers
@@ -40,7 +40,7 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
         result = db.execute(query, params).mappings().all()
     except Exception as e:
         #daca am gherlit baza de date primesc eroarea si o dau mai departe
-        raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+        raise AppError(status_code=400, detail=f"Database error: {str(e)}")
 
     #daca nu sunt rezultate, back to front :)
     if not result:
@@ -67,7 +67,7 @@ def get_kpi_stats(db: Session):
         result = db.execute(query).mappings().all()
     except Exception as e:
         #TODO: trebuie sa schimb asta sa am o eroare personalizata, nu erori de HTTP
-        raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+        raise AppError(status_code=400, detail=f"Database error: {str(e)}")
 
     if not result:
         return {}
@@ -93,12 +93,12 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
     #verific daca exista deja alarma
     existing_alarm = db.query(Alarm).filter(Alarm.alarm_number == alarm_data.alarm_number).first()
     if existing_alarm:
-        raise HTTPException(status_code=400, detail="Alarm with this number already exists")
+        raise AppError(status_code=400, detail="Alarm with this number already exists")
     
     #verific daca exista severitatea specificata
     severity = db.query(Severity).filter(Severity.id == alarm_data.severity_id).first()
     if not severity:
-        raise HTTPException(status_code=400, detail="Invalid severity ID")
+        raise AppError(status_code=400, detail="Invalid severity ID")
     
     #creez alarma
     new_alarm = Alarm(
@@ -132,7 +132,7 @@ def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
     #verific daca exista alarma pe care doresc sa o modific
     alarm=db.query(Alarm).filter(Alarm.alarm_number==alarm_number).first()
     if not alarm:
-        raise HTTPException(status_code=404, detail="Alarm not found")
+        raise AppError(status_code=404, detail="Alarm not found")
     
     #preiau doar campurile care au fost setate in request (cele care nu sunt None)
     update_data = alarm_data.model_dump(exclude_unset=True)
@@ -142,7 +142,7 @@ def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
         severity = db.query(Severity).filter(Severity.id == update_data["severity_id"]).first()
         if not severity:
             #daca severitatea nu exista, arunc HTTPException
-            raise HTTPException(status_code=400, detail="Invalid severity ID")
+            raise AppError(status_code=400, detail="Invalid severity ID")
     
     #actualizez campurile alarmei cu noile valori
     for field, value in update_data.items():
@@ -150,4 +150,10 @@ def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
     
     db.commit()
     db.refresh(alarm)
+    return alarm
+
+def get_alarm_by_number(db: Session, alarm_number: str):
+    alarm=db.query(Alarm).filter(Alarm.alarm_number==alarm_number).first()
+    if not alarm:
+        raise  AppError(status_code=404, detail="Alarm not found")
     return alarm
