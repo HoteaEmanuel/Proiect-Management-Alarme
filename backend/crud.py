@@ -141,7 +141,6 @@ def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
     if "severity_id" in update_data:
         severity = db.query(Severity).filter(Severity.id == update_data["severity_id"]).first()
         if not severity:
-            #daca severitatea nu exista, arunc HTTPException
             raise AppError(status_code=400, detail="Invalid severity ID")
     
     #actualizez campurile alarmei cu noile valori
