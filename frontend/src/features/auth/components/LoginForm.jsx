@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/authStore";
 import { authApi } from "../api/auth.api";
 
+import "../../../styles/features/auth/components/LoginForm.css";
+
 const LoginForm = () => {
   const navigate = useNavigate();
 
@@ -44,16 +46,18 @@ const LoginForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className=" w-2/3 h-2/3 md:w-1/4 md:h-1/2  flex flex-col justify-center items-center gap-4 border-2 rounded-2xl p-4 shadow-2xl has-focus:border-blue-800"
+      className="login-form"
     >
-      <h1 className="heading">Log in</h1>
-      {errors.server && <p className="text-red-500"> {errors.server.message}</p>}
-      <label htmlFor="username" className="w-full text-left">
+      <h1 className="login-form-title">Log in</h1>
+
+      {errors.server && <p className="login-form-error"> {errors.server.message}</p>}
+
+      <label htmlFor="username" className="login-form-label">
         Username
       </label>
 
       {errors.username && (
-        <p className="text-red-500 w-full">{errors.username.message}</p>
+        <p className="login-form-error">{errors.username.message}</p>
       )}
       <Input
         {...register("username", {
@@ -70,10 +74,11 @@ const LoginForm = () => {
         id={"username"}
       />
 
-      <label htmlFor="password" className="w-full text-left">
+      <label htmlFor="password" className="login-form-label">
         Password
       </label>
-      <div className="relative w-full ">
+
+      <div className="login-form-password">
         <div>
           <Input
             {...register("password", {
@@ -88,23 +93,23 @@ const LoginForm = () => {
             })}
             id={"password"}
             type={passwordVisible ? "text" : "password"}
-            style={{ paddingRight: "20px" }}
           />
         </div>
+
         {passwordVisible ? (
           <FaEyeSlash
-            className="absolute top-1/3 right-1 cursor-pointer"
+            className="login-form-password-icon"
             onClick={() => setPasswordVisible(passwordVisible ? false : true)}
           />
         ) : (
           <FaEye
-            className="absolute top-1/3 right-1 cursor-pointer"
+            className="login-form-password-icon"
             onClick={() => setPasswordVisible(passwordVisible ? false : true)}
           />
         )}
       </div>
 
-      <button className="btn w-1/2">
+      <button className="login-form-button">
         {isSubmitting ? "Submitting... " : "Log in"}
       </button>
     </form>

@@ -1,6 +1,6 @@
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
-:root {
+/* :root {
   --font-size: 16px;
   --background: #0a0e1a;
   --foreground: #e5e7eb;
@@ -123,9 +123,9 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-critical: var(--critical);
-}
+} */
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border outline-ring/50;
   }
@@ -133,11 +133,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
 
   html {
     font-size: var(--font-size);
@@ -184,4 +179,4 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
-}
+} */

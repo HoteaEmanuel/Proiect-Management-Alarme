@@ -1,0 +1,70 @@
+.login-form {
+  width: min(100%, 24rem);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.login-form-title {
+  margin: 0 0 0.75rem;
+  color: var(--color-text);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  line-height: 1.1;
+}
+
+.login-form-label {
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+
+.login-form-error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+}
+
+.login-form-password {
+  position: relative;
+}
+
+.login-form-password .input {
+  padding-right: 2.5rem;
+}
+
+.login-form-password-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.85rem;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.login-form-button {
+  width: 100%;
+  margin-top: 0.75rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  padding: 0.75rem 1rem;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+.login-form-button:hover {
+  opacity: 0.9;
+}
+
+.login-form-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
