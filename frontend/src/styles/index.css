@@ -1,34 +1,34 @@
 :root {
-  /* Colors */
-  --color-bg: #0b1220;
-  --color-surface: #111827;
-  --color-surface-muted: #162033;
-  --color-border: #1f2a3d;
+    /* Colors */
+    --color-bg: #0b1220;
+    --color-surface: #111827;
+    --color-surface-muted: #162033;
+    --color-border: #1f2a3d;
 
-  --color-text: #e5e7eb;
-  --color-text-muted: #94a3b8;
+    --color-text: #e5e7eb;
+    --color-text-muted: #94a3b8;
 
-  --color-accent: #06b6d4;
-  --color-success: #10b981;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
+    --color-accent: #06b6d4;
+    --color-success: #10b981;
+    --color-danger: #ef4444;
+    --color-warning: #f59e0b;
 
-  /* Font sizes */
-  --fs-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.85rem);
-  --fs-sm: clamp(0.875rem, 0.82rem + 0.2vw, 1rem);
-  --fs-md: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --fs-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.35rem);
-  --fs-xl: clamp(1.5rem, 1.25rem + 0.8vw, 2rem);
-  --fs-2xl: clamp(2rem, 1.6rem + 1.4vw, 3rem);
+    /* Font sizes */
+    --fs-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.85rem);
+    --fs-sm: clamp(0.875rem, 0.82rem + 0.2vw, 1rem);
+    --fs-md: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    --fs-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.35rem);
+    --fs-xl: clamp(1.5rem, 1.25rem + 0.8vw, 2rem);
+    --fs-2xl: clamp(2rem, 1.6rem + 1.4vw, 3rem);
 
-  /* Font weights */
-  --fw-regular: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600;
-  --fw-bold: 700;
+    /* Font weights */
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
 
-  /* Radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+    /* Radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
 }
