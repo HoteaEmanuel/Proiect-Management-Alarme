@@ -1,0 +1,53 @@
+.home-page {
+
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    padding: clamp(1.5rem, 5vw, 4rem);
+    text-align: center;
+}
+
+.home-title {
+
+    margin: 0;
+    max-width: 50rem;
+    color: var(--color-text);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    line-height: 1.1;
+}
+
+.home-subtitle {
+
+    margin: 0;
+    max-width: 42rem;
+    color: var(--color-text-muted);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-medium);
+    line-height: 1.2;
+}
+
+.home-button {
+
+    margin-top: 1rem;
+    border: 0;
+    border-radius: var(--radius-md);
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    padding: 0.8rem 1.2rem;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+
+    &:hover {
+
+        opacity: 0.9;
+    }
+}
