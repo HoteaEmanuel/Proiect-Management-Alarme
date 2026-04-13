@@ -17,7 +17,6 @@ export const useAuthStore = create(
         isAuthenticated: true,
       }),
       setAccessToken:(token)=>{
-        console.log("AICEA MAI")
         set({accessToken:token})
       },
 

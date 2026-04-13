@@ -9,6 +9,7 @@ import UnauthRoute from "./components/UnauthRoute.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import useCheckAuth from "./hooks/useCheckAuth.js";
 import { Statistics } from "./pages/Statistics.jsx";
+import Settings from "./pages/Settings.jsx";
 function App() {
   console.log("IN APP");
 
@@ -23,7 +24,8 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Rootlayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/stats" element={<Statistics />} />
+          <Route path="/dashboard/statistics" element={<Statistics />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Route>
 
