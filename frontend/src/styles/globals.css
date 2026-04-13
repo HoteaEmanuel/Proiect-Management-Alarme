@@ -1,5 +1,5 @@
-/* @import 'tailwindcss';
-@theme{
+ @import 'tailwindcss';
+/* @theme{
 
 }
 
@@ -16,4 +16,4 @@ label{
     .btn{
         @apply inline-flex items-center justify-center p-2 rounded-2xl border cursor-pointer   bg-blue-500 hover:bg-blue-400 hover:scale-105
     }
-} */
+} */ 

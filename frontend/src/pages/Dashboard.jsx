@@ -206,7 +206,7 @@ const Dashboard = () => {
         </div>
       </div>
       <AlarmsTable
-        data={filteredAlarms?.alarms}
+        data={filteredAlarms?.alarms || []}
         totalCount={filteredAlarms?.total_alarms}
         pagination={pagination}
         onPaginationChange={setPagination}
