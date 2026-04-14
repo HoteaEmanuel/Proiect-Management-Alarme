@@ -23,4 +23,10 @@
     width: 100%;
     display: flex;
     overflow-y: auto;
+
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        
+        display: none;
+    }
 }
