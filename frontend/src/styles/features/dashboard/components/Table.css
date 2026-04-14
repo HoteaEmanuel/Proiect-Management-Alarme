@@ -12,7 +12,7 @@
     width: 100%;
     border-collapse: collapse;
     color: var(--color-text);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
 }
 
 .alarm-table-head {
@@ -35,7 +35,7 @@
 
 .alarm-table-heading {
 
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
     text-align: left;
     font-weight: var(--fw-medium);
     white-space: nowrap;
@@ -50,9 +50,9 @@
 
 .alarm-table-cell {
 
-  padding: 0.75rem 1rem;
-  color: var(--color-text);
-  white-space: nowrap;
+    padding: 0.6rem 0.85rem;
+    color: var(--color-text);
+    white-space: nowrap;
 }
 
 .alarm-table-status,
@@ -61,7 +61,7 @@
     display: inline-flex;
     align-items: center;
     border-radius: var(--radius-lg);
-    padding: 0.25rem 0.6rem;
+    padding: 0.2rem 0.5rem;
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     line-height: 1;
@@ -69,8 +69,8 @@
 
 .alarm-table-status-active {
 
-  background-color: rgba(16, 185, 129, 0.14);
-  color: var(--color-success);
+    background-color: rgba(16, 185, 129, 0.14);
+    color: var(--color-success);
 }
 
 .alarm-table-status-acknowledged {
