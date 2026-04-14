@@ -18,6 +18,8 @@ def getAlarms(db:Session = Depends(get_db)):
 
 @router.get("/resources", response_model=AlarmPaginationResponse)
 def get_resources(filters: RequestFilters = Depends(), db: Session = Depends(get_db)):
+
+    print("test")
     
     #verific daca nu ma gherleste frontendul
     if filters.current_page < 1:
@@ -27,7 +29,9 @@ def get_resources(filters: RequestFilters = Depends(), db: Session = Depends(get
     try:
         total_alarms, alarms_list = get_filtered_alarms(db, filters)
     except AppError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+        raise HTTPException(status_code=e.status_code, detail=e.detail)\
+        
+    print("test2")
 
     #calculez numarul de pagini (pe baza numarului total de alarme)  
     total_pages = (total_alarms + filters.page_size - 1) // filters.page_size

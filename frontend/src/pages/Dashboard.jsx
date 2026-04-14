@@ -7,6 +7,7 @@ import {
 import { AlarmsTable } from "../features/dashboard/components/Table";
 import { useState } from "react";
 import { alarmsApi } from "../features/dashboard/api/alarms.api";
+import "../styles/pages/Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [sorting, setSorting] = useState([]);
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
+
   useEffect(() => {
     const fetchAlarms = async () => {
       console.log("SORTING AICEA: ", sorting);
@@ -30,6 +32,7 @@ const Dashboard = () => {
 
     fetchAlarms();
   }, [filters, pagination, sorting]);
+
   console.log("FILTERS: ", filters);
   console.log(filteredAlarms);
   console.log("PAGINATION");
@@ -37,17 +40,21 @@ const Dashboard = () => {
 
   console.log("SORTING");
   console.log(sorting);
+
   if (isPendingAlarms) return <p>Loading...</p>;
+
   console.log(alarms);
+
   return (
-    <div className="w-full flex flex-col p-5">
-      <h1 className="heading mb-10">Alarms</h1>
-      <div className="flex gap-4 p-2">
-        <div className="flex flex-col">
-          Start date
+    <div className="dashboard-page">
+      <h1 className="dashboard-title">Alarms</h1>
+
+      <div className="dashboard-filters">
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Start date</label>
           <input
             type="date"
-            className="border"
+            className="dashboard-filter-input"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
@@ -62,16 +69,17 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="flex flex-col">
-          End date
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">End date</label>
           <input
             type="date"
-            className="border"
+            className="dashboard-filter-input"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 endDate: e.target.value,
               }));
+
               setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
@@ -80,20 +88,21 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="flex flex-col">
-          Status
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Status</label>
           <select
+            className="dashboard-filter-input"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 status: e.target.value,
               }));
+
               setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
               }));
             }}
-            className="border p-2"
           >
             <option value="">All</option>
             <option value="Active">Active</option>
@@ -103,9 +112,10 @@ const Dashboard = () => {
           </select>
         </div>
 
-        <div className="flex flex-col">
-          Severity
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Severity</label>
           <select
+            className="dashboard-filter-input"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
@@ -117,9 +127,7 @@ const Dashboard = () => {
                 pageIndex: 0,
               }));
             }}
-            className="border p-2"
           >
-            {/* <option value="">Status</option> */}
             <option value="">All</option>
             <option value="Critical">Critical</option>
             <option value="Major">Major</option>
@@ -129,20 +137,21 @@ const Dashboard = () => {
           </select>
         </div>
 
-        <div className="flex flex-col">
-          Type
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Type</label>
           <select
+            className="dashboard-filter-input"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 type: e.target.value,
               }));
+
               setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
               }));
             }}
-            className="border p-2"
           >
             <option value="">All</option>
             <option value="System">System</option>
@@ -151,60 +160,64 @@ const Dashboard = () => {
           </select>
         </div>
 
-        <div className="flex flex-col">
-          Summary
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Summary</label>
           <input
+            className="dashboard-filter-input"
+            placeholder="Summary"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 summary: e.target.value,
               }));
+
               setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
               }));
             }}
-            placeholder="Summary"
-            className="border p-2"  
-          ></input>
+          />
         </div>
 
-         <div className="flex flex-col">
-          Server
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Server</label>
           <input
+            className="dashboard-filter-input"
+            placeholder="Server name"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 server: e.target.value,
               }));
+
               setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
               }));
             }}
-            placeholder="Server name"
-            className="border p-2"
-          ></input>
+          />
         </div>
 
-        <div className="flex flex-col">
-          Description
+        <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Description</label>
           <input
+            className="dashboard-filter-input"
+            placeholder="Description"
             onChange={(e) => {
               setFilters((prev) => ({
                 ...prev,
                 alert_description: e.target.value,
               }));
+
               setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
               }));
             }}
-            placeholder="Description"
-            className="border p-2"
-          ></input>
+          />
         </div>
       </div>
+
       <AlarmsTable
         data={filteredAlarms?.alarms || []}
         totalCount={filteredAlarms?.total_alarms}
@@ -214,23 +227,30 @@ const Dashboard = () => {
         onSortingChange={setSorting}
       />
 
-      <div className="flex w-full gap-4 justify-end">
-        <h1>Total alarms: {alarms?.length}</h1>
-        <h1>Total filteredAlarms: {filteredAlarms?.alarms?.length}</h1>
-        <h1>
-          Page: <span className="font-bold">{pagination.pageIndex + 1} </span> /{" "}
+      <div className="dashboard-pagination-info">
+        <h2 className="dashboard-pagination-text">Total alarms: {alarms?.length}</h2>
+        <h2 className="dashboard-pagination-text">
+          Total filteredAlarms: {filteredAlarms?.alarms?.length}
+        </h2>
+        <h2 className="dashboard-pagination-text">
+          Page: <span className="dashboard-pagination-current">{pagination.pageIndex + 1}</span> /{" "}
           {filteredAlarms?.total_pages}
-        </h1>
-        <h1>Page size:</h1>
+        </h2>
+
+        <label className="dashboard-pagination-label" htmlFor="page-size">
+          Page size:
+        </label>
+
         <select
+          id="page-size"
           value={pagination.pageSize}
+          className="dashboard-page-size-select"
           onChange={(e) =>
             setPagination({
               pageIndex: 0,
               pageSize: e.target.value,
             })
           }
-          className="flex gap-4 font-bold"
         >
           <option value={10}>10</option>
           <option value={20}>25</option>
