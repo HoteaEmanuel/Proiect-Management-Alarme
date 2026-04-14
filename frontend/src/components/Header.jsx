@@ -1,15 +1,18 @@
 import React from "react";
 import { useAuthStore } from "../store/authStore";
+import "../styles/components/Header.css";
 
 const Header = () => {
   const { user } = useAuthStore();
+
   console.log(user);
+
   return (
-    <div className="w-screen h-1/10 flex items-center justify-end p-2 border-2">
-      <h1>
-        Welcome: <span className="font-bold">{user.username}</span>
-      </h1>
-    </div>
+    <header className="header">
+      <p className="header-welcome">
+        Welcome: <span className="header-username">{user.username}</span>
+      </p>
+    </header>
   );
 };
 
