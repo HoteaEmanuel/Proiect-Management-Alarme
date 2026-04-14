@@ -8,6 +8,8 @@ import {
 } from "@tanstack/react-table";
 import { formatDate } from "../../../utils/formatDate.js";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
+import "../../../styles/features/dashboard/components/Table.css";
+
 const columns = [
   {
     accessorKey: "alarm_number",
@@ -18,9 +20,7 @@ const columns = [
     accessorKey: "status",
     header: "Status",
     cell: ({ getValue }) => (
-      <span
-        className={`${getValue().toLowerCase() === "active" ? "bg-green-100 text-green-700" : getValue().toLowerCase() === "acknowledged" ? "bg-amber-100 text-yellow-700" : getValue().toLowerCase() === "cleared" ? "bg-green-50 text-green-800" : "bg-red-100 text-red-700"} p-1 rounded-xl`}
-      >
+      <span className={`alarm-table-status alarm-table-status-${getValue().toLowerCase()}`}>
         {getValue()}
       </span>
     ),
@@ -29,17 +29,7 @@ const columns = [
     accessorKey: "severity",
     header: "Severitate",
     cell: ({ getValue }) => (
-      <span
-        className={`px-2 py-1 rounded-full text-xs ${
-          getValue().toLowerCase() === "critical"
-            ? "bg-red-500 text-red-900"
-            : getValue().toLowerCase() === "warning"
-              ? "bg-yellow-300 text-yellow-700"
-              : getValue().toLowerCase() === "major"
-                ? "bg-orange-100 text-orange-700"
-                : "bg-yellow-100 "
-        }`}
-      >
+      <span className={`alarm-table-severity alarm-table-severity-${getValue().toLowerCase()}`}>
         {getValue()}
       </span>
     ),
@@ -47,12 +37,10 @@ const columns = [
   {
     accessorKey: "server_name",
     header: "Server",
-    // cell: ({ getValue }) => <span>{getValue()}</span>,
   },
   {
     accessorKey: "summary",
     header: "Alarm Summary",
-    // cell: ({ getValue }) => <span>{getValue()}</span>,
   },
   {
     accessorKey: "type",
@@ -69,23 +57,11 @@ const columns = [
     header: "First Occurence",
     cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
   },
-
-  // {
-  //   accessorKey: "company",
-  //   header: "Company",
-  //   cell: ({ getValue }) => <span>{getValue()}</span>,
-  // },
   {
     accessorKey: "project",
     header: "Project",
     cell: ({ getValue }) => <span>{getValue()}</span>,
   },
-
-  // {
-  //   accessorKey: "last_occurence_datetime",
-  //   header: "Last Occurence",
-  //   cell: ({ getValue }) => <span>{formatDate(getValue().toString())}</span>,
-  // },
 ];
 
 export const AlarmsTable = ({
@@ -100,7 +76,9 @@ export const AlarmsTable = ({
   console.log(pagination);
   console.log(totalCount);
   console.log(data?.length);
+
   const alarms = data;
+
   const table = useReactTable({
     data: alarms,
     columns,
@@ -114,8 +92,11 @@ export const AlarmsTable = ({
     onSortingChange: (updater) => {
       const newSort =
         typeof updater === "function" ? updater(sorting) : updater;
+
       const safeSort = Array.isArray(newSort) ? newSort : [];
+
       onSortingChange?.(safeSort);
+
       onPaginationChange((prev) => ({
         ...prev,
         pageIndex: 0,
@@ -135,21 +116,22 @@ export const AlarmsTable = ({
   } = table;
 
   return (
-    <div className="rounded-xl border border-gray-200">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+    <div className="alarm-table-wrapper">
+      <table className="alarm-table">
+        <thead className="alarm-table-head">
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <tr key={headerGroup.id} className="alarm-table-row">
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
-                  className="px-4 py-3 text-left font-medium cursor-pointer select-none hover:text-gray-700"
+                  className="alarm-table-heading"
                 >
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext(),
                   )}
+
                   {header.column.getIsSorted() === "asc"
                     ? " ↑"
                     : header.column.getIsSorted() === "desc"
@@ -161,11 +143,11 @@ export const AlarmsTable = ({
           ))}
         </thead>
 
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="alarm-table-body">
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={row.id} className="alarm-table-row">
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.alarm_number} className="px-4 py-3 text-gray-700">
+                <td key={cell.id} className="alarm-table-cell">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -174,31 +156,36 @@ export const AlarmsTable = ({
         </tbody>
       </table>
 
-      <div className="flex w-full gap-4 bg-red-100">
-        <button onClick={() => firstPage()} className="btn">
+      <div className="alarm-table-actions">
+        <button
+          type="button"
+          onClick={() => firstPage()}
+          className="alarm-table-button"
+        >
           First page
         </button>
 
-        <button onClick={() => previousPage()} disabled={!getCanPreviousPage()}>
-          {getCanPreviousPage() && (
-            <MdNavigateBefore className="size-7 hover:scale-110 cursor-pointer" />
-          )}
+        <button
+          type="button"
+          onClick={() => previousPage()}
+          disabled={!getCanPreviousPage()}
+          className="alarm-table-icon-button"
+        >
+          {getCanPreviousPage() && <MdNavigateBefore className="alarm-table-icon" />}
         </button>
 
         <button
+          type="button"
           onClick={() => nextPage()}
           disabled={!getCanNextPage()}
-
-          // className="btn"
+          className="alarm-table-icon-button"
         >
-          {getCanNextPage() && (
-            <MdNavigateNext className="size-7 hover:scale-110 cursor-pointer" />
-          )}
+          {getCanNextPage() && <MdNavigateNext className="alarm-table-icon" />}
         </button>
       </div>
 
       {alarms?.length === 0 && (
-        <div className="text-center py-12 text-gray-400">Nu exista date</div>
+        <div className="alarm-table-empty">Nu exista date</div>
       )}
     </div>
   );

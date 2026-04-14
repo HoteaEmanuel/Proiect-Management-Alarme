@@ -1,0 +1,187 @@
+.alarm-table-wrapper {
+
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+}
+
+.alarm-table {
+
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--color-text);
+    font-size: var(--fs-sm);
+}
+
+.alarm-table-head {
+
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+}
+
+.alarm-table-row {
+
+    border-bottom: 1px solid var(--color-border);
+}
+
+.alarm-table-body .alarm-table-row:hover {
+
+    background-color: var(--color-surface-muted);
+}
+
+.alarm-table-heading {
+
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: var(--fw-medium);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.alarm-table-heading:hover {
+
+  color: var(--color-text);
+}
+
+.alarm-table-cell {
+
+  padding: 0.75rem 1rem;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.alarm-table-status,
+.alarm-table-severity {
+
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-lg);
+    padding: 0.25rem 0.6rem;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1;
+}
+
+.alarm-table-status-active {
+
+  background-color: rgba(16, 185, 129, 0.14);
+  color: var(--color-success);
+}
+
+.alarm-table-status-acknowledged {
+
+    background-color: rgba(245, 158, 11, 0.14);
+    color: var(--color-warning);
+}
+
+.alarm-table-status-cleared {
+
+    background-color: rgba(16, 185, 129, 0.08);
+    color: var(--color-success);
+}
+
+.alarm-table-status-closed {
+
+    background-color: rgba(239, 68, 68, 0.14);
+    color: var(--color-danger);
+}
+
+.alarm-table-severity-critical {
+
+    background-color: var(--color-danger);
+    color: var(--color-bg);
+}
+
+.alarm-table-severity-warning {
+
+    background-color: rgba(245, 158, 11, 0.22);
+    color: var(--color-warning);
+}
+
+.alarm-table-severity-major {
+
+    background-color: rgba(245, 158, 11, 0.14);
+    color: var(--color-warning);
+}
+
+.alarm-table-severity-minor {
+
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+}
+
+.alarm-table-severity-info {
+
+    background-color: rgba(148, 163, 184, 0.15);
+    color: var(--color-text-muted);
+}
+
+.alarm-table-actions {
+
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface-muted);
+}
+
+.alarm-table-button,
+.alarm-table-icon-button {
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.alarm-table-button {
+
+    padding: 0.45rem 0.75rem;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+}
+
+.alarm-table-icon-button {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    padding: 0.25rem;
+}
+
+.alarm-table-button:hover,
+.alarm-table-icon-button:hover {
+
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.alarm-table-button:disabled,
+.alarm-table-icon-button:disabled {
+
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.alarm-table-icon {
+
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.alarm-table-empty {
+
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: var(--fs-sm);
+}

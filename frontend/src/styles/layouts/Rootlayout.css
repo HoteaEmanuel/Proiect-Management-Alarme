@@ -1,0 +1,26 @@
+.root-layout {
+
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+.root-layout-body {
+
+    width: 100%;
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.root-layout-content {
+
+    width: 100%;
+    display: flex;
+    overflow-y: auto;
+}
