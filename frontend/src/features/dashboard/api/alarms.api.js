@@ -23,7 +23,7 @@ export const alarmsApi = {
     if (filters?.type) url += "type=" + filters.type + "&&";
     if (filters?.summary) url += "summary_like=" + filters.summary + "&&";
 
-    if(filters?.server) url += "server_name=" + filters.server+"&&";  
+    if(filters?.server) url += "server_name_like=" + filters.server+"&&";  
      if(filters?.alert_description) url += "alert_description_like=" + filters.alert_description+"&&";  
     url +=
       "current_page=" +
