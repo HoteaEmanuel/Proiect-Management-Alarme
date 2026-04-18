@@ -10,6 +10,10 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import useCheckAuth from "./hooks/useCheckAuth.js";
 import { Statistics } from "./pages/Statistics.jsx";
 import Settings from "./pages/Settings.jsx";
+import ChatWindow from "./pages/ai-chatbot/ChatWindow.jsx";
+import Chatlayout from "./layouts/Chatlayout.jsx";
+import NewChat from "./pages/ai-chatbot/NewChat.jsx";
+import Chats from "./pages/ai-chatbot/Chats.jsx";
 function App() {
   console.log("IN APP");
 
@@ -26,6 +30,11 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />
+        </Route>
+        <Route element={<Chatlayout />}>
+          {/* <Route path="/chat" element={<ChatWindow />}  /> */}
+          <Route path="/chat/new" element={<NewChat />} />
+          <Route path="/chats" element={<Chats />} />
         </Route>
       </Route>
 

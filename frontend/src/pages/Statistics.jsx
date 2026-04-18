@@ -1,5 +1,4 @@
 import React from "react";
-import { alarmsApi } from "../features/dashboard/api/alarms.api";
 import { useGetStatistics } from "../features/dashboard/hooks/alarms.queries";
 import {
   PieChart,

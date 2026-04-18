@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   useGetAllAlarms,
   useGetFilteredAlarms,
@@ -10,7 +9,6 @@ import { alarmsApi } from "../features/dashboard/api/alarms.api";
 import "../styles/pages/Dashboard.css";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
   const [filters, setFilters] = useState(undefined);
 
