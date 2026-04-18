@@ -228,13 +228,23 @@ const Dashboard = () => {
       />
 
       <div className="dashboard-pagination-info">
-        <h2 className="dashboard-pagination-text">Total alarms: {alarms?.length}</h2>
         <h2 className="dashboard-pagination-text">
-          Total filteredAlarms: {filteredAlarms?.alarms?.length}
+          Total alarms:{" "}
+          <span className="font-semibold">{alarms?.length}</span>{" "}
         </h2>
         <h2 className="dashboard-pagination-text">
-          Page: <span className="dashboard-pagination-current">{pagination.pageIndex + 1}</span> /{" "}
-          {filteredAlarms?.total_pages}
+          Total matching alarms:{" "}
+          <span className="font-semibold">
+            {" "}
+            {filteredAlarms?.alarms?.length}
+          </span>
+        </h2>
+        <h2 className="dashboard-pagination-text">
+          Page:{" "}
+          <span className="dashboard-pagination-current">
+            {pagination.pageIndex + 1}
+          </span>{" "}
+          / {filteredAlarms?.total_pages}
         </h2>
 
         <label className="dashboard-pagination-label" htmlFor="page-size">
