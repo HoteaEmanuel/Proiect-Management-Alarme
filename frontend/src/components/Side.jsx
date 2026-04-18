@@ -3,51 +3,46 @@ import { MdDashboard } from "react-icons/md";
 import { IoIosStats } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosChatboxes } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
+import { RiChatAiFill } from "react-icons/ri";
 import "../styles/components/Side.css";
 
 const Side = () => {
-  const navigate = useNavigate();
 
   return (
     <aside className="side">
       <h1 className="side-title">Alarm Manager</h1>
 
       <nav className="side-nav">
-        <button
-          type="button"
-          className="side-nav-item"
-          onClick={() => navigate("/dashboard")}
-        >
+        <Link type="button" className="side-nav-item" to={"/dashboard"}>
           <MdDashboard className="side-nav-icon" />
           <span className="side-nav-text">Dashboard</span>
-        </button>
+        </Link>
 
-        <button
+        <Link
           type="button"
           className="side-nav-item"
-          onClick={() => navigate("/dashboard/statistics")}
+          // onClick={() => navigate("/dashboard/statistics")}
+          to={"/dashboard/statistics"}
         >
           <IoIosStats className="side-nav-icon" />
           <span className="side-nav-text">Statistics</span>
-        </button>
+        </Link>
 
-        <button
+        <Link type="button" className="side-nav-item" to={"/chat/new"}>
+          <RiChatAiFill className="side-nav-icon" />
+          <span className="side-nav-text">AI Assistant</span>
+        </Link>
+
+        <Link
           type="button"
           className="side-nav-item"
-        >
-          <IoIosChatboxes className="side-nav-icon" />
-          <span className="side-nav-text">Chats</span>
-        </button>
-
-        <button
-          type="button"
-          className="side-nav-item"
-          onClick={() => navigate("/settings")}
+          to={'/settings'}
+          // onClick={() => navigate("/settings")}
         >
           <IoMdSettings className="side-nav-icon" />
           <span className="side-nav-text">Settings</span>
-        </button>
+        </Link>
       </nav>
     </aside>
   );
