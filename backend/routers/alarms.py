@@ -1,23 +1,22 @@
-from datetime import datetime
-from sqlalchemy import text
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_alarm_by_number
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from database import get_db
 from models.alarm import Alarm
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
 from models.exceptions import AppError
 router=APIRouter()
 
-@router.get("/",response_model=list[AlarmResponse])
-def getAlarms(db:Session = Depends(get_db)):
+#router pentru testare doar
+@router.get("/all-alarms",response_model=list[AlarmResponse])
+def get_all_alarms(db:Session = Depends(get_db)):
     alarms=db.query(Alarm).options(joinedload(Alarm.severity_rel)).all()
     print("ALARMS LENGTH: ", alarms.__len__())
     return alarms
 
 
 @router.get("/resources", response_model=AlarmPaginationResponse)
-def get_resources(filters: RequestFilters = Depends(), db: Session = Depends(get_db)):
+def get_filtered_and_paginated_alarms(filters: RequestFilters = Depends(), db: Session = Depends(get_db)):
 
     print("test")
     
@@ -49,15 +48,6 @@ def read_kpi_stats(db: Session = Depends(get_db)):
     try:
         stats = get_kpi_stats(db)
         return stats
-    except AppError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
-
-
-@router.get("/{number}",response_model=AlarmResponse)
-def getAlarmByNumber(number:str,db:Session = Depends(get_db)):
-    try:
-        alarm = get_alarm_by_number(db, number)
-        return alarm
     except AppError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 

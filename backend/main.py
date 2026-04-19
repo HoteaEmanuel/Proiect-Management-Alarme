@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import alarms, auth
+from routers import alarms, auth, chatbot
 from database import get_db, engine
 import models.users
 
@@ -22,6 +22,7 @@ def greet():
     return "Hello"
 app.include_router(auth.router)
 app.include_router(alarms.router, prefix="/alarms", tags=["Alarms"])
+app.include_router(chatbot.router, prefix="/api", tags=["Chatbot"])
 
 
 print("HELLO :)")
