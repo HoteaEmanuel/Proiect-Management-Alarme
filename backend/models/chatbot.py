@@ -6,12 +6,19 @@ from datetime import datetime
 class Base(DeclarativeBase):
     pass
 
+class ConversationModel(Base):
+    __tablename__ = "Conversations"
+
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    conversation_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
 class MessageModel(Base):
     __tablename__ = "Messages"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     
-    chat_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    conversation_id: Mapped[int] = mapped_column(Integer, ForeignKey("Conversations.conversation_id"), nullable=False, index=True, )
     
     user_id: Mapped[int] = mapped_column(Integer, nullable=False)
     
