@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from models import MessageModel, ConversationModel
-from schemas import ChatMessage
 
-def get_conversation_history(db: Session, user_id: int, conversation_id: int, limit: int = None):
+from models import MessageModel, ConversationModel, AppError
+from schemas import ChatMessage, ChatCreate
+
+def get_conversation_history(db: Session, user_id: int, conversation_id: int, limit: int = 10):
     
     stmt = (
         select(MessageModel)
@@ -18,7 +19,10 @@ def get_conversation_history(db: Session, user_id: int, conversation_id: int, li
     if limit is not None:
         stmt.limit(limit)
     
-    rows = db.execute(stmt).scalars().all()
+    try:
+        rows = db.execute(stmt).scalars().all()
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
     #inversez pentru ordinea cronologica
     rows = list(reversed(rows))
@@ -35,8 +39,11 @@ def get_full_conversation(db: Session, user_id: int, conversation_id: int):
         .order_by(MessageModel.created_at.asc())
     )
 
-    rows = db.execute(stmt).scalars().all()
-
+    try:
+        rows = db.execute(stmt).scalars().all()
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
     return [ChatMessage.model_validate(row) for row in rows]
 
 def get_user_conversations(db: Session, user_id: int):
@@ -48,6 +55,42 @@ def get_user_conversations(db: Session, user_id: int):
         .order_by(ConversationModel.created_at.desc())
     )
 
-    rows = db.execute(stmt).scalars().all()
-
+    try:
+        rows = db.execute(stmt).scalars().all()
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
     return rows
+
+def save_message_to_db(db: Session, message_data: ChatCreate):
+    
+    message = MessageModel(
+        conversation_id=message_data.conversation_id,
+        user_id=message_data.user_id,
+        role=message_data.role,
+        content=message_data.content
+    )
+    
+    try:
+        db.add(message)
+        db.commit()
+        db.refresh(message)
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
+    return message
+
+def create_new_conversation(db: Session, user_id: int):
+    
+    conversation = ConversationModel(
+        user_id=user_id
+    )
+    
+    try:
+        db.add(conversation)
+        db.commit()
+        db.refresh(conversation)
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
+    return conversation

@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from models.alarm import Alarm
-from models.severity import Severity
+
+from models import Alarm, Severity, AppError
 from schemas import RequestFilters, AlarmCreate, AlarmUpdate
-from models.exceptions import AppError
 
 
 def get_filtered_alarms(db: Session, filters: RequestFilters):

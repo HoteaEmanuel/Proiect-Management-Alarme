@@ -1,19 +1,18 @@
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from database import get_db
-from models.users import Users
 from sqlalchemy.orm import Session
 from typing import Annotated
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter, HTTPException, Response, Cookie
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.encoders import jsonable_encoder
 from starlette import status
 from datetime import timedelta, datetime, timezone
 from jose import jwt, JWTError, ExpiredSignatureError
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import Response,Cookie
 from dotenv import load_dotenv
-from fastapi.encoders import jsonable_encoder
-import time
 import os
+
+from models import Users
 
 router = APIRouter(
 

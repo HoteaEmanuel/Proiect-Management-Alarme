@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from models.exceptions import AppError
+
+from models import AppError
 
 def get_kpi_stats(db: Session):
 
@@ -8,7 +9,6 @@ def get_kpi_stats(db: Session):
     try:
         result = db.execute(query).mappings().all()
     except Exception as e:
-        #TODO: trebuie sa schimb asta sa am o eroare personalizata, nu erori de HTTP
         raise AppError(status_code=400, detail=f"Database error: {str(e)}")
 
     if not result:

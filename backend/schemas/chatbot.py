@@ -20,6 +20,7 @@ class ChatMessage(ChatCreate):
     model_config = ConfigDict(from_attributes=True)
 
 class ChatResponse(BaseModel):
+    conversation_id: int
     conversation: list[ChatMessage]
 
 class ConversationCreate(BaseModel):

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from database import get_db
-from models.alarm import Alarm
+
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
-from models.exceptions import AppError
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
+from models import Alarm, AppError
+
 router=APIRouter()
 
 #router pentru testare doar
@@ -27,8 +28,8 @@ def get_filtered_and_paginated_alarms(filters: RequestFilters = Depends(), db: S
     #preiau alarmele filtrate, sortate si paginate
     try:
         total_alarms, alarms_list = get_filtered_alarms(db, filters)
-    except AppError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)\
+    except Exception as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
         
     print("test2")
 
@@ -48,7 +49,7 @@ def read_kpi_stats(db: Session = Depends(get_db)):
     try:
         stats = get_kpi_stats(db)
         return stats
-    except AppError as e:
+    except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.post("/",response_model=AlarmResponse,status_code=201)
@@ -56,7 +57,7 @@ def add_alarm(alarm_data: AlarmCreate, db: Session = Depends(get_db)):
     try:
         new_alarm = create_alarm(db, alarm_data)
         return new_alarm
-    except AppError as e:
+    except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.put("/{number}",response_model=AlarmResponse)
@@ -64,5 +65,5 @@ def edit_alarm(number:str, alarm_data: AlarmUpdate, db: Session = Depends(get_db
     try:
         updated_alarm = update_alarm(db, number, alarm_data)
         return updated_alarm
-    except AppError as e:
+    except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)

@@ -1,9 +1,8 @@
-from sqlalchemy import Column, String, DateTime, Integer
+from enums import Status, AlarmType, CategoryType, SubCategoryType, Details
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
-from enums import Status,AlarmType,CategoryType,SubCategoryType,Details
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
      
 class Alarm(Base):
    __tablename__="Alarms" 
