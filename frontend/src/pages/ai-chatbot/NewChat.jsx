@@ -8,12 +8,12 @@ const NewChat = () => {
   const { user } = useAuthStore();
   const message = useRef();
   console.log(user);
-  const { mutate: sendPrompt } = useCreateChat();
+  const { mutate: sendMessage } = useCreateChat();
   const onSubmit = async () => {
     console.log(message.current.value);
     
     try {
-      await sendPrompt(message.current.value);
+      await sendMessage(message.current.value);
     } catch (error) {
       throw new Error(error);
     }

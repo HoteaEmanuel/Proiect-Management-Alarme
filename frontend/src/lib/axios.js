@@ -13,7 +13,7 @@ const refreshClient = axios.create({
   withCredentials: true,
 });
 
-// Request in care trimitem acces okenul stocat in localStorage
+// Request in care trimitem acces tokenul stocat in localStorage
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   console.log("TOKEN AICI: ", token);

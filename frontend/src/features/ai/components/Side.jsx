@@ -13,11 +13,12 @@ import { useGetUserChats } from "../api/chatBot.api";
 const Side = () => {
   const { data: chats, isLoading, isPending } = useGetUserChats();
 const navigate=useNavigate();
-  if (isLoading || isPending) return <p>Loading...</p>;
-  
+  if (isLoading || isPending) return (<p>Loading...</p>);
+  console.log("SIDE");
   console.log(chats);
+  if(chats?.data) console.log(chats.data)
   return (
-    <aside className="side max-h-[90%] gap-1">
+    <aside className="side h-[90%] gap-1 z-100" >
       <Link
         to={"/dashboard"}
         className="flex items-center"
@@ -42,11 +43,11 @@ const navigate=useNavigate();
 
         <hr />
         <h1 className="text-sm opacity-50">Recents</h1>
-        {chats.data.conversations.length === 0 && <h1>No chats yet!</h1>}
-        {chats.data.conversations.length > 0 && (
+        {chats.conversations?.length === 0 && <h1>No chats yet!</h1>}
+        {chats.conversations?.length > 0 && (
           <ul className="overflow-y-auto flex-1 flex flex-col gap-2 text-xs">
-            {chats.data.conversations.map((chat,index) => (
-              <li chat={chat.conversation_id} onClick={()=>navigate(`/chat/${chat.conversation_id}`)} className={`${index % 2 ? 'bg-gray-950' : 'bg-gray-800'} cursor-pointer hover:scale-105 p-1`}>Conversation id: {chat.conversation_id}</li>
+            {chats.conversations.map((chat,index) => (
+              <li  key={chat.conversation_id} onClick={()=>navigate(`/chat/${chat.conversation_id}`)} className={`${index % 2 ? 'bg-gray-950' : 'bg-gray-800'} cursor-pointer hover:scale-105 p-1`}>Conversation id: {chat.conversation_id}</li>
             ))}
           </ul>
         )}
