@@ -4,7 +4,7 @@ const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const alarmsApi = {
   getAllAlerts: async () => {
     try {
-      const response = await api.get(`${VITE_URL_APP}/alarms`);
+      const response = await api.get(`${VITE_URL_APP}/alarms/resources`);
       return response.data;
     } catch (error) {
       throw new Error(error);
@@ -37,7 +37,7 @@ export const alarmsApi = {
         sorting[0].id +
         "&&sort_order=" +
         (sorting[0].desc === false ? "asc" : "desc");
-
+    console.log("URL: ");
     console.log(url);
     const response = await api.get(url);
     console.log(response);

@@ -3,7 +3,7 @@ from datetime import datetime
 
 class ChatRequest(BaseModel):
     user_id: int
-    conversation_id: int
+    conversation_id: int = 0
     message: str
     new_chat: bool = False
 

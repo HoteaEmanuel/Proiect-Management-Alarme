@@ -19,7 +19,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchAlarms = async () => {
-      console.log("SORTING AICEA: ", sorting);
       const data = await alarmsApi.getFilteredAlarms({
         filters,
         pagination,

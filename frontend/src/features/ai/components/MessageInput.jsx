@@ -1,9 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, {  useState } from "react";
 import Input from "../../../components/Input";
 import { IoSend } from "react-icons/io5";
-const MessageInput = () => {
+const MessageInput = ({message,onSubmit}) => {
   const [hasText, setHasText] = useState(false);
-  const message = useRef(null);
 
   const MAX_HEIGHT = 300;
 
@@ -36,7 +35,7 @@ const MessageInput = () => {
                  bg-background px-4 py-4 min-h-9 max-h-50 pr-8"
       />
       {hasText && (
-        <IoSend className="size-5 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer hover:scale-105" />
+        <IoSend className="size-5 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer hover:scale-105" onClick={onSubmit} />
       )}
     </div>
   );

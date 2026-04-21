@@ -18,6 +18,7 @@ app.add_middleware(
 )
 
 @app.get("/")
+
 def greet():
     return "Hello"
 app.include_router(auth.router)
