@@ -4,8 +4,10 @@ from sqlalchemy import select
 from models import MessageModel, ConversationModel, AppError
 from schemas import ChatMessage, ChatCreate
 
+#functie ce returneaza istoricul unei conversatii, cu limita de mesaje (de folosit pentru fereastra de context a agentilor)
 def get_conversation_history(db: Session, user_id: int, conversation_id: int, limit: int = 10):
     
+    #querry ff simplu pentru a prelua mesajele
     stmt = (
         select(MessageModel)
         .where(
@@ -14,10 +16,8 @@ def get_conversation_history(db: Session, user_id: int, conversation_id: int, li
         )
         #ordonez descrescator ca sa le am pe cele mai recente, apoi in le reordonez ca sa fie cronologic
         .order_by(MessageModel.created_at.desc())
+        .limit(limit)
     )
-
-    if limit is not None:
-        stmt.limit(limit)
     
     try:
         rows = db.execute(stmt).scalars().all()
@@ -27,8 +27,10 @@ def get_conversation_history(db: Session, user_id: int, conversation_id: int, li
     #inversez pentru ordinea cronologica
     rows = list(reversed(rows))
     
+    #parsez rezultatete ca sa le am sub forma de dictionare
     return [{"role": row.role, "content": row.content} for row in rows]
 
+#functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
 def get_full_conversation(db: Session, user_id: int, conversation_id: int):
     stmt = (
         select(MessageModel)
@@ -46,6 +48,7 @@ def get_full_conversation(db: Session, user_id: int, conversation_id: int):
     
     return [ChatMessage.model_validate(row) for row in rows]
 
+#functie ce returneaza lista de conversatii ale user ului
 def get_user_conversations(db: Session, user_id: int):
     stmt = (
         select(ConversationModel)
@@ -62,6 +65,7 @@ def get_user_conversations(db: Session, user_id: int):
     
     return rows
 
+#functie ce salveaza un mesaj in baza de date (ATENTIE: mesajul trebuie sa apartina unei conversatii)
 def save_message_to_db(db: Session, message_data: ChatCreate):
     
     message = MessageModel(
@@ -80,6 +84,8 @@ def save_message_to_db(db: Session, message_data: ChatCreate):
     
     return message
 
+
+#functie ce creeaza o noua conversatie in baza de date
 def create_new_conversation(db: Session, user_id: int):
     
     conversation = ConversationModel(

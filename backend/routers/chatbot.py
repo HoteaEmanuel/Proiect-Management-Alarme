@@ -3,7 +3,7 @@ from database import get_db
 from sqlalchemy.orm import Session
 
 from schemas import ChatRequest, ChatResponse, ConversationListresponse
-from integrations.chatbot import llm_request
+from integrations.chatbot import user_chat_request
 from crud import get_user_conversations, get_full_conversation
 from models import AppError
 
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post("/chatbot", response_model=ChatResponse)
 def send_message_to_chatbot(request: ChatRequest, db: Session = Depends(get_db)):
     try:
-        return llm_request(db=db, request=request)
+        return user_chat_request(db=db, request=request)
     except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 

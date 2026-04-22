@@ -1,84 +1,47 @@
-import os
-from openai import AzureOpenAI
 from sqlalchemy.orm import Session
 
 from models import AppError
 from schemas import ChatRequest, ChatCreate, ChatResponse
 from crud import get_conversation_history, get_full_conversation, save_message_to_db, create_new_conversation
+from client import llm_request
 
-ai_model = os.getenv("AI_MODEL")
-model_key = os.getenv("MODEL_KEY")
-api = os.getenv("API")
-endpoint = os.getenv("ENDPOINT")
-
-client = AzureOpenAI(
-    azure_endpoint=endpoint,
-    api_key=model_key,
-    api_version="2025-04-01-preview"
-)
-
-def llm_request(db: Session, request: ChatRequest):
-
+#functie ce gestioneaza conversatiile user-agent din pagina de chat (practic un agent)
+def user_chat_request(db: Session, request: ChatRequest):
+    
     try:
-
+        #daca e conversatie noua o creez si ii preiau id-ul creat de baza de date
         if request.new_chat:
             conversation = create_new_conversation(db=db, user_id=request.user_id)
             conversation_id = conversation.conversation_id
         else:
             conversation_id = request.conversation_id
 
-        system_prompt = {"role": "system", "content": "Raspunde in limba romana dar pocit"}
-
         context_history = get_conversation_history(db=db, user_id=request.user_id, 
                                         conversation_id=conversation_id, 
                                         limit=10)
 
-        message = [
-            {"role": "user", "content": request.message}
-        ]
-
-        config = {
-            "messages" : [system_prompt] + context_history + message,
-            "model" : ai_model,
-            "reasoning_effort" : "medium",
-            "logit_bias" : None,
-            "max_completion_tokens" : 8000,
-            #"n" : 1,
-            #"stop" : None,
-            #"stream" : False,
-            #"stream_options" : {"include_usage" : False},
-            #"temperature" : 0.2,
-            #"top_p" : 0.8,
-            #"tools" : None,
-            #"tool_choice" : "none",
-            #"parallel_tool_calls" : True,
-            "user" : None
-        }
-
+        #salvez mesajul utilizatorului in baza de date
         user_message_data = ChatCreate(
             conversation_id=conversation_id,
             user_id=request.user_id,
             role="user",
             content=request.message
         )
-
         save_message_to_db(db=db, message_data=user_message_data)
 
-        response = client.chat.completions.create(**config)
+        #apelez API-ul
+        bot_reply = llm_request("Raspunde in limba romana dar ca si cum te balbai", request.message, context_history)
 
-
-        bot_reply = response.choices[0].message.content
-        #used_tokens = response.usage.total_tokens
-
+        #salvez raspunsul bot-ului in baza de date
         bot_message_data = ChatCreate(
             conversation_id=conversation_id,
             user_id=request.user_id,
             role="assistant",
             content=bot_reply
         )
-
         save_message_to_db(db=db, message_data=bot_message_data)
 
+        #preiau toata conversatia din baza de date si o trimit catre frontend
         full_chat_history = get_full_conversation(db=db, 
                                              user_id=request.user_id, 
                                              conversation_id=conversation_id)
@@ -89,3 +52,5 @@ def llm_request(db: Session, request: ChatRequest):
         raise
     except Exception as e:
         raise AppError(status_code=500, detail=f"LLM request failed: {str(e)}")
+    
+
