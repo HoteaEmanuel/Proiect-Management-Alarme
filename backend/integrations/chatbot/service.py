@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models import AppError
 from schemas import ChatRequest, ChatCreate, ChatResponse
 from crud import get_conversation_history, get_full_conversation, save_message_to_db, create_new_conversation
-from client import llm_request
+from .client import llm_request
 
 #functie ce gestioneaza conversatiile user-agent din pagina de chat (practic un agent)
 def user_chat_request(db: Session, request: ChatRequest):
