@@ -82,6 +82,6 @@ export const useGetConversation = (chatId) => {
           user_id: user.user_id,
         },
       }),
-    queryKey: ["conversation", chatId],
+    queryKey: ["conversation", user.user_id, chatId],
   });
 };

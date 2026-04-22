@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetUserChats } from "../../features/ai/api/chatBot.api";
+import { useGetUserChats } from "../../features/ai/api/chatBot.api.js";
 import { useNavigate } from "react-router-dom";
 
 const Chats = () => {
