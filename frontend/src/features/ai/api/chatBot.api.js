@@ -76,12 +76,14 @@ export const useGetUserChats = () => {
 export const useGetConversation = (chatId) => {
   const { user } = useAuthStore();
   return useQuery({
-    queryFn: async () =>
-      await api.get(`${VITE_URL_APP}/api/chat/${chatId}`, {
+    queryFn: async () => {
+      const response = await api.get(`${VITE_URL_APP}/api/chat/${chatId}`, {
         params: {
           user_id: user.user_id,
         },
-      }),
+      });
+      return response.data;
+    },
     queryKey: ["conversation", user.user_id, chatId],
   });
 };

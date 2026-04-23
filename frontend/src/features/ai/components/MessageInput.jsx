@@ -3,7 +3,7 @@ import Input from "../../../components/Input";
 import { IoSend } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-const MessageInput = ({ onSubmit, message }) => {
+const MessageInput = ({ onSubmit, message, placeholder }) => {
   const [hasText, setHasText] = useState(false);
 
   const { id } = useParams();
@@ -40,7 +40,7 @@ const MessageInput = ({ onSubmit, message }) => {
   return (
     <div className="w-1/2 relative flex items-center mx-auto">
       <textarea
-        placeholder={"How can i help you today?"}
+        placeholder={placeholder}
         ref={message}
         rows={1}
         type={"text-area"}
