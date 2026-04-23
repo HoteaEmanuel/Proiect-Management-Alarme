@@ -2,7 +2,9 @@ __all__ = [
     "DB_SCHEMA_PROMPT",
     "DB_SAFETY_PROMPT",  
     "SQL_OUTPUT_PROMPT",
+    "QUERY_RESULT_PROMPT",
     "LANGUAGE_PROMPT",
+    "NEW_CONVERSATION_PROMPT",
     "PERSONA_PROMPT", 
     "CONVERSATION_CONTEXT_PROMPT",
     "ERROR_HANDLING_PROMPT"
@@ -46,19 +48,6 @@ You have access to a Microsoft SQL Server database with the following tables and
 - CATEGORY_TIER_2 (NVARCHAR(100))
 - CATEGORY_TIER_3 (NVARCHAR(200))
 
-### dbo.Conversations
-- conversation_id (INT, PK, autoincrement)
-- user_id (INT)
-- created_at (DATETIME)
-
-### dbo.Messages
-- id (INT, PK, autoincrement)
-- conversation_id (INT, FK -> Conversations.conversation_id)
-- user_id (INT)
-- role (VARCHAR(20)): 'user', 'assistant', 'system'
-- content (TEXT)
-- created_at (DATETIME)
-
 ## STORED PROCEDURES
 
 ### dbo.CautareFiltrata
@@ -70,7 +59,8 @@ Filters, searches and paginates alarms. Parameters:
 Returns: all Alarms columns + severity (severity name) + TotalAlarms (total count without pagination)
 
 ### dbo.GetDashboardKPIs
-Returns aggregated statistics in the form of (Category, Label, CountValue):
+Returns aggregated statistics within a time interval in the form of (Category, Label, CountValue):
+- Time Filters: @start_date, @end_date
 - General: total alarm count
 - Severity: alarm count per severity
 - Status: alarm count per status
@@ -88,20 +78,44 @@ Rules for raw SELECT:
 - You may use JOINs between existing tables
 - No subqueries that modify data
 - Never use INTO (no SELECT INTO)
-- Only query tables defined in the schema: dbo.Alarms, dbo.Severities, dbo.Conversations, dbo.Messages
+- Only query tables defined in the schema: dbo.Alarms, dbo.Severities
 - Never query system tables (sys.*, INFORMATION_SCHEMA, etc.)
 """
 
 SQL_OUTPUT_PROMPT = """
+You must always respond with a JSON object that follows this exact schema:
+- "has_sql_query": boolean — true if the user's question requires a database query, false otherwise
+- "sql_query": string or null — if has_sql_query is true, provide the SQL query here; otherwise null
+- "text_response": string or null — if has_sql_query is false, provide your response here; otherwise null
+- "conversation_title": string or null — provided separately
+
+"has_sql_query" and "text_response" are mutually exclusive:
+- If the question requires a query → set has_sql_query=true, fill sql_query, leave text_response null
+- If the question is conversational → set has_sql_query=false, fill text_response, leave sql_query null
+
 When generating SQL queries:
-- Return ONLY the SQL query, no explanations unless asked
 - Always use stored procedures when they cover the use case
-- Prefer dbo.CautareFiltrata over raw SELECT on darms when filtering/pagination is needed
+- Prefer dbo.CautareFiltrata over raw SELECT on Alarms when filtering/pagination is needed
 - Never use SELECT *; always specify columns
 - Format queries with proper indentation
-- Use parameterized queries, never concatenate user input directly
-Return ONLY the raw SQL query, no explanations, no markdown, no backticks.
-The response must start directly with SELECT, EXEC, or WITH.
+- Never concatenate user input directly
+- sql_query must start directly with SELECT, EXEC, or WITH — no markdown, no backticks, no explanations
+"""
+
+QUERY_RESULT_PROMPT = """
+The user asked a question that required a database query.
+The query was executed and the results are provided below.
+Interpret the results in natural language, directly answering the user's original question.
+- Be concise and specific, do not just list the raw data
+- Highlight important patterns or anomalies if relevant
+- If the result is empty, clearly state that no data was found matching the criteria
+"""
+
+NEW_CONVERSATION_PROMPT = """
+Generate a short and descriptive title for this conversation based on the user's first message.
+- Maximum 5-6 words
+- Should reflect the topic of the conversation
+- Fill the "conversation_title" field with this title
 """
 
 LANGUAGE_PROMPT = """
@@ -119,6 +133,7 @@ If the user refers to a previous query or result, use that context directly.
 
 ERROR_HANDLING_PROMPT = """
 If the user's request is ambiguous, ask one clarifying question before generating a query.
+Only ask if the ambiguity would fundamentally change the query.
 If you cannot fulfill a request with the available schema, explain clearly what is and isn't possible.
 Never generate a query you're not confident about without flagging the uncertainty.
 """

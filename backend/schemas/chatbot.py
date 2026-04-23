@@ -11,7 +11,10 @@ class ChatCreate(BaseModel):
     conversation_id: int
     user_id: int
     role: str
+    has_sql_query: bool = False
     content: str
+    sql_query: str | None = None
+
 
 class ChatMessage(ChatCreate):
     id: int
@@ -21,6 +24,7 @@ class ChatMessage(ChatCreate):
 
 class ChatResponse(BaseModel):
     conversation_id: int
+    conversation_title: str
     conversation: list[ChatMessage]
 
 class ConversationCreate(BaseModel):
@@ -35,3 +39,9 @@ class ConversationResponse(BaseModel):
 
 class ConversationListresponse(BaseModel):
     conversations: list[ConversationResponse]
+
+class LLMSQLResponse(BaseModel):
+    conversation_title: str | None
+    has_sql_query: bool
+    sql_query: str | None
+    text_response: str | None
