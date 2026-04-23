@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from database import get_db
+from datetime import datetime
 
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
 from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from models import Alarm, AppError
+from database import get_db
 
 router=APIRouter()
 
@@ -44,10 +45,12 @@ def get_filtered_and_paginated_alarms(filters: RequestFilters = Depends(), db: S
     }
 
 @router.get("/kpi-stats", response_model=dict[str, dict[str, int | float]])
-def read_kpi_stats(db: Session = Depends(get_db)):
+def read_kpi_stats(db: Session = Depends(get_db),
+                    start_date: datetime = datetime(2026, 1, 1, 0, 0, 0), 
+                    end_date: datetime = datetime(2026, 12, 31, 23, 59, 59)):
 
     try:
-        stats = get_kpi_stats(db)
+        stats = get_kpi_stats(db=db, start_date=start_date, end_date=end_date)
         return stats
     except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)

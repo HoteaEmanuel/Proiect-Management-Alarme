@@ -1,13 +1,22 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from datetime import datetime
 
 from models import AppError
 
-def get_kpi_stats(db: Session):
+#datetime e YYYY-MM-DD
+def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime):
 
-    query = text("EXEC dbo.GetDashboardKPIs")
+    query = text("""
+        EXEC dbo.GetDashboardKPIs 
+            @start_date = :start_date, 
+            @end_date   = :end_date;
+    """)
+
+    params = {"start_date": start_date, "end_date": end_date}
+
     try:
-        result = db.execute(query).mappings().all()
+        result = db.execute(query, params).mappings().all()
     except Exception as e:
         raise AppError(status_code=400, detail=f"Database error: {str(e)}")
 

@@ -1,94 +1,62 @@
-CREATE PROCEDURE dbo.GetDashboardKPIs
+CREATE OR ALTER PROCEDURE dbo.GetDashboardKPIs
+    @start_date DATETIME,
+    @end_date   DATETIME
 AS
 BEGIN
     SET NOCOUNT ON;
 
+    WITH FilteredAlarms AS (
+        SELECT *
+        FROM dbo.Alarms
+        WHERE (
+            FIRST_OCCURENCE_DATETIME BETWEEN @start_date AND @end_date
+            OR LAST_OCCURENCE_DATETIME  BETWEEN @start_date AND @end_date
+            OR CLEAR_OCCURENCE_DATETIME BETWEEN @start_date AND @end_date
+        )
+    )
+
     -- Numar total de alarme
     SELECT 'General' AS Category, 'Total' AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms
+    FROM FilteredAlarms
 
     UNION ALL
 
     -- Numar de alarme per severitate (cu LEFT JOIN pt a avea si valorile 0)
     SELECT 'Severity' AS Category, s.name AS Label, COUNT(a.alarm_number) AS CountValue
     FROM dbo.Severities s
-    LEFT JOIN dbo.Alarms a ON s.id = a.severity_id
+    LEFT JOIN FilteredAlarms a ON s.id = a.severity_id
     GROUP BY s.name
 
     UNION ALL
 
-    -- Numar de alarme per status
-    SELECT 'Status' AS Category, a.status AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.status
-    
-    UNION ALL
-    
-    -- Numar de alarme per companie
-    SELECT 'Company' AS Category, a.company AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.company
-    
-    UNION ALL
-    
-    -- Numar de alarme per proiect
-    SELECT 'Project' AS Category, a.project AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.project
-
-    UNION ALL
-    
-    -- Numar de alarme per server
-    SELECT 'ServerName' AS Category, a.server_name AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.server_name
-
-    UNION ALL
-    
-    --Numar de alarme per alert_key
-    SELECT 'AlertKey' AS Category, a.alert_key AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.alert_key
+    SELECT 'Status'        AS Category, status        AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY status        UNION ALL
+    SELECT 'Company'       AS Category, company       AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY company       UNION ALL
+    SELECT 'Project'       AS Category, project       AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY project       UNION ALL
+    SELECT 'ServerName'    AS Category, server_name   AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY server_name   UNION ALL
+    SELECT 'AlertKey'      AS Category, alert_key     AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY alert_key     UNION ALL
+    SELECT 'CategoryTier1' AS Category, category_tier_1 AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY category_tier_1 UNION ALL
+    SELECT 'CategoryTier2' AS Category, category_tier_2 AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY category_tier_2 UNION ALL
+    SELECT 'CategoryTier3' AS Category, category_tier_3 AS Label, COUNT(*) AS CountValue FROM FilteredAlarms GROUP BY category_tier_3
 
     UNION ALL
 
-    -- Numar de alarme per CategoryTier1
-    SELECT 'CategoryTier1' AS Category, a.category_tier_1 AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.category_tier_1
-    
-    UNION ALL
-    
-    -- Numar de alarme per CategoryTier2
-    SELECT 'CategoryTier2' AS Category, a.category_tier_2 AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.category_tier_2
-    
-    UNION ALL
-    
-    -- Numar de alarme per CategoryTier3
-    SELECT 'CategoryTier3' AS Category, a.category_tier_3 AS Label, COUNT(*) AS CountValue
-    FROM dbo.Alarms a
-    GROUP BY a.category_tier_3
-    
-    UNION ALL
-
-   --timpul mediu de rezolvare alarma (verific doar pe cele cu statulul 'cleared')
+    -- Timpul mediu de rezolvare (doar cele clearate in interval)
     SELECT 
         'TimeKPI' AS Category, 
         'Avg_Resolution_Time_Minutes' AS Label, 
         AVG(DATEDIFF(MINUTE, FIRST_OCCURENCE_DATETIME, CLEAR_OCCURENCE_DATETIME)) AS CountValue
-    FROM dbo.Alarms
+    FROM FilteredAlarms
     WHERE CLEAR_OCCURENCE_DATETIME IS NOT NULL
 
     UNION ALL
 
-   --timpul mediu de reaparitie, verific doar pentru alea care au reaparut logic :)
+    -- Timpul mediu de reaparitie
     SELECT 
         'TimeKPI' AS Category, 
         'Avg_Time_Between_Occurrences_Minutes' AS Label, 
         AVG(DATEDIFF(MINUTE, FIRST_OCCURENCE_DATETIME, LAST_OCCURENCE_DATETIME)) AS CountValue
-    FROM dbo.Alarms
+    FROM FilteredAlarms
     WHERE LAST_OCCURENCE_DATETIME > FIRST_OCCURENCE_DATETIME;
 
 END
+GO
