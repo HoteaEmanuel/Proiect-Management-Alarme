@@ -9,7 +9,7 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
-import Loading from "../../features/ai/components/loading.jsx";
+import Loading from "../../features/ai/components/Loading.jsx";
 const ChatWindow = () => {
   const { id } = useParams();
   console.log(id);

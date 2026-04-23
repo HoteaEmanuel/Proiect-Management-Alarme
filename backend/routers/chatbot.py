@@ -28,8 +28,8 @@ def get_conversations_list(user_id: int, db: Session = Depends(get_db)):
 @router.get("/chat/{chat_id}", response_model=ChatResponse)
 def get_chat_history(user_id: int, chat_id: int, db: Session = Depends(get_db)):
     try:
-        history = get_full_conversation(db=db, user_id=user_id, conversation_id=chat_id)
-        return ChatResponse(conversation_id=chat_id, conversation=history)
+        conversation = get_full_conversation(db=db, user_id=user_id, conversation_id=chat_id)
+        return ChatResponse(conversation_id=chat_id, conversation=conversation["messages"], conversation_title=conversation["conversation_title"])
     except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 

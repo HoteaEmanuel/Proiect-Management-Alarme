@@ -42,11 +42,22 @@ def get_full_conversation(db: Session, user_id: int, conversation_id: int):
     )
 
     try:
+        conversation = db.execute(
+            select(ConversationModel)
+            .where(ConversationModel.conversation_id == conversation_id)
+        ).scalar()
+
+        if conversation is None:
+            raise AppError(status_code=404, detail="Conversation not found")
+
         rows = db.execute(stmt).scalars().all()
     except Exception as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-    return [ChatMessage.model_validate(row) for row in rows]
+    return {
+        "conversation_title": conversation.conversation_title, 
+        "messages": [ChatMessage.model_validate(row) for row in rows]
+    }
 
 #functie ce returneaza lista de conversatii ale user ului
 def get_user_conversations(db: Session, user_id: int):
@@ -137,7 +148,10 @@ def create_new_conversation(db: Session, user_id: int):
 
 def run_llm_query(db: Session, query: str):
     try:
-        result = db.execute(text(query)).mappings().all()
-        return [dict(row) for row in result]
+        result = db.execute(text(query))
+        if result.returns_rows:
+            return [dict(row) for row in result.mappings().all()]
+
+        return []
     except AppError as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")

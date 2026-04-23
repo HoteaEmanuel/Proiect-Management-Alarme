@@ -118,7 +118,7 @@ def user_chat_request(db: Session, request: ChatRequest):
 
         return ChatResponse(conversation_id=request.conversation_id,
                             conversation_title=conversation_title,
-                            conversation=full_chat_history)
+                            conversation=full_chat_history["messages"])
     
     except AppError:
         raise
