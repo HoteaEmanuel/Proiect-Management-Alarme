@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import Input from "../../components/Input";
 import MessageInput from "../../features/ai/components/MessageInput";
@@ -6,26 +6,25 @@ import { useCreateChat } from "../../features/ai/api/chatBot.api.js";
 
 const NewChat = () => {
   const { user } = useAuthStore();
-  const message = useRef();
+  const [message, setMessage] = useState("");
   console.log(user);
   const { mutate: sendMessage } = useCreateChat();
   const onSubmit = async () => {
-    console.log(message.current.value);
-    
+
     try {
-      await sendMessage(message.current.value);
+      await sendMessage(message);
     } catch (error) {
       throw new Error(error);
     }
   };
   return (
     <div className="w-screen h-full  flex flex-col gap-10 justify-center items-center ">
-      <div className="flex flex-col gap-1">
+      <main className="flex flex-col gap-1">
         <h1 className="font-bold text-4xl">
           Hello, <span className="text-blue-500 italic">{user.username} </span>
         </h1>
         <p className="opacity-50 text-sm text-center">What's new?</p>
-      </div>
+      </main>
 
       {/* <Input
         placeholder={"How can i help you? :)"}
@@ -37,6 +36,7 @@ const NewChat = () => {
         className="w-full border border-gray-700 p-4 rounded-xl"
         message={message}
         onSubmit={onSubmit}
+        setMessage={setMessage}
       />
     </div>
   );

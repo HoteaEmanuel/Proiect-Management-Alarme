@@ -18,7 +18,7 @@ const navigate=useNavigate();
   console.log(chats);
   if(chats?.data) console.log(chats.data)
   return (
-    <aside className="side h-[90%] gap-1 z-100" >
+    <aside className="side max-h-screen gap-1 z-100 bg-red-500" >
       <Link
         to={"/dashboard"}
         className="flex items-center"
@@ -30,7 +30,7 @@ const navigate=useNavigate();
       </Link>
       {/* <h1 className="side-title">AI Assistant</h1> */}
 
-      <nav className="side-nav flex flex-col h-full">
+      <nav className="side-nav flex flex-col h-[90%]">
         <Link type="button" className="side-nav-item" to={"/chat/new"}>
           <RiChatNewFill className="side-nav-icon" />
           <span className="side-nav-text">New chat</span>

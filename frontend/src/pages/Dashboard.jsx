@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
 
+  // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a paginarii, a filtrelor sau a sortarii
   useEffect(() => {
     const fetchAlarms = async () => {
       const data = await alarmsApi.getFilteredAlarms({
@@ -30,17 +31,7 @@ const Dashboard = () => {
     fetchAlarms();
   }, [filters, pagination, sorting]);
 
-  console.log("FILTERS: ", filters);
-  console.log(filteredAlarms);
-  console.log("PAGINATION");
-  console.log(pagination);
-
-  console.log("SORTING");
-  console.log(sorting);
-
   if (isPendingAlarms) return <p>Loading...</p>;
-
-  console.log(alarms);
 
   return (
     <div className="dashboard-page">

@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import Input from "../../../components/Input";
 import { IoSend } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-const MessageInput = ({ onSubmit, message, placeholder }) => {
-  const [hasText, setHasText] = useState(false);
-
+const MessageInput = ({
+  onSubmit,
+  message,
+  placeholder,
+  setMessage,
+}) => {
   const { id } = useParams();
   console.log(id);
   const MAX_HEIGHT = 300;
@@ -14,7 +17,6 @@ const MessageInput = ({ onSubmit, message, placeholder }) => {
     const el = e.target;
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
-    setHasText(el.value.trim().length > 0 ? true : false);
 
     // Daca elementul are heightul mai mare decat MAX_HEIGHT atunci ii adaugam scroll ( overflow y auto)
     if (el.scrollHeight > MAX_HEIGHT) {
@@ -41,7 +43,8 @@ const MessageInput = ({ onSubmit, message, placeholder }) => {
     <div className="w-1/2 relative flex items-center mx-auto">
       <textarea
         placeholder={placeholder}
-        ref={message}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
         rows={1}
         type={"text-area"}
         onKeyDown={handleKeyDown}
@@ -49,7 +52,7 @@ const MessageInput = ({ onSubmit, message, placeholder }) => {
         className="w-full resize-none overflow-hidden rounded-md border border-input border-gray-800
                  bg-background px-4 py-4 min-h-9 max-h-50 pr-8"
       />
-      {hasText && (
+      {message.trim().length>0 && (
         <button onClick={onSubmit}>
           <FaArrowUp className="size-8 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer hover:scale-105 bg-gray-900 p-2 rounded-2xl border border-blue-950" />
         </button>

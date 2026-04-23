@@ -8,7 +8,7 @@ const Chatlayout = () => {
         <Header />
         <div className="root-layout-body">
           <Side />
-          <section className="root-layout-content overflow-y-auto">
+          <section className="root-layout-content">
             <Outlet />
           </section>
         </div>
