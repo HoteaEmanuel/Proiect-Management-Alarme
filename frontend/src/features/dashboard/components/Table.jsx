@@ -27,7 +27,7 @@ const columns = [
   },
   {
     accessorKey: "severity",
-    header: "Severitate",
+    header: "Severity",
     cell: ({ getValue }) => (
       <span className={`alarm-table-severity alarm-table-severity-${getValue().toLowerCase()}`}>
         {getValue()}
