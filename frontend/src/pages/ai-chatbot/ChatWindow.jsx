@@ -9,7 +9,7 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
-import Loading from "../../features/ai/components/loading.jsx";
+import Loading from "../../features/ai/components/Loading.jsx";
 import { useAuthStore } from "../../store/authStore.js";
 import { api } from "../../lib/axios.js";
 import Loading1 from "../../features/ai/components/Loading1.jsx";
