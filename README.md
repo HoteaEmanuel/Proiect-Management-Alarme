@@ -1,4 +1,4 @@
-# Sistem de monitorizare alarme
+# Sistem de monitorizare alarme - Proiect Nokia
 
 ## Descriere proiect
 Acest proiect are ca obiectiv dezvoltarea unui sistem complet pentru **monitorizarea, analiza și corelarea alertelor (alarme)** generate de infrastructură și aplicații.
