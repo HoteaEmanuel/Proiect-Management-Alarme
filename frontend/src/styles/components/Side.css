@@ -1,6 +1,6 @@
 .side {
 
-    width: 14rem;
+    width: 20%;
     min-width: 14rem;
     border-right: 1px solid var(--color-border);
     background-color: var(--color-surface);

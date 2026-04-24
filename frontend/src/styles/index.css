@@ -58,4 +58,5 @@ body {
 
 .container{
     background-color: var(--color-bg);
+    width: 100%;
 }

@@ -8,9 +8,9 @@
 
 .dot {
   height: 8px;
-  width: 8px;         
-  margin-right: 5px;  
-  border-radius: 50%; 
+  width: 8px;
+  margin-right: 5px;
+  border-radius: 50%;
   background-color: #b3d4fc;
   animation: pulse 1.5s infinite ease-in-out;
 }
@@ -19,13 +19,19 @@
   margin-right: 0;
 }
 
-.dot:nth-child(1) { animation-delay: -0.3s; }
-.dot:nth-child(2) { animation-delay: -0.1s; }
-.dot:nth-child(3) { animation-delay: 0.1s; }
+.dot:nth-child(1) {
+  animation-delay: -0.3s;
+}
+.dot:nth-child(2) {
+  animation-delay: -0.1s;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.1s;
+}
 
 @keyframes pulse {
   0% {
-    transform: scale(0.5);  
+    transform: scale(0.5);
     background-color: #1f2a3d;
     box-shadow: 0 0 0 0 rgba(15, 34, 56, 0.7);
   }
@@ -33,17 +39,15 @@
   50% {
     transform: scale(1);
     background-color: #162033;
-    box-shadow: 0 0 0 4px rgba(178, 212, 252, 0); 
+    box-shadow: 0 0 0 4px rgba(178, 212, 252, 0);
   }
 
   100% {
     transform: scale(0.5);
     background-color: #1f2a3d;
-    box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7); 
+    box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
   }
 }
-
-
 
 .load {
   display: flex;
@@ -71,6 +75,43 @@
 }
 
 @keyframes loading_492 {
-  0%, 100% { scale: 0; }
-  50% { scale: 1; }
+  0%,
+  100% {
+    scale: 0;
+  }
+  50% {
+    scale: 1;
+  }
+}
+
+/* From Uiverse.io by Fernando-sv */
+.loader {
+  border: 2px solid var(--color-border);
+  border-left-color: transparent;
+  border-radius: 50%;
+}
+
+.loader {
+  border: 2px solid var(--color-border);
+  border-left-color: transparent;
+  width: 2em;
+  height: 2em;
+}
+
+.loader {
+  border: 2px solid var(--color-border);
+  border-left-color: transparent;
+  width: 2em;
+  height: 2em;
+  animation: spin89345 1s linear infinite;
+}
+
+@keyframes spin89345 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }

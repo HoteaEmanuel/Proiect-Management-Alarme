@@ -35,7 +35,7 @@ export const useCreateChat = () => {
 
 export const useSendMessage = ({ id }) => {
   const { user } = useAuthStore();
-  const queryClient = useQueryClient();
+ // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ message }) => {
       console.log("MESS HERE: ", message);
@@ -50,14 +50,13 @@ export const useSendMessage = ({ id }) => {
     onError: () => {
       toast.error("Could not send the message!");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["conversation", user.user_id, id],
-      });
-    },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["conversation", user.user_id, id],
+    //   });
+    // },
   });
 };
-
 export const useGetUserChats = () => {
   const { user } = useAuthStore();
   return useQuery({
@@ -67,7 +66,7 @@ export const useGetUserChats = () => {
       );
       console.log("API CHATS");
       console.log(response);
-      return response.data;
+      return response.data.conversations;
     },
     queryKey: ["conversations", user.user_id],
   });
