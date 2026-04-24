@@ -1,0 +1,266 @@
+.statistics-page {
+
+    width: 100%;
+    padding: 28px 24px 36px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    color: var(--color-text);
+    background-color: var(--color-bg);
+}
+
+.statistics-title {
+
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    line-height: 1.1;
+}
+
+.statistics-section-title {
+
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    line-height: 1.15;
+}
+
+.statistics-section {
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.statistics-card-title {
+
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+}
+
+.statistics-kpi-grid {
+
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+
+    margin-bottom: 1rem;
+}
+
+.statistics-two-columns {
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+
+    margin-bottom: 2rem;
+}
+.statistics-chart-body {
+
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+}
+
+.statistics-three-columns {
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+
+    margin-bottom: 2rem;
+}
+
+.statistics-chart-section {
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    margin-bottom: 2rem;
+}
+
+.statistics-chart-card {
+
+    width: 100%;
+    padding: 14px 16px 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+}
+
+.statistics-large-chart-body {
+
+    width: 100%;
+    min-height: 340px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.statistics-large-chart {
+
+    min-height: 360px;
+}
+
+.statistics-bottom-grid {
+
+    align-items: stretch;
+}
+
+.statistics-active-card {
+
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+
+        box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+    }
+}
+
+.statistics-active-header {
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.statistics-active-label {
+
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.statistics-active-value-row {
+
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.statistics-active-value {
+
+    font-size: 2.25rem;
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
+
+.statistics-active-status {
+
+    position: relative;
+    width: 12px;
+    height: 12px;
+    display: inline-flex;
+}
+
+.statistics-active-pulse {
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background-color: #4ade80;
+    opacity: 0.75;
+    animation: statistics-active-pulse 1.4s ease-out infinite;
+}
+
+.statistics-active-dot {
+
+    position: relative;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background-color: var(--color-success);
+}
+
+.recharts-cartesian-axis-tick-value {
+
+    fill: var(--color-text-muted);
+}
+
+.recharts-legend-item-text {
+
+    color: var(--color-text) !important;
+}
+
+.recharts-default-tooltip {
+
+    color: #2563eb;
+}
+
+@keyframes statistics-active-pulse {
+
+    0% {
+
+        transform: scale(0.9);
+        opacity: 0.75;
+    }
+
+    70% {
+
+        transform: scale(1.8);
+        opacity: 0;
+    }
+
+    100% {
+
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+@media(max-width: 1200px) {
+
+    .statistics-kpi-grid {
+
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .statistics-three-columns {
+
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media(max-width: 800px) {
+
+    .statistics-page {
+
+        padding: 20px 16px 28px;
+        gap: 18px;
+    }
+
+    .statistics-kpi-grid,
+    .statistics-two-columns,
+    .statistics-three-columns {
+
+        grid-template-columns: 1fr;
+    }
+
+    .statistics-large-chart {
+
+        height: 320px;
+    }
+}
