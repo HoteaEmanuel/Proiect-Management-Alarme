@@ -12,7 +12,7 @@ Aplicația simulează un sistem real utilizat în:
 ## Tehnologii utilizate
 
 - **Frontend:** React.js  
-- **Backend:** Python (REST API)  
+- **Backend:** Python (Fast API)  
 - **Baza de date:** Microsoft SQL Server  
 - **AI Chatbot:** GPT-4o mini  
 
