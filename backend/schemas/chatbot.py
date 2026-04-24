@@ -33,7 +33,7 @@ class ConversationCreate(BaseModel):
 class ConversationResponse(BaseModel):
     user_id: int
     conversation_id: int
-    conversation_title: str
+    conversation_title: str | None = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
