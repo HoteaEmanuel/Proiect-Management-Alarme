@@ -65,7 +65,7 @@ export const useGetUserChats = () => {
       const response = await api.get(
         `${VITE_URL_APP}/api/conversations/${user.user_id}`,
       );
-      console.log("API");
+      console.log("API CHATS");
       console.log(response);
       return response.data;
     },
