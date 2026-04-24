@@ -47,7 +47,7 @@ const navigate=useNavigate();
         {chats?.length > 0 && (
           <ul className="overflow-y-auto flex-1 flex flex-col gap-2 text-xs">
             {chats.map((chat,index) => (
-              <li  key={chat.conversation_id} onClick={()=>navigate(`/chat/${chat.conversation_id}`)} className={`${index % 2 ? 'bg-gray-950' : 'bg-gray-800'} cursor-pointer hover:scale-105 p-1`}>{chat.conversation_title}</li>
+              <li  key={chat.conversation_id} onClick={()=>navigate(`/chat/${chat.conversation_id}`)} className={`${index % 2 ? 'bg-gray-950' : 'bg-gray-800'} cursor-pointer p-1`}>{chat.conversation_title}</li>
             ))}
           </ul>
         )}

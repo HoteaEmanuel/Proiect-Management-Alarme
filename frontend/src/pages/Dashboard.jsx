@@ -6,6 +6,7 @@ import {
 import { AlarmsTable } from "../features/dashboard/components/Table";
 import { useState } from "react";
 import { alarmsApi } from "../features/dashboard/api/alarms.api";
+import { CiExport } from "react-icons/ci";
 import "../styles/pages/Dashboard.css";
 
 const Dashboard = () => {
@@ -35,7 +36,13 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      <h1 className="dashboard-title">Alarms</h1>
+      <div className="flex w-full justify-between items-center">
+        <h1 className="dashboard-title">Alarms</h1>
+        <button className="flex gap-1 items-center border rounded-2xl p-1 px-2 cursor-pointer hover:scale-105 bg-blue-950">
+          Export
+          <CiExport />
+        </button>
+      </div>
 
       <div className="dashboard-filters">
         <div className="dashboard-filter">
