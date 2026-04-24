@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
 import { useParams } from "react-router-dom";
 import MessageInput from "../../features/ai/components/MessageInput.jsx";
@@ -20,7 +20,7 @@ const ChatWindow = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
   console.log(id);
-  const { data, isPending } = useGetConversation(id);
+  const { data, isPending, isFetching } = useGetConversation(id);
   const [copied, setCopied] = useState(false);
   const [messages, setMessages] = useState([]);
   const isInitialLoad = useRef(true);
@@ -30,7 +30,19 @@ const ChatWindow = () => {
   // const message = useRef();
   const [message, setMessage] = useState("");
   // const [hasContent, setHasContent] = useState(false);
-  const conversationRef = useRef(null);
+  // const conversationRef = useRef(null);
+
+  const conversationRef = useCallback((el) => {
+  if (!el) return;
+  
+  const handleScroll = () => {
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    setShowScrollBtn(distanceFromBottom > 500);
+  };
+
+  el.addEventListener("scroll", handleScroll);
+  return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
+}, []);
   const chatEnd = useRef(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
@@ -46,15 +58,16 @@ const ChatWindow = () => {
     isInitialLoad.current = true;
   }, [id]); // Resetare ref la fiecare intrarea pe un chat
 
-
   // La deschiderea chat ului va da automat scroll la finalul conversatiei
   useEffect(() => {
+    if (isFetching) return;
     if (!messages?.length) return;
-    if (isInitialLoad.current && chatEnd.current && messages) {
-      chatEnd.current.scrollIntoView({ behavior: "smooth" });
-      isInitialLoad.current = false; // setez la false ca sa nu se mai da scroll dupa modificarea mesajelor
-    }
-  }, [messages]);
+    if (isFetching) return;
+    if (!isInitialLoad.current) return;
+
+    chatEnd.current?.scrollIntoView({ behavior: "smooth" });
+    isInitialLoad.current = false;
+  }, [messages, isFetching]);
 
   useEffect(() => {
     setMessages(data?.conversation);
@@ -70,13 +83,13 @@ const ChatWindow = () => {
       const distanceFromBottom =
         el.scrollHeight - el.scrollTop - el.clientHeight;
       console.log("DISTANCE", distanceFromBottom);
-      setShowScrollBtn(distanceFromBottom > 100);
+      setShowScrollBtn(distanceFromBottom > 500);
     };
 
     el.addEventListener("scroll", handleScroll);
     console.log("EVENT ADDED");
     return () => el.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [conversationRef]);
 
   // Functie care copiaza contentul unui mesaj in clipboard
   const handleCopy = async (text) => {
@@ -167,9 +180,8 @@ const ChatWindow = () => {
                 </div>
               </li>
             ))}
+          <div ref={chatEnd} className="bg-red-500" />
         </ol>
-
-        <div ref={chatEnd} />
       </section>
 
       <div className="absolute flex flex-col bottom-0 right-5 w-4/5 z-10 items-center justify-center gap-4">
