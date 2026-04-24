@@ -3,9 +3,12 @@ import Input from "../../../components/Input";
 import { IoSend } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import LoadingCircle from "../../../components/LoadingCircle";
 const MessageInput = ({
   onSubmit,
   message,
+  disabled,
+  loading,
   placeholder,
   setMessage,
 }) => {
@@ -34,11 +37,13 @@ const MessageInput = ({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       console.log("TO SUBMIT" + new Date());
+      if (disabled) return;
       onSubmit();
       return;
     }
   };
-
+  console.log("ACTIVE STATE");
+  console.log(loading);
   return (
     <div className="w-1/2 relative flex items-center mx-auto">
       <textarea
@@ -52,10 +57,16 @@ const MessageInput = ({
         className="w-full resize-none overflow-hidden rounded-md border border-input border-gray-800
                  bg-background px-4 py-4 min-h-9 max-h-50 pr-8"
       />
-      {message.trim().length>0 && (
+      {message.trim().length > 0 && !loading && (
         <button onClick={onSubmit}>
           <FaArrowUp className="size-8 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer hover:scale-105 bg-gray-900 p-2 rounded-2xl border border-blue-950" />
         </button>
+      )}
+      {loading && (
+        <div className="absolute right-1">
+          {" "}
+          <LoadingCircle />{" "}
+        </div>
       )}
     </div>
   );

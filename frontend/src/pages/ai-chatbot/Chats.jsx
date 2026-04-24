@@ -1,30 +1,55 @@
-import React from "react";
+import React, {  useState, useMemo } from "react";
 import { useGetUserChats } from "../../features/ai/api/chatBot.api.js";
 import { useNavigate } from "react-router-dom";
+import Input from "../../components/Input.jsx";
+import LoadingCircle from "../../components/LoadingCircle.jsx";
 
 const Chats = () => {
   const navigate = useNavigate();
-  const { data: chats, isPending } = useGetUserChats();
-  if (isPending) return <p>Loading...</p>;
+  const { data: chats = [] } = useGetUserChats();
+  const [search, setSearch] = useState("");
   console.log(chats);
-  console.log();
+  const filtered = useMemo(
+    () =>
+      chats.filter((chat) =>
+        chat.conversation_title
+          .toLowerCase()
+          .includes(search.trim().toLowerCase()),
+      ),
+    [chats, search],
+  );
+  // if (isPending) return <LoadingCircle />;
+
+  console.log(search);
   return (
-    <div className="w-screen h-screen">
-      {chats.conversations?.length === 0 && (
+    <div className="w-full h-full flex flex-col items-center gap-10 p-10 ">
+      {chats.conversations?.length === 0 ? (
         <p className="text-center"> No chats yet </p>
+      ) : (
+        <h1 className="text-center font-semibold text-3xl">
+          Search your chats
+        </h1>
       )}
-      {chats.conversations?.length > 0 && (
-        <ul className="flex flex-col w-full gap-2">
-          {chats?.conversations.map((conversation,index) => (
+
+      <Input
+        placeholder={"Search any chat..."}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      {chats?.length > 0 && (
+        <ol className="flex flex-col w-full gap-2 overflow-y-auto">
+          {filtered.map((conversation, index) => (
             <li
-              key={index+100}
-              className="w-full flex justify-center cursor-pointer bg-gray-900"
+              key={index}
+              className="w-full flex justify-center cursor-pointer bg-gray-900 p-1"
               onClick={() => navigate(`/chat/${conversation.conversation_id}`)}
             >
-              {conversation.conversation_id}
+              {conversation.conversation_title}
             </li>
           ))}
-        </ul>
+          {filtered.length === 0 && (
+            <p className="text-center font-semibold">No chats available</p>
+          )}
+        </ol>
       )}
     </div>
   );

@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import Input from "../../components/Input";
-import MessageInput from "../../features/ai/components/MessageInput";
+import MessageInput from "../../features/ai/components/MessageInput.jsx";
 import { useCreateChat } from "../../features/ai/api/chatBot.api.js";
 
 const NewChat = () => {
   const { user } = useAuthStore();
   const [message, setMessage] = useState("");
   console.log(user);
-  const { mutate: sendMessage } = useCreateChat();
+  const { mutate: sendMessage, isPending } = useCreateChat();
   const onSubmit = async () => {
-
-    try {
-      await sendMessage(message);
-    } catch (error) {
-      throw new Error(error);
-    }
+    if (isPending) return;
+    await sendMessage(message);
   };
   return (
     <div className="w-screen h-full  flex flex-col gap-10 justify-center items-center ">
@@ -34,8 +30,9 @@ const NewChat = () => {
       <MessageInput
         placeholder={"How can i help you?"}
         className="w-full border border-gray-700 p-4 rounded-xl"
-        message={message}
         onSubmit={onSubmit}
+        message={message}
+        loading={isPending}
         setMessage={setMessage}
       />
     </div>

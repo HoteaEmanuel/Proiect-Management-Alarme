@@ -4,7 +4,7 @@ from datetime import datetime
 
 from models import AppError
 from schemas import ChatRequest, ChatCreate, ChatResponse, LLMSQLResponse
-from crud import get_conversation_history, get_full_conversation, save_message_to_db
+from crud import get_conversation_history, get_full_conversation, save_message_to_db, get_user_conversations
 from crud import create_new_conversation, run_llm_query, set_response_id, get_conversation_title, set_conversation_title
 from .client import llm_request
 from .prompt_builder import get_system_prompt
@@ -17,6 +17,13 @@ def prepare_conversation(db: Session, request: ChatRequest):
             conversation_id = conversation.conversation_id
     else:
         conversation_id = request.conversation_id
+
+    #verificare conversation id
+    conversations_list = get_user_conversations(db=db, user_id=request.user_id)
+    conversations_list = [p.conversation_id for p in conversations_list]
+
+    if conversation_id not in conversations_list:
+        raise AppError(status_code=400, detail="conversation_id not found")
 
     #salvez mesajul utilizatorului in baza de date
     user_message_data = ChatCreate(
