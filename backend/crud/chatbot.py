@@ -156,7 +156,7 @@ def run_llm_query(db: Session, query: str):
     except AppError as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-    
+#functie care sterge o conversatie+toate mesajele asoctiate din baza de date      
 def delete_conversation(db: Session, user_id: int, conversation_id: int):
     try:
         conversation=db.execute(
@@ -180,3 +180,21 @@ def delete_conversation(db: Session, user_id: int, conversation_id: int):
     except Exception as e:
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}") 
+    
+def update_conversation_title(db: Session, user_id: int, conversation_id: int, new_title: str):
+    conversation = db.execute(
+        select(ConversationModel)
+        .where(
+            ConversationModel.conversation_id == conversation_id,
+            ConversationModel.user_id == user_id
+        )
+    ).scalar()
+    if conversation is None:
+        raise AppError(status_code=404, detail="Conversation not found")
+    
+    try:
+        conversation.conversation_title=new_title
+        db.commit()
+    except:
+        db.rollback()
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")

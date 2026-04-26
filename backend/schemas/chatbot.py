@@ -46,3 +46,6 @@ class LLMSQLResponse(BaseModel):
     has_sql_query: bool
     sql_query: str | None
     text_response: str | None
+    
+class ConversationTitleUpdate(BaseModel):
+    new_title: str
