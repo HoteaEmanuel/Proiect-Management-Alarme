@@ -155,3 +155,28 @@ def run_llm_query(db: Session, query: str):
         return []
     except AppError as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
+    
+def delete_conversation(db: Session, user_id: int, conversation_id: int):
+    try:
+        conversation=db.execute(
+            select(ConversationModel).
+            where(
+                ConversationModel.conversation_id == conversation_id,
+                ConversationModel.user_id == user_id)
+        ).scalar()
+        if conversation is None:
+            raise AppError(status_code=404, detail="Conversation not found")
+        
+        # sterg toate mesajele asociate conversatiei
+        db.query(MessageModel).filter(MessageModel.conversation_id == conversation_id).delete()
+        
+        # sterg conversatia
+        db.delete(conversation)
+        db.commit()
+        
+    except AppError:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}") 
