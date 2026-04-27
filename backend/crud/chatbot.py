@@ -195,6 +195,6 @@ def update_conversation_title(db: Session, user_id: int, conversation_id: int, n
     try:
         conversation.conversation_title=new_title
         db.commit()
-    except:
+    except Exception as e:
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
