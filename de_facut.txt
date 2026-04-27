@@ -2,3 +2,7 @@
     APIError (pentru ce tine de api calls)
     AuthError (pentru ce tine de autentificare)
     DatabaseError (pentru ce tine de baza de date)
+
+-implementat verificarea de autentificare la fiecare router (in routers/chatbot.py deja am bagat)
+
+-de modificat routerele sa fie la plural (/conversation -> /okconversations)

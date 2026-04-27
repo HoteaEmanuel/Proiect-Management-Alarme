@@ -28,7 +28,7 @@ def get_conversations_list(user_id: str = Depends(get_current_user), db: Session
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/conversation/{conversation_id}", response_model=ConversationHistory)
+@router.get("/conversations/{conversation_id}", response_model=ConversationHistory)
 def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
         conversation = get_full_conversation(db=db, user_id=user_id["id"], conversation_id=conversation_id)
