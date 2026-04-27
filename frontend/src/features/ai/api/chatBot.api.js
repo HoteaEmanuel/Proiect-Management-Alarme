@@ -18,20 +18,18 @@ export const useCreateChat = () => {
       });
       return response.data;
     },
-    mutationKey: ["conversations", user.user_id],
-    // onError: () => {
-    //   toast.error("Could not send the message");
-    // },
+    mutationKey: ["conversations"],
+    onError: () => {
+      toast.error("Could not send the message");
+    },
     onSuccess: (response) => {
       toast.success("Yey");
-      if (response.conversation_id) {
-        return navigate(
-          `/chat/${response.conversation_id}`,
-        );
-      }
       queryClient.invalidateQueries({
         queryKey: ["conversations", user.user_id],
       });
+      if (response.conversation_id) {
+        return navigate(`/chat/${response.conversation_id}`);
+      }
     },
   });
 };

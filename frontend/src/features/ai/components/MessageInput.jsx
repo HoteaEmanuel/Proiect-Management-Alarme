@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import Input from "../../../components/Input";
 import { IoSend } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
-import { useParams } from "react-router-dom";
 import LoadingCircle from "../../../components/LoadingCircle";
 import { toast } from "sonner";
 
@@ -16,7 +15,6 @@ const MessageInput = ({
   placeholder,
   setMessage,
 }) => {
-  const { id } = useParams();
   const MAX_HEIGHT = 300;
   const input = useRef();
   const handleInput = (e) => {
