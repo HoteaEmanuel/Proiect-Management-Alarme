@@ -178,7 +178,7 @@ export const Statistics = () => {
               <h2 className="statistics-card-title">Severities</h2>
 
               <div className="statistics-chart-body">
-                <GraficBara data={severities} />
+                <GraficBara data={severities} vertical={true} />
               </div>
             </div>
 
@@ -215,7 +215,7 @@ export const Statistics = () => {
 
               <div className="statistics-chart-card statistics-large-chart">
                 <div className="statistics-large-chart-body">
-                  <ResponsiveContainer width="92%" height={300}>
+                  {/* <ResponsiveContainer width="92%" height={300}>
                     <BarChart
                       data={companies}
                       layout="vertical"
@@ -231,9 +231,9 @@ export const Statistics = () => {
                         radius={[0, 4, 4, 0]}
                       />
                     </BarChart>
-                  </ResponsiveContainer>
+                  </ResponsiveContainer> */}
 
-                  {/* <GraficBara data={companies} vertical={}/> */}
+                  <GraficBara data={companies} direction={"horizontal"} vertical={false}/>
                 </div>
               </div>
             </div>
@@ -262,6 +262,8 @@ export const Statistics = () => {
                       />
                     </BarChart>
                   </ResponsiveContainer>
+
+                  {/* <GraficBara data={topServers} direction={"horizontal"}/> */}
                 </div>
               </div>
             </div>
