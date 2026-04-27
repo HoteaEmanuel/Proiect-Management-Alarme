@@ -16,8 +16,6 @@ import NewChat from "./pages/ai-chatbot/NewChat.jsx";
 import Chats from "./pages/ai-chatbot/Chats.jsx";
 import { Toaster } from "sonner";
 function App() {
-  console.log("IN APP");
-
   useCheckAuth();
   return (
     <Routes>

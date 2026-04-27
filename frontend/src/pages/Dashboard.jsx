@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useTransition } from "react";
 import {
   useGetAllAlarms,
   useGetFilteredAlarms,
@@ -6,10 +6,13 @@ import {
 import { AlarmsTable } from "../features/dashboard/components/Table";
 import { useState } from "react";
 import { alarmsApi } from "../features/dashboard/api/alarms.api";
-import { CiExport } from "react-icons/ci";
+import { CiExport, CiPlug1 } from "react-icons/ci";
 import "../styles/pages/Dashboard.css";
+import { RiLoader2Fill } from "react-icons/ri";
+import { toast } from "sonner";
 
 const Dashboard = () => {
+  const [isExporting, startExporting] = useTransition();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
   const [filters, setFilters] = useState(undefined);
 
@@ -34,13 +37,52 @@ const Dashboard = () => {
 
   if (isPendingAlarms) return <p>Loading...</p>;
 
+  const handleExport = async () => {
+    try {
+      startExporting(async () => {
+        const data = await alarmsApi.export({
+          filters,
+          pagination,
+          sorting,
+        });
+        // Un Blob e un obiect care reprezinta un fișier în memorie,  type e tipul — in cazul asta .xlsx
+        const blob = new Blob([data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        const url = URL.createObjectURL(blob); // Generare url care pointeaza spre acest blob
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "export.xlsx";
+        a.click();
+        console.log(url);
+      });
+    } catch (e) {
+      toast.error("Export failed");
+    }
+  };
+
   return (
     <div className="dashboard-page">
       <div className="flex w-full justify-between items-center">
         <h1 className="dashboard-title">Alarms</h1>
-        <button className="flex gap-1 items-center border rounded-2xl p-1 px-2 cursor-pointer hover:scale-105 bg-blue-950">
-          Export
-          <CiExport />
+
+        <button
+          className="flex gap-1 items-center border rounded-2xl p-1 px-2 cursor-pointer hover:scale-105 bg-blue-950"
+          onClick={handleExport}
+        >
+          {isExporting ? (
+            <>
+              Exporting...
+              <RiLoader2Fill className="animate-spin" />
+            </>
+          ) : (
+            <>
+              Export
+              <CiExport />
+            </>
+          )}
         </button>
       </div>
 
