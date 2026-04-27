@@ -23,6 +23,6 @@ export const useGetStatistics=()=>{
     return useQuery({
     queryFn:()=>getStatistics(),
     queryKey:["statistics"],
-    staleTime:1000*30
+    staleTime:1000*30 // 30 sec
   })
 }

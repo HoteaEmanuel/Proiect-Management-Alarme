@@ -2,12 +2,12 @@ import React, { useEffect, useTransition } from "react";
 import {
   useGetAllAlarms,
   useGetFilteredAlarms,
-} from "../features/dashboard/hooks/alarms.queries";
-import { AlarmsTable } from "../features/dashboard/components/Table";
+} from "@features/dashboard/hooks/alarms.queries";
+import { AlarmsTable } from "@features/dashboard/components/Table";
 import { useState } from "react";
-import { alarmsApi } from "../features/dashboard/api/alarms.api";
+import { alarmsApi } from "@features/dashboard/api/alarms.api";
 import { CiExport, CiPlug1 } from "react-icons/ci";
-import "../styles/pages/Dashboard.css";
+import "@styles/pages/Dashboard.css";
 import { RiLoader2Fill } from "react-icons/ri";
 import { toast } from "sonner";
 

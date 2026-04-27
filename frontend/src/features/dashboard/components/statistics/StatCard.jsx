@@ -1,4 +1,4 @@
-import "../../../styles/features/dashboard/components/StatCard.css";
+import '@styles/features/dashboard/components/StatCard.css';
 
 const StatCard = ({ label, value, unit }) => {
 

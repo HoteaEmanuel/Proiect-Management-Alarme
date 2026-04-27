@@ -47,8 +47,13 @@ export const alarmsApi = {
     return response.data;
   },
 
-  getStatistics: async () => {
-    const response = await api.get(`${VITE_URL_APP}/alarms/kpi-stats`);
+  getStatistics: async (filters) => {
+    let url = `${VITE_URL_APP}/alarms/kpi-stats?`;
+    url += "start_date=" + filters.start_date + "&&";
+    url += "end_date=" + filters.end_date;
+
+    console.log("URL CALLED: ", url);
+    const response = await api.get(url);
     return response.data;
   },
   export: async ({ filters, pagination, sorting }) => {

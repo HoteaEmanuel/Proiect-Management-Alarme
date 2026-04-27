@@ -1,8 +1,8 @@
 import React from 'react'
 import { IoAlertSharp } from "react-icons/io5";
-import Button from '../components/Button';
+import Button from '@components/Button';
 import { useNavigate } from 'react-router-dom';
-import '../styles/pages/Home.css'
+import '@styles/pages/Home.css'
 
 const Home = () => {
 
