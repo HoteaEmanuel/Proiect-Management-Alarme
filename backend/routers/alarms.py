@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 
@@ -6,6 +6,9 @@ from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, Alar
 from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from models import Alarm, AppError
 from database import get_db
+import io
+from openpyxl import Workbook
+from openpyxl.styles import Font
 
 router=APIRouter()
 
@@ -70,3 +73,40 @@ def edit_alarm(number:str, alarm_data: AlarmUpdate, db: Session = Depends(get_db
         return updated_alarm
     except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+@router.get("/export")
+def export_alarms(filters: RequestFilters=Depends(), db: Session=Depends(get_db)):
+    #ignor paginarea
+    filters.current_page=1
+    filters.page_size=999999
+    
+    #preiau alarmele (filtrate) fara paginare
+    try:
+        _, alarms_list=get_filtered_alarms(db, filters)
+    except Exception as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+    #creez workbook-ul si setez numele sheet-ului
+    wb=Workbook()
+    ws=wb.active
+    ws.title="Alarms"
+    
+    #preiau numele coloanelor din schema AlarmResponse si le adaug ca header
+    columns=list(AlarmResponse.model_fields.keys())
+    ws.append(columns)
+    
+    #adaug fiecare alarma ca rand
+    for alarm in alarms_list:
+        ws.append([str(alarm.get(col, "")) for col in columns])
+        
+    #salvez workbook-ul intr-un buffer
+    output=io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    #returnez fisiserul
+    return Response(
+        content=output.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=alarms_export.xlsx"}
+    )
