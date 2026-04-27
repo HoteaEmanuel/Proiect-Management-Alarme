@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from database import get_db
 from sqlalchemy.orm import Session
 
-from schemas import ChatRequest, ChatResponse, ConversationListresponse
+from schemas import ChatRequest, ChatResponse, ConversationListresponse, ConversationTitleUpdate
 from integrations.chatbot import user_chat_request
-from crud import get_user_conversations, get_full_conversation
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title
 from models import AppError
 
 router = APIRouter()
@@ -32,4 +32,18 @@ def get_chat_history(user_id: int, chat_id: int, db: Session = Depends(get_db)):
         return ChatResponse(conversation_id=chat_id, conversation=conversation["messages"], conversation_title=conversation["conversation_title"])
     except Exception as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-
+    
+@router.delete("/conversations/{user_id}/{conversation_id}", status_code=204)
+def delete_chat(user_id: int, conversation_id: int, db: Session = Depends(get_db)):
+    try:
+        delete_conversation(db=db, user_id=user_id, conversation_id=conversation_id)
+    except Exception as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    
+@router.patch("/conversations/{user_id}/{conversation_id}", status_code=200)
+def edit_conversation_title(user_id: int, conversation_id: int, body: ConversationTitleUpdate, db: Session = Depends(get_db)):
+    try:
+        update_conversation_title(db=db, user_id=user_id, conversation_id=conversation_id, new_title=body.new_title)
+        return {"detail": "Title updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
