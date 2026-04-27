@@ -137,7 +137,10 @@ const ChatWindow = () => {
       handleScrollDown();
 
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, mesaj);
-      setMessages((prev) => [...prev, { content: response.data.content, role:'user' }]);
+      setMessages((prev) => [
+        ...prev,
+        { content: response.data.content, role: "assistant" },
+      ]);
       console.log("RESP AICI");
       console.log(response);
     } finally {
@@ -213,11 +216,7 @@ const ChatWindow = () => {
             onSubmit={handleSubmit}
             message={message}
             loading={isTyping}
-            placeholder={
-              data.mesages.length > 0
-                ? "Ask anything"
-                : "How can i help you today?"
-            }
+            placeholder={"Ask anything"}
             setMessage={setMessage}
           />
         </div>
