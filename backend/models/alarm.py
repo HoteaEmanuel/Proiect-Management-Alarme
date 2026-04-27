@@ -2,6 +2,7 @@ from enums import Status, AlarmType, CategoryType, SubCategoryType, Details
 from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from database import Base
      
 class Alarm(Base):

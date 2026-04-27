@@ -2,10 +2,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, text
 
 from models import MessageModel, ConversationModel, AppError
-from schemas import ChatMessage, ChatCreate, ConversationCreate
+from schemas import ChatMessage, ChatCreate
 
 #functie ce returneaza istoricul unei conversatii, cu limita de mesaje (de folosit pentru fereastra de context a agentilor)
-def get_conversation_history(db: Session, user_id: int, conversation_id: int, limit: int = 10):
+def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
     
     #querry ff simplu pentru a prelua mesajele
     stmt = (
@@ -31,7 +31,7 @@ def get_conversation_history(db: Session, user_id: int, conversation_id: int, li
     return [{"role": row.role, "content": row.content} for row in rows]
 
 #functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
-def get_full_conversation(db: Session, user_id: int, conversation_id: int):
+def get_full_conversation(db: Session, user_id: str, conversation_id: str):
     stmt = (
         select(MessageModel)
         .where(
@@ -60,7 +60,7 @@ def get_full_conversation(db: Session, user_id: int, conversation_id: int):
     }
 
 #functie ce returneaza lista de conversatii ale user ului
-def get_user_conversations(db: Session, user_id: int):
+def get_user_conversations(db: Session, user_id: str):
     stmt = (
         select(ConversationModel)
         .where(
@@ -106,7 +106,7 @@ def set_response_id(db: Session, user_message_id: int, bot_response_id: int):
     except Exception as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-def get_conversation_title(db: Session, conversation_id: int):
+def get_conversation_title(db: Session, conversation_id: str):
     try:
         result = db.execute(
             text("SELECT CONVERSATION_TITLE FROM CONVERSATIONS WHERE CONVERSATION_ID = :conversation_id"),
@@ -120,7 +120,7 @@ def get_conversation_title(db: Session, conversation_id: int):
     except Exception as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
 
-def set_conversation_title(db: Session, conversation_id: int, conversation_title: str):
+def set_conversation_title(db: Session, conversation_id: str, conversation_title: str):
     try:
         db.query(ConversationModel)\
             .filter(ConversationModel.conversation_id == conversation_id)\
@@ -131,7 +131,7 @@ def set_conversation_title(db: Session, conversation_id: int, conversation_title
     
 
 #functie ce creeaza o noua conversatie in baza de date
-def create_new_conversation(db: Session, user_id: int):
+def create_new_conversation(db: Session, user_id: str):
     
     conversation = ConversationModel(
         user_id=user_id,
@@ -157,7 +157,7 @@ def run_llm_query(db: Session, query: str):
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
 #functie care sterge o conversatie+toate mesajele asoctiate din baza de date      
-def delete_conversation(db: Session, user_id: int, conversation_id: int):
+def delete_conversation(db: Session, user_id: str, conversation_id: str):
     try:
         conversation=db.execute(
             select(ConversationModel).
@@ -181,7 +181,7 @@ def delete_conversation(db: Session, user_id: int, conversation_id: int):
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}") 
     
-def update_conversation_title(db: Session, user_id: int, conversation_id: int, new_title: str):
+def update_conversation_title(db: Session, user_id: str, conversation_id: str, new_title: str):
     conversation = db.execute(
         select(ConversationModel)
         .where(

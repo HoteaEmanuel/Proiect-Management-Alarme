@@ -47,7 +47,7 @@ def serialize_query_result(result: list) -> str:
         default=lambda x: x.isoformat() if isinstance(x, datetime) else str(x)
     )
 
-def get_llm_response(db: Session, request: ChatCreate, user_message_id: int, context_history: list[dict[str, str]]):
+def get_llm_response(db: Session, request: ChatCreate, context_history: list[dict[str, str]]):
 
     system_prompt = get_system_prompt(
             new_conversation_prompt=request.new_chat,
@@ -113,19 +113,19 @@ def user_chat_request(db: Session, request: ChatRequest):
     try:
         request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
 
-        conversation_title, final_text, is_query, query = get_llm_response(db, request, user_message_id, context_history)
+        conversation_title, final_text, is_query, query = get_llm_response(db, request, context_history)
 
         save_bot_response(db, request, final_text, is_query, query, user_message_id)
         
 
         #preiau toata conversatia din baza de date si o trimit catre frontend
-        full_chat_history = get_full_conversation(db=db, 
-                                             user_id=request.user_id, 
-                                             conversation_id=request.conversation_id)
+        #full_chat_history = get_full_conversation(db=db, 
+        #                                    user_id=request.user_id, 
+        #                                     conversation_id=request.conversation_id)
 
         return ChatResponse(conversation_id=request.conversation_id,
                             conversation_title=conversation_title,
-                            conversation=full_chat_history["messages"])
+                            response_text=final_text)
     
     except AppError:
         raise

@@ -2,14 +2,14 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 class ChatRequest(BaseModel):
-    user_id: int
-    conversation_id: int = 0
+    user_id: str | None = None
+    conversation_id: str | None = None
     message: str
     new_chat: bool = False
 
 class ChatCreate(BaseModel):
-    conversation_id: int
-    user_id: int
+    conversation_id: str
+    user_id: str
     role: str
     has_sql_query: bool = False
     content: str
@@ -23,16 +23,19 @@ class ChatMessage(ChatCreate):
     model_config = ConfigDict(from_attributes=True)
 
 class ChatResponse(BaseModel):
-    conversation_id: int
+    conversation_id: str
     conversation_title: str
-    conversation: list[ChatMessage]
+    response_text: str
+
+class ConversationHistory(BaseModel):
+    mesages: list[ChatMessage]
 
 class ConversationCreate(BaseModel):
-    user_id: int
+    user_id: str
 
 class ConversationResponse(BaseModel):
-    user_id: int
-    conversation_id: int
+    user_id: str
+    conversation_id: str
     conversation_title: str | None = None
     created_at: datetime
 

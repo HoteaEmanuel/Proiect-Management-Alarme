@@ -1,14 +1,14 @@
 CREATE TABLE Conversations (
-    conversation_id INT IDENTITY(1,1) PRIMARY KEY,
+    conversation_id NVARCHAR(36) PRIMARY KEY,
     conversation_title VARCHAR(50),
-    user_id INT NOT NULL,
+    user_id NVARCHAR(36) NOT NULL,
     created_at DATETIME DEFAULT GETDATE()
 );
 
 CREATE TABLE Messages (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    conversation_id INT NOT NULL,
-    user_id INT NOT NULL,
+    conversation_id NVARCHAR(36) NOT NULL,
+    user_id NVARCHAR(36) NOT NULL FOREIGN KEY REFERENCES Users(id),
     role VARCHAR(20) NOT NULL,
     response_id INT NULL,
     content TEXT NOT NULL,
