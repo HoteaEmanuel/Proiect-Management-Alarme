@@ -66,7 +66,7 @@ const MessageInput = ({
         onKeyDown={handleKeyDown}
         onInput={handleInput}
         className="w-full resize-none overflow-hidden rounded-md border border-input border-gray-800
-                 bg-background px-4 py-4 min-h-9 max-h-50 pr-8"
+                 bg-background p-4 min-h-9 max-h-50 pr-8"
       />
       {message.trim().length > 0 && !loading && (
         <button onClick={onSubmit}>
