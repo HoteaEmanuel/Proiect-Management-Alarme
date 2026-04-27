@@ -70,8 +70,10 @@ const ChatWindow = () => {
     isInitialLoad.current = false;
   }, [messages, isFetching]);
 
+  console.log("DATA FROM CONV");
+  console.log(data);
   useEffect(() => {
-    setMessages(data?.conversation);
+    setMessages(data?.messages);
   }, [setMessages, data]);
 
   // Functie care adauga adauga event de scroll astfel incat sa apara posibilitatea de scroll
@@ -135,7 +137,7 @@ const ChatWindow = () => {
       handleScrollDown();
 
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, mesaj);
-      setMessages((prev) => [...prev, response.data.conversation.at(-1)]);
+      setMessages((prev) => [...prev, { content: response.data.content, role:'user' }]);
       console.log("RESP AICI");
       console.log(response);
     } finally {
@@ -212,7 +214,7 @@ const ChatWindow = () => {
             message={message}
             loading={isTyping}
             placeholder={
-              data?.conversation.length > 0
+              data.mesages.length > 0
                 ? "Ask anything"
                 : "How can i help you today?"
             }

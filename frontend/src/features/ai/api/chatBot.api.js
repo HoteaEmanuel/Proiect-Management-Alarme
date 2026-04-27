@@ -11,7 +11,6 @@ export const useCreateChat = () => {
   return useMutation({
     mutationFn: async (message) =>
       await api.post(`${VITE_URL_APP}/api/chatbot`, {
-        user_id: user.user_id,
         new_chat: true,
         message,
       }),
@@ -62,7 +61,7 @@ export const useGetUserChats = () => {
   return useQuery({
     queryFn: async () => {
       const response = await api.get(
-        `${VITE_URL_APP}/api/conversations/${user.user_id}`,
+        `${VITE_URL_APP}/api/conversations`,
       );
       console.log("API CHATS");
       console.log(response);
@@ -76,11 +75,7 @@ export const useGetConversation = (chatId) => {
   const { user } = useAuthStore();
   return useQuery({
     queryFn: async () => {
-      const response = await api.get(`${VITE_URL_APP}/api/chat/${chatId}`, {
-        params: {
-          user_id: user.user_id,
-        },
-      });
+      const response = await api.get(`${VITE_URL_APP}/api/conversations/${chatId}`);
       return response.data;
     },
     queryKey: ["conversation", user.user_id, chatId],
