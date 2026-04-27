@@ -9,20 +9,24 @@ export const useCreateChat = () => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (message) =>
-      await api.post(`${VITE_URL_APP}/api/chatbot`, {
+    mutationFn: async (message) => {
+      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, {
         new_chat: true,
+        user_id: user.user_id,
+        conversation_id: undefined,
         message,
-      }),
-    mutationKey: ["conversations", user.user_id],
-    onError: () => {
-      toast.error("Could not send the message");
+      });
+      return response.data;
     },
+    mutationKey: ["conversations", user.user_id],
+    // onError: () => {
+    //   toast.error("Could not send the message");
+    // },
     onSuccess: (response) => {
       toast.success("Yey");
-      if (response.data?.conversation[0].conversation_id) {
+      if (response.conversation_id) {
         return navigate(
-          `/chat/${response.data.conversation[0].conversation_id}`,
+          `/chat/${response.conversation_id}`,
         );
       }
       queryClient.invalidateQueries({
@@ -34,7 +38,7 @@ export const useCreateChat = () => {
 
 export const useSendMessage = ({ id }) => {
   const { user } = useAuthStore();
- // const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ message }) => {
       console.log("MESS HERE: ", message);
@@ -60,9 +64,7 @@ export const useGetUserChats = () => {
   const { user } = useAuthStore();
   return useQuery({
     queryFn: async () => {
-      const response = await api.get(
-        `${VITE_URL_APP}/api/conversations`,
-      );
+      const response = await api.get(`${VITE_URL_APP}/api/conversations`);
       console.log("API CHATS");
       console.log(response);
       return response.data.conversations;
@@ -75,7 +77,9 @@ export const useGetConversation = (chatId) => {
   const { user } = useAuthStore();
   return useQuery({
     queryFn: async () => {
-      const response = await api.get(`${VITE_URL_APP}/api/conversations/${chatId}`);
+      const response = await api.get(
+        `${VITE_URL_APP}/api/conversations/${chatId}`,
+      );
       return response.data;
     },
     queryKey: ["conversation", user.user_id, chatId],
