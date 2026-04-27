@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useGetStatistics } from "../features/dashboard/hooks/alarms.queries";
 import {
   PieChart,
@@ -15,12 +15,15 @@ import {
 import StatCard from "../features/dashboard/components/StatCard";
 import "../styles/pages/Statistics.css";
 
+
 export const Statistics = () =>
 {
   const COLORS = ["#378ADD", "#E24B4A", "#EF9F27", "#1D9E75", "#7F77DD"];
 
   const { data: statistics, isPending: isPendingStatistics } =
     useGetStatistics();
+
+    const [timePeriod, setTimePeriod] = useState({ start_date:'2026-',end_date:2026})
 
   if (isPendingStatistics) return <p>Loading...</p>;
 
@@ -79,6 +82,26 @@ export const Statistics = () =>
     
     <div className="statistics-page">
       <h1 className="statistics-title">KPI Statistics</h1>
+      
+
+       <div className="dashboard-filter">
+          <label className="dashboard-filter-label">Start date</label>
+          <input
+            type="date"
+            className="dashboard-filter-input"
+            onChange={(e) => {
+              setFilters((prev) => ({
+                ...prev,
+                startDate: e.target.value,
+              }));
+
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+              }));
+            }}
+          />
+        </div>
 
       <div className="statistics-kpi-grid">
         <StatCard label={"Total alarms"} value={statistics.General.Total} />
