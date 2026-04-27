@@ -9,7 +9,8 @@ def get_system_prompt(
         db_safety_prompt: bool = False,
         sql_output_prompt: bool = False,
         query_results_prompt: bool = False,
-        error_handling_prompt: bool = False
+        error_handling_prompt: bool = False,
+        file_analysis_prompt: bool = False
 
 ):
     system_prompt = ""
@@ -39,5 +40,8 @@ def get_system_prompt(
 
     if new_conversation_prompt:
         system_prompt = system_prompt + NEW_CONVERSATION_PROMPT
+        
+    if file_analysis_prompt:
+        system_prompt = system_prompt + FILE_ANALYSIS_PROMPT
     
     return system_prompt

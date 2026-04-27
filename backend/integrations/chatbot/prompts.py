@@ -7,7 +7,8 @@ __all__ = [
     "NEW_CONVERSATION_PROMPT",
     "PERSONA_PROMPT", 
     "CONVERSATION_CONTEXT_PROMPT",
-    "ERROR_HANDLING_PROMPT"
+    "ERROR_HANDLING_PROMPT",
+    "FILE_ANALYSIS_PROMPT"
 ]
 
 
@@ -136,4 +137,12 @@ If the user's request is ambiguous, ask one clarifying question before generatin
 Only ask if the ambiguity would fundamentally change the query.
 If you cannot fulfill a request with the available schema, explain clearly what is and isn't possible.
 Never generate a query you're not confident about without flagging the uncertainty.
+"""
+
+FILE_ANALYSIS_PROMPT = """
+The user has attached a file containing data. The data is provided below in JSON format.
+Answer the user's questions based EXCLUSIVELY on this data.
+Do NOT generate SQL queries. Do NOT reference the database schema.
+If the requested information is not present in the data, state that clearly.
+Always respond in the same language the user writes in.
 """
