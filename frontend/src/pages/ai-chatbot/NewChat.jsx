@@ -26,15 +26,16 @@ const NewChat = () => {
         placeholder={"How can i help you? :)"}
         className="w-1/2 border border-gray-700 p-4 rounded-xl"
       /> */}
-
-      <MessageInput
-        placeholder={"How can i help you?"}
-        className="w-full border border-gray-700 p-4 rounded-xl"
-        onSubmit={onSubmit}
-        message={message}
-        loading={isPending}
-        setMessage={setMessage}
-      />
+      <div className="w-1/2">
+        <MessageInput
+          placeholder={"How can i help you?"}
+          className="w-full border border-gray-700 p-4 rounded-xl"
+          onSubmit={onSubmit}
+          message={message}
+          loading={isPending}
+          setMessage={setMessage}
+        />
+      </div>
     </div>
   );
 };
