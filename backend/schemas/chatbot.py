@@ -28,7 +28,7 @@ class ChatResponse(BaseModel):
     content: str
 
 class ConversationHistory(BaseModel):
-    mesages: list[ChatMessage]
+    messages: list[ChatMessage]
 
 class ConversationCreate(BaseModel):
     user_id: str
