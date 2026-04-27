@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useRef } from "react";
 import Input from "../../../components/Input";
 import { IoSend } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import LoadingCircle from "../../../components/LoadingCircle";
+import { toast } from "sonner";
+
+const MESSAGE_LIMIT = 5000;
+
 const MessageInput = ({
   onSubmit,
   message,
@@ -13,10 +17,13 @@ const MessageInput = ({
   setMessage,
 }) => {
   const { id } = useParams();
-  console.log(id);
   const MAX_HEIGHT = 300;
-
+  const input = useRef();
   const handleInput = (e) => {
+    const inputSize = e.target.value.length;
+    if (inputSize >= MESSAGE_LIMIT) {
+      toast.error(`Maximum ${MESSAGE_LIMIT} characters allowed`);
+    }
     const el = e.target;
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
@@ -36,22 +43,26 @@ const MessageInput = ({
     // Daca se apasa enter, fara shift atunci se da submit la message
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      console.log("TO SUBMIT" + new Date());
       if (disabled) return;
       onSubmit();
+      input.current.value = "";
+      input.current.style.height = "auto"; // Resetez inaltimea
+
       return;
     }
   };
   console.log("ACTIVE STATE");
   console.log(loading);
   return (
-    <div className="w-1/2 relative flex items-center mx-auto">
+    <div className="w-full relative flex items-center mx-auto">
       <textarea
         placeholder={placeholder}
         value={message}
+        ref={input}
         onChange={(e) => setMessage(e.target.value)}
         rows={1}
         type={"text-area"}
+        maxLength={MESSAGE_LIMIT}
         onKeyDown={handleKeyDown}
         onInput={handleInput}
         className="w-full resize-none overflow-hidden rounded-md border border-input border-gray-800

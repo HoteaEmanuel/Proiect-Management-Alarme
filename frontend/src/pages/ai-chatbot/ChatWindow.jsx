@@ -33,16 +33,17 @@ const ChatWindow = () => {
   // const conversationRef = useRef(null);
 
   const conversationRef = useCallback((el) => {
-  if (!el) return;
-  
-  const handleScroll = () => {
-    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    setShowScrollBtn(distanceFromBottom > 500);
-  };
+    if (!el) return;
 
-  el.addEventListener("scroll", handleScroll);
-  return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
-}, []);
+    const handleScroll = () => {
+      const distanceFromBottom =
+        el.scrollHeight - el.scrollTop - el.clientHeight;
+      setShowScrollBtn(distanceFromBottom > 500);
+    };
+
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
+  }, []);
   const chatEnd = useRef(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
@@ -141,10 +142,15 @@ const ChatWindow = () => {
       setIsTyping(false);
     }
   };
+
+  console.log(messages);
   return (
-    <div className="w-full h-full overflow-y-auto" ref={conversationRef}>
-      <section className="p-20 pb-30">
-        <ol className="flex flex-col gap-4 w-full p-2">
+    <div
+      className="w-full h-full overflow-y-auto overflow-x-hidden"
+      ref={conversationRef}
+    >
+      <section className="w-full pl-3 pr-1 pb-30 flex justify-center">
+        <ol className="flex flex-col gap-4 w-2/3 p-2">
           {messages?.length > 0 &&
             messages.map((message, index) => (
               <li
@@ -160,9 +166,9 @@ const ChatWindow = () => {
                   }`}
                   onMouseEnter={() => setShowCopy(index)}
                 >
-                  {message.content}
+                  <p className="whitespace-pre-wrap"> {message.content}</p>
                 </div>
-                <div className="relative bg-red-500">
+                <div className="relative">
                   <div className="absolute bottom-0 left-1">
                     {showCopy === index && !copied && (
                       <button
@@ -180,7 +186,7 @@ const ChatWindow = () => {
                 </div>
               </li>
             ))}
-          <div ref={chatEnd} className="bg-red-500" />
+          <div ref={chatEnd} />
         </ol>
       </section>
 
@@ -200,7 +206,7 @@ const ChatWindow = () => {
             <FaArrowCircleDown className="size-6 cursor-pointer container text-gray-700 rounded-full" />{" "}
           </button>
         )}
-        <div className="w-full flex justify-center p-4 pt-0 bg-[#0b1220]">
+        <div className="w-2/3 flex justify-center p-4 pt-0 bg-[#0b1220]">
           <MessageInput
             onSubmit={handleSubmit}
             message={message}

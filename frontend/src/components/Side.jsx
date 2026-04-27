@@ -11,7 +11,7 @@ const Side = () => {
 
   return (
     <aside className="side">
-      <h1 className="side-title">Alarm Monitoring</h1>
+      <h1 className="side-title">Alarm Manager</h1>
 
       <nav className="side-nav">
         <Link type="button" className="side-nav-item" to={"/dashboard"}>
