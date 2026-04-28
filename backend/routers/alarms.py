@@ -9,7 +9,7 @@ from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, Alar
 from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from models import Alarm, AppError
 from database import get_db
-from .auth import get_current_user
+from auth_utils import get_current_user
 
 router = APIRouter(
     dependencies=[Depends(get_current_user)]

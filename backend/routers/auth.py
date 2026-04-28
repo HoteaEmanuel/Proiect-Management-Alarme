@@ -1,20 +1,18 @@
 import os
-from database import get_db
 from sqlalchemy.orm import Session
 from typing import Annotated
 from fastapi import Depends, APIRouter, HTTPException, Response, Cookie
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.encoders import jsonable_encoder
 from starlette import status
-from datetime import timedelta, datetime, timezone
+from datetime import timedelta
 from jose import jwt, JWTError, ExpiredSignatureError
 from dotenv import load_dotenv
 
-from passlib.context import CryptContext
-
+from database import get_db
 from models import AppError
 from schemas import CreateUserRequest, LoginRequest, UserResponse, TokenResponse
 from crud import authenticate_user, create_user
+from auth_utils import create_jwt_token, get_current_user
 
 router = APIRouter(
 
@@ -28,9 +26,6 @@ ALGORITHM = os.getenv("ALGORITHM")
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
-
-http_bearer = HTTPBearer()
-bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         
 #######################################################
 
@@ -47,19 +42,6 @@ async def create_user(create_user_request: CreateUserRequest, db: db_dependency)
 
 
 #######################################################
-
-
-
-
-# Creeaza un token JWT care contine username-ul si id-ul user-ului si timpul de expirare, apoi il semneaza folosind cheia secreta.
-def create_jwt_token(username: str, user_id: str, expires_delta: timedelta):
-
-    payload = {"sub": username, "id": user_id}
-    expires = datetime.now(timezone.utc) + expires_delta
-    payload["exp"] = expires
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-
 
 # Primeste datele de login, verifica utilizatorul in baza de date si returneaza un token daca autentificarea este valida.
 @router.post("/login", response_model= TokenResponse , status_code=status.HTTP_200_OK)
@@ -96,37 +78,6 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
 
 
 #######################################################
-
-# Verifica tokenul primit, il decodeaza si extrage datele utilizatorului curent.
-async def get_current_user(credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)]):
-    token = credentials.credentials
-    print("TOKEN ")
-    print(token)
-    try:
-        # Verifica daca tokenul e valid
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        user_id: str = payload.get("id")
-        if username is None or user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate user"
-            )
-        # Returnez userul
-        return {"username": username, "id": user_id}
-    
-    except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Expired token"
-        )    
-        
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate user"
-        )   
-
 
 user_dependency = Annotated[dict, Depends(get_current_user)]
 

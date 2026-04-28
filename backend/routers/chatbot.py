@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from schemas import MessageRequest, MessageResponse, ConversationListresponse, ConversationTitleUpdate, ConversationHistory
 from integrations.chatbot import user_chat_request
 from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, save_conversation_file
-from .auth import get_current_user
+from auth_utils import get_current_user
 
 router = APIRouter(
     dependencies=[Depends(get_current_user)]
