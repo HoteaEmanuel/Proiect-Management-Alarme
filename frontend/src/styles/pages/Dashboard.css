@@ -76,6 +76,7 @@
 .dashboard-page {
 
     width: 100%;
+    
     display: flex;
     flex-direction: column;
     padding: 1.25rem;
@@ -88,6 +89,14 @@
     font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
     line-height: 1.15;
+}
+
+.dashboard-header {
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 
@@ -170,6 +179,12 @@
     font-size: var(--fs-xs);
     font-weight: var(--fw-regular);
 }
+
+.dashboard-pagination-value {
+
+    font-weight: var(--fw-semibold);
+}
+
 
 .dashboard-pagination-current {
 

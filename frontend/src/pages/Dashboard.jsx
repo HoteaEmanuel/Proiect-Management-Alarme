@@ -65,7 +65,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      <div className="flex w-full justify-between items-center">
+      <div className="dashboard-header">
         <h1 className="dashboard-title">Alarms</h1>
 
         <button
@@ -85,8 +85,6 @@ const Dashboard = () => {
               </>
             )}
           </button>
-
-
       </div>
 
       <div className="dashboard-filters">
@@ -270,14 +268,15 @@ const Dashboard = () => {
       <div className="dashboard-pagination-info">
         <h2 className="dashboard-pagination-text">
           Total alarms:{" "}
-          <span className="font-semibold">{alarms?.length}</span>{" "}
+          <span className="dashboard-pagination-value">{alarms?.length}</span>{" "}
         </h2>
         <h2 className="dashboard-pagination-text">
           Total matching alarms:{" "}
-          <span className="font-semibold">
+          <span className="dashboard-pagination-value">
             {" "}
             {filteredAlarms?.alarms?.length}
           </span>
+
         </h2>
         <h2 className="dashboard-pagination-text">
           Page:{" "}
