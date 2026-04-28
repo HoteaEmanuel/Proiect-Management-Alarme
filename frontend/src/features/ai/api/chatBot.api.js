@@ -88,10 +88,9 @@ export const useRenameConversation = () => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ conversationId,title}) => {
-
+    mutationFn: async ({ conversationId, title }) => {
       console.log("DATA HERE: ");
-      console.log(conversationId,title)
+      console.log(conversationId, title);
       await api.patch(`${VITE_URL_APP}/api/conversations/${conversationId}`, {
         new_title: title,
       });
@@ -107,11 +106,14 @@ export const useRenameConversation = () => {
 
 export const useDeleteConversation = (conversationId) => {
   const { user } = useAuthStore();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   console.log("DELETING HERE");
+  console.log(conversationId);
   return useMutation({
     mutationFn: async () => {
+      console.log("CONV ID HEREE:");
+      console.log(conversationId);
       await api.delete(`${VITE_URL_APP}/api/conversations/${conversationId}`);
     },
     mutationKey: ["conversations", user.user_id],
@@ -120,7 +122,7 @@ export const useDeleteConversation = (conversationId) => {
         queryKey: ["conversations", user.user_id],
       });
       toast.success("Conversation was deleted");
-      navigate('/chat/new');
+      navigate("/chat/new");
     },
   });
 };
