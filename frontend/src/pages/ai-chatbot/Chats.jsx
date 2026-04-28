@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../components/Input.jsx";
 import LoadingCircle from "../../components/LoadingCircle.jsx";
 
+import { CiSearch } from "react-icons/ci";
+
 const Chats = () => {
   const navigate = useNavigate();
   const { data: chats = [], isPending } = useGetUserConversations();
@@ -29,11 +31,17 @@ const Chats = () => {
           Search your chats
         </h1>
       )}
+      <div className="relative w-full mb-10 flex items-center">
+        <Input
+          placeholder={"Search any chat..."}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ paddingLeft: 30 }}
+        />
+        <div className="absolute flex items-center h-full left-1 ">
+          <CiSearch className="size-5" />
+        </div>
+      </div>
 
-      <Input
-        placeholder={"Search any chat..."}
-        onChange={(e) => setSearch(e.target.value)}
-      />
       {chats?.length > 0 && (
         <ol className="flex flex-col w-full gap-2 overflow-y-auto">
           {filtered.map((conversation, index) => (
