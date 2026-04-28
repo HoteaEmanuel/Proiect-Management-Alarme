@@ -84,13 +84,16 @@ export const useGetConversation = (chatId) => {
   });
 };
 
-export const useRenameConversation = (conversationId) => {
+export const useRenameConversation = () => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (name) => {
+    mutationFn: async ({ conversationId,title}) => {
+
+      console.log("DATA HERE: ");
+      console.log(conversationId,title)
       await api.patch(`${VITE_URL_APP}/api/conversations/${conversationId}`, {
-        new_title: name,
+        new_title: title,
       });
     },
     mutationKey: ["conversations", user.user_id],
@@ -104,6 +107,7 @@ export const useRenameConversation = (conversationId) => {
 
 export const useDeleteConversation = (conversationId) => {
   const { user } = useAuthStore();
+  const navigate=useNavigate();
   const queryClient = useQueryClient();
   console.log("DELETING HERE");
   return useMutation({
@@ -116,6 +120,7 @@ export const useDeleteConversation = (conversationId) => {
         queryKey: ["conversations", user.user_id],
       });
       toast.success("Conversation was deleted");
+      navigate('/chat/new');
     },
   });
 };
