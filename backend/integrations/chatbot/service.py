@@ -3,14 +3,14 @@ import json
 from datetime import datetime
 
 from models import AppError
-from schemas import ChatRequest, ChatCreate, ChatResponse, LLMSQLResponse
-from crud import get_conversation_history, get_full_conversation, save_message_to_db, get_user_conversations
+from schemas import MessageRequest, MessageCreate, MessageResponse, LLMSQLResponse
+from crud import get_conversation_history, save_message_to_db, get_user_conversations
 from crud import create_new_conversation, run_llm_query, set_response_id, get_conversation_title, set_conversation_title
 from .client import llm_request
 from .prompt_builder import get_system_prompt
 from .query_validator import is_query_safe
 
-def prepare_conversation(db: Session, request: ChatRequest):
+def prepare_conversation(db: Session, request: MessageRequest):
     #daca e conversatie noua o creez si ii preiau id-ul creat de baza de date
     if request.new_chat:
             conversation = create_new_conversation(db=db, user_id=request.user_id)
@@ -26,7 +26,7 @@ def prepare_conversation(db: Session, request: ChatRequest):
         raise AppError(status_code=400, detail="conversation_id not found")
 
     #salvez mesajul utilizatorului in baza de date
-    user_message_data = ChatCreate(
+    user_message_data = MessageCreate(
         conversation_id=conversation_id,
         user_id=request.user_id,
         role="user",
@@ -47,7 +47,7 @@ def serialize_query_result(result: list) -> str:
         default=lambda x: x.isoformat() if isinstance(x, datetime) else str(x)
     )
 
-def get_llm_response(db: Session, request: ChatCreate, context_history: list[dict[str, str]]):
+def get_llm_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
 
     system_prompt = get_system_prompt(
             new_conversation_prompt=request.new_chat,
@@ -92,10 +92,10 @@ def get_llm_response(db: Session, request: ChatCreate, context_history: list[dic
     #salvez raspunsul bot-ului in baza de date
     
 
-    return conversation_title, final_text, is_query, query 
+    return final_text, is_query, query 
 
-def save_bot_response(db: Session, request: ChatCreate, final_text: str, is_query: bool, query: str, user_message_id: int):
-    bot_message_data = ChatCreate(
+def save_bot_response(db: Session, request: MessageCreate, final_text: str, is_query: bool, query: str, user_message_id: int):
+    bot_message_data = MessageCreate(
         conversation_id=request.conversation_id,
         user_id=request.user_id,
         role="assistant",
@@ -108,24 +108,16 @@ def save_bot_response(db: Session, request: ChatCreate, final_text: str, is_quer
     set_response_id(db, user_message_id, bot_reply.id)
 
 #functie ce gestioneaza conversatiile user-agent din pagina de chat (practic un agent)
-def user_chat_request(db: Session, request: ChatRequest):
+def user_chat_request(db: Session, request: MessageRequest):
     
     try:
         request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
 
-        conversation_title, final_text, is_query, query = get_llm_response(db, request, context_history)
+        final_text, is_query, query = get_llm_response(db, request, context_history)
 
         save_bot_response(db, request, final_text, is_query, query, user_message_id)
-        
 
-        #preiau toata conversatia din baza de date si o trimit catre frontend
-        #full_chat_history = get_full_conversation(db=db, 
-        #                                    user_id=request.user_id, 
-        #                                     conversation_id=request.conversation_id)
-
-        return ChatResponse(conversation_id=request.conversation_id,
-                            conversation_title=conversation_title,
-                            content=final_text)
+        return MessageResponse(content=final_text)
     
     except AppError:
         raise

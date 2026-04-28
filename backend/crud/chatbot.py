@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, text
 
 from models import MessageModel, ConversationModel, AppError
-from schemas import ChatMessage, ChatCreate
+from schemas import Message, MessageCreate
 
 #functie ce returneaza istoricul unei conversatii, cu limita de mesaje (de folosit pentru fereastra de context a agentilor)
 def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
@@ -56,7 +56,7 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
     
     return {
         "conversation_title": conversation.conversation_title, 
-        "messages": [ChatMessage.model_validate(row) for row in rows]
+        "messages": [Message.model_validate(row) for row in rows]
     }
 
 #functie ce returneaza lista de conversatii ale user ului
@@ -77,7 +77,7 @@ def get_user_conversations(db: Session, user_id: str):
     return rows
 
 #functie ce salveaza un mesaj in baza de date
-def save_message_to_db(db: Session, message_data: ChatCreate):
+def save_message_to_db(db: Session, message_data: MessageCreate):
     
     message = MessageModel(
         conversation_id=message_data.conversation_id,

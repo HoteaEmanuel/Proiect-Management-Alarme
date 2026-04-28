@@ -1,16 +1,20 @@
+import io
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
+from openpyxl import Workbook
+from openpyxl.styles import Font
 
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
 from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
 from models import Alarm, AppError
 from database import get_db
-import io
-from openpyxl import Workbook
-from openpyxl.styles import Font
+from .auth import get_current_user
 
-router=APIRouter()
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
+
 
 #router pentru testare doar
 @router.get("/all-alarms",response_model=list[AlarmResponse])

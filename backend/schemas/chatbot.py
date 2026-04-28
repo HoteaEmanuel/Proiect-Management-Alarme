@@ -1,40 +1,37 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
-class ChatRequest(BaseModel):
+class MessageRequest(BaseModel):
     user_id: str | None = None
     conversation_id: str | None = None
     message: str
     new_chat: bool = False
 
-class ChatCreate(BaseModel):
-    conversation_id: str
+class MessageCreate(BaseModel):
     user_id: str
+    conversation_id: str
     role: str
     has_sql_query: bool = False
     content: str
     sql_query: str | None = None
 
 
-class ChatMessage(ChatCreate):
+class Message(MessageCreate):
     id: int
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
-class ChatResponse(BaseModel):
-    conversation_id: str
-    conversation_title: str
+class MessageResponse(BaseModel):
     content: str
 
 class ConversationHistory(BaseModel):
-    messages: list[ChatMessage]
+    messages: list[Message]
 
 class ConversationCreate(BaseModel):
     user_id: str
 
 class ConversationResponse(BaseModel):
-    user_id: str
     conversation_id: str
     conversation_title: str | None = None
     created_at: datetime
