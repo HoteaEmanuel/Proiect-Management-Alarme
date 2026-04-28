@@ -1,15 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select, text, inspect
-
-<<<<<<< HEAD
-from models import MessageModel, ConversationModel, AppError
-from schemas import Message, MessageCreate
-=======
-from models import MessageModel, ConversationModel, AppError, ConversationFileModel
-from schemas import ChatMessage, ChatCreate
 import pandas as pd
 import io
->>>>>>> parsing
+
+from models import MessageModel, ConversationModel, AppError, ConversationFileModel
+from schemas import Message, MessageCreate
 
 #functie ce returneaza istoricul unei conversatii, cu limita de mesaje (de folosit pentru fereastra de context a agentilor)
 def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
