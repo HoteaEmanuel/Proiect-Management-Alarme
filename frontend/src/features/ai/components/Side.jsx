@@ -10,10 +10,10 @@ import { RiChatNewFill } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { PiChatsCircleFill } from "react-icons/pi";
 import "../../../styles/components/Side.css";
-import { useGetUserChats } from "../api/chatBot.api";
+import { useGetUserConversations } from "../api/chatBot.api";
 import OptionsModal from "./OptionsModal";
 const Side = () => {
-  const { data: chats, isLoading, isPending } = useGetUserChats();
+  const { data: chats, isLoading, isPending } = useGetUserConversations();
   const [selectedChat, setSelectedChat] = useState(undefined);
   const [showOptions, setShowOptions] = useState(false);
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Side = () => {
     <aside className="side">
       <Link
         to={"/dashboard"}
-        className="flex items-center"
+        // className="flex items-center"
         type="button"
         className="side-nav-item"
       >
@@ -51,18 +51,18 @@ const Side = () => {
         {chats?.length === 0 && <h1>No chats yet!</h1>}
         {chats?.length > 0 && (
           <ul className="overflow-y-auto flex-1 flex flex-col gap-2 text-xs">
-            {chats.map((chat, index) => (
+            {chats.map((chat) => ( 
               <li
                 key={chat.conversation_id}
                 onClick={() => navigate(`/chat/${chat.conversation_id}`)}
                 onMouseEnter={() => setSelectedChat(chat.conversation_id)}
-                onMouseLeave={() => setSelectedChat(null)}
-                className={`${index % 2 ? "bg-gray-950" : "bg-gray-800"} cursor-pointer p-1 flex items-center gap-2`}
+                // onMouseLeave={() => setSelectedChat(null)}
+                className={" cursor-pointer p-1 flex items-center gap-2"}
               >
                 <span className="truncate"> {chat.conversation_title}</span>
                 {selectedChat === chat.conversation_id && (
                   <SlOptions
-                    className="size-3 hover:bg-black/50 p-0.5 rounded-full"
+                    className="size-3 hover:bg-black/50 hover:scale-120 p-0.5 rounded-full"
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowOptions(true);
@@ -74,7 +74,13 @@ const Side = () => {
           </ul>
         )}
 
-        {showOptions && <OptionsModal />}
+        {showOptions && (
+          <OptionsModal
+            clear={setSelectedChat}
+            showOptions={setShowOptions}
+            conversationId={selectedChat}
+          />
+        )}
       </nav>
     </aside>
   );

@@ -2,10 +2,10 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
 import { useParams } from "react-router-dom";
 import MessageInput from "../../features/ai/components/MessageInput.jsx";
-
 import {
   FaArrowAltCircleDown,
   FaArrowCircleDown,
+  FaArrowDown,
   FaCheck,
 } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
@@ -208,7 +208,7 @@ const ChatWindow = () => {
         )}
         {showScrollBtn && !isTyping && (
           <button onClick={handleScrollDown}>
-            <FaArrowCircleDown className="size-6 cursor-pointer container text-gray-700 rounded-full" />{" "}
+            <FaArrowDown className="size-6 cursor-pointer  bg-gray-800 border border-black p-1 text-gray-400 rounded-full" />{" "}
           </button>
         )}
         <div className="w-2/3 flex justify-center p-4 pt-0 bg-[#0b1220]">

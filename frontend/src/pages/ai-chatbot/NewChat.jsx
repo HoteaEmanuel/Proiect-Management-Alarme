@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
-import Input from "../../components/Input";
-import MessageInput from "../../features/ai/components/MessageInput.jsx";
-import { useCreateChat } from "../../features/ai/api/chatBot.api.js";
+import Input from "@components/Input";
+import MessageInput from "@features/ai/components/MessageInput.jsx";
+import {  useCreateConversation } from "@features/ai/api/chatBot.api.js";
 
 const NewChat = () => {
   const { user } = useAuthStore();
   const [message, setMessage] = useState("");
   console.log(user);
-  const { mutate: sendMessage, isPending } = useCreateChat();
+  const { mutate: sendMessage, isPending } = useCreateConversation();
   const onSubmit = async () => {
     if (isPending) return;
     await sendMessage(message);

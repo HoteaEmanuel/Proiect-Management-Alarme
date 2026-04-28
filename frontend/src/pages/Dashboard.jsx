@@ -69,7 +69,7 @@ const Dashboard = () => {
         <h1 className="dashboard-title">Alarms</h1>
 
         <button
-          className="flex gap-1 items-center border rounded-2xl p-1 px-2 cursor-pointer hover:scale-105 bg-blue-950"
+          className="flex gap-1 items-center shadow-2xs rounded-2xl py-1 px-3 border border-gray-800 cursor-pointer hover:scale-105 bg-gray-900"
           onClick={handleExport}
         >
           {isExporting ? (

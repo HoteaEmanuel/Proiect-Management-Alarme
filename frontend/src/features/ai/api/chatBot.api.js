@@ -4,7 +4,7 @@ import { useAuthStore } from "../../../store/authStore.js";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
-export const useCreateChat = () => {
+export const useCreateConversation = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -58,7 +58,7 @@ export const useSendMessage = ({ id }) => {
     // },
   });
 };
-export const useGetUserChats = () => {
+export const useGetUserConversations = () => {
   const { user } = useAuthStore();
   return useQuery({
     queryFn: async () => {
@@ -81,5 +81,41 @@ export const useGetConversation = (chatId) => {
       return response.data;
     },
     queryKey: ["conversation", user.user_id, chatId],
+  });
+};
+
+export const useRenameConversation = (conversationId) => {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (name) => {
+      await api.patch(`${VITE_URL_APP}/api/conversations/${conversationId}`, {
+        new_title: name,
+      });
+    },
+    mutationKey: ["conversations", user.user_id],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", user.user_id],
+      });
+    },
+  });
+};
+
+export const useDeleteConversation = (conversationId) => {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  console.log("DELETING HERE");
+  return useMutation({
+    mutationFn: async () => {
+      await api.delete(`${VITE_URL_APP}/api/conversations/${conversationId}`);
+    },
+    mutationKey: ["conversations", user.user_id],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["conversations", user.user_id],
+      });
+      toast.success("Conversation was deleted");
+    },
   });
 };
