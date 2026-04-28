@@ -4,5 +4,3 @@
     DatabaseError (pentru ce tine de baza de date)
 
 -de verificat toate routerele sa fie la plural
-
--de generat mai multe alarme

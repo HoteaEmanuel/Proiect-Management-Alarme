@@ -69,21 +69,24 @@ const Dashboard = () => {
         <h1 className="dashboard-title">Alarms</h1>
 
         <button
-          className="flex gap-1 items-center shadow-2xs rounded-2xl py-1 px-3 border border-gray-800 cursor-pointer hover:scale-105 bg-gray-900"
-          onClick={handleExport}
-        >
-          {isExporting ? (
-            <>
-              Exporting...
-              <RiLoader2Fill className="animate-spin" />
-            </>
-          ) : (
-            <>
-              Export
-              <CiExport />
-            </>
-          )}
-        </button>
+            className="dashboard-export-button"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <>
+                <span>Exporting...</span>
+                <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
+              </>
+            ) : (
+              <>
+                <span>Export</span>
+                <CiExport className="dashboard-export-icon" />
+              </>
+            )}
+          </button>
+
+
       </div>
 
       <div className="dashboard-filters">
