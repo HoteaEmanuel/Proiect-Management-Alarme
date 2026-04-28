@@ -1,8 +1,15 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, text
+from sqlalchemy import select, text, inspect
 
+<<<<<<< HEAD
 from models import MessageModel, ConversationModel, AppError
 from schemas import Message, MessageCreate
+=======
+from models import MessageModel, ConversationModel, AppError, ConversationFileModel
+from schemas import ChatMessage, ChatCreate
+import pandas as pd
+import io
+>>>>>>> parsing
 
 #functie ce returneaza istoricul unei conversatii, cu limita de mesaje (de folosit pentru fereastra de context a agentilor)
 def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
@@ -198,3 +205,71 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
     except Exception as e:
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
+def parse_file(filename: str, content: bytes) -> str:
+    #extrag extensia fisierului
+    ext=filename.rsplit(".", 1)[-1].lower()
+    try:
+        #parsez in functie de extensie
+        if ext == "csv":
+            df=pd.read_csv(io.BytesIO(content))
+        elif ext in ("xlsx", "xls"):
+            df=pd.read_excel(io.BytesIO(content))
+        else:
+            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls")
+        
+        return df.to_json(orient="records", force_ascii=False)
+    except AppError:
+        raise
+    except Exception as e:
+        raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
+
+def save_conversation_file(db: Session, user_id: str, conversation_id: str, filename: str, content: bytes):
+    # verific ca conversatia apartine userului
+    conversation = db.execute(
+        select(ConversationModel)
+        .where(
+            ConversationModel.conversation_id == conversation_id,
+            ConversationModel.user_id == user_id
+        )
+    ).scalar_one_or_none()
+
+    if conversation is None:
+        raise AppError(status_code=404, detail="Conversation not found")
+
+    # parsez fisierul si il convertesc in JSON string
+    parsed_content = parse_file(filename, content)
+
+    # verific daca exista deja un fisier asociat acestei conversatii
+    existing = db.execute(
+        select(ConversationFileModel)
+        .where(ConversationFileModel.conversation_id == conversation_id)
+    ).scalar_one_or_none()
+
+    try:
+        if existing:
+            # daca exista deja, il inlocuiesc cu cel nou
+            existing.file_name = filename
+            existing.file_content = parsed_content
+        else:
+            # daca nu exista, creez o noua inregistrare
+            db.add(ConversationFileModel(
+                conversation_id=conversation_id,
+                user_id=user_id,
+                file_name=filename,
+                file_content=parsed_content
+            ))
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    
+#functie care returneaza fisierul (csv sau excel) asociat (daca exista) conversatiei
+def get_conversation_file(db: Session, conversation_id:str):
+    return db.execute(
+        select(ConversationFileModel)
+        .where(
+            ConversationFileModel.conversation_id == conversation_id
+        )
+    ).scalar()
+    

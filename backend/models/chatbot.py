@@ -45,3 +45,13 @@ class MessageModel(Base):
             name="CHK_Message_Role"
         ),
     )
+    
+class ConversationFileModel(Base):
+    __tablename__ = "ConversationFiles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("Conversations.conversation_id"), nullable=False)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    file_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    file_content: Mapped[str] = mapped_column(Text, nullable=False)
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

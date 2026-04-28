@@ -3,9 +3,15 @@ import json
 from datetime import datetime
 
 from models import AppError
+<<<<<<< HEAD
 from schemas import MessageRequest, MessageCreate, MessageResponse, LLMSQLResponse
 from crud import get_conversation_history, save_message_to_db, get_user_conversations
 from crud import create_new_conversation, run_llm_query, set_response_id, get_conversation_title, set_conversation_title
+=======
+from schemas import ChatRequest, ChatCreate, ChatResponse, LLMSQLResponse
+from crud import get_conversation_history, get_full_conversation, save_message_to_db, get_user_conversations
+from crud import create_new_conversation, run_llm_query, set_response_id, get_conversation_title, set_conversation_title, get_conversation_file
+>>>>>>> parsing
 from .client import llm_request
 from .prompt_builder import get_system_prompt
 from .query_validator import is_query_safe
@@ -47,7 +53,45 @@ def serialize_query_result(result: list) -> str:
         default=lambda x: x.isoformat() if isinstance(x, datetime) else str(x)
     )
 
+<<<<<<< HEAD
 def get_llm_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
+=======
+def get_llm_response(db: Session, request: ChatCreate, context_history: list[dict[str, str]]):
+    
+    # aici voi schimba putin logica - va fi ceva provizoriu
+    # voi folosi functia din crud pentru a verifica daca exista fisier excel/csv atasat conversatiei
+    # daca exista -> flux cu fisier (LLM analizeaza datele direct, fara sql)
+    # daca nu exista -> flux normal cu SQL - neschimbat
+    
+    #verific daca exista fisier atasat conversatiei
+    conversation_file=get_conversation_file(db, request.conversation_id)
+    
+    #flux cu fisier
+    if conversation_file:
+        system_prompt=get_system_prompt(
+            persona_prompt=True,
+            language_prompt=True,
+            conversation_context_prompt=False if context_history==[] else True,
+            file_analysis_prompt=True
+        )
+        #injectez datele din fisier + intrebarea userului in prompt
+        user_prompt=(
+            f"Data from file '{conversation_file.file_name}':\n"
+            f"{conversation_file.file_content}\n\n"
+            f"User's question: {request.message}"
+        )
+        final_text=llm_request(system_prompt, user_prompt, context_history)
+        
+        #daca e chat nou, ii setez un titlu relevant
+        if request.new_chat:
+            title=request.message[:50]
+            set_conversation_title(db, request.conversation_id, title)
+            conversation_title=title
+        else:
+            conversation_title=get_conversation_title(db, request.conversation_id)
+            
+        return conversation_title, final_text, False, None
+>>>>>>> parsing
 
     system_prompt = get_system_prompt(
             new_conversation_prompt=request.new_chat,

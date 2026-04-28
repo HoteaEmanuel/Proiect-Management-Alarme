@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from database import get_db
 from sqlalchemy.orm import Session
 
 from schemas import MessageRequest, MessageResponse, ConversationListresponse, ConversationTitleUpdate, ConversationHistory
 from integrations.chatbot import user_chat_request
-from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, save_conversation_file
 from .auth import get_current_user
 
 router = APIRouter(
@@ -48,5 +48,17 @@ def edit_conversation_title(conversation_id: str, body: ConversationTitleUpdate,
     try:
         update_conversation_title(db=db, user_id=user_id["id"], conversation_id=conversation_id, new_title=body.new_title)
         return {"detail": "Title updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+#router pentru upload file in conversatie
+@router.post("/conversations/{conversation_id}/upload-file", status_code=201)
+def upload_conversation_file(conversation_id: str, file: UploadFile=File(...), user_id: str=Depends(get_current_user), db: Session=Depends(get_db)):
+    print("user_id:", user_id)
+    print("conversation_id:", conversation_id)
+    try:
+        content=file.file.read()
+        save_conversation_file(db, user_id["id"], conversation_id, file.filename, content)
+        return {"detail": "File uploaded succesfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
