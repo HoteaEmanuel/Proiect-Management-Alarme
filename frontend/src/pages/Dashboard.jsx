@@ -45,7 +45,7 @@ const Dashboard = () => {
           pagination,
           sorting,
         });
-        // blob e un obiect care reprezinta un fiser in memorie,  type e tipul — in cazul asta .xlsx
+        // Un Blob e un obiect care reprezinta un fișier în memorie,  type e tipul — in cazul asta .xlsx
         const blob = new Blob([data], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
@@ -62,10 +62,6 @@ const Dashboard = () => {
       toast.error("Export failed");
     }
   };
-  console.log("ALL ALARMS");
-  console.log(alarms);
-  console.log("FILTERED ALARMS");
-  console.log(filteredAlarms);
 
   return (
     <div className="dashboard-page">
@@ -272,7 +268,6 @@ const Dashboard = () => {
       <div className="dashboard-pagination-info">
         <h2 className="dashboard-pagination-text">
           Total alarms:{" "}
-<<<<<<< HEAD
           <span className="dashboard-pagination-value">{alarms?.length}</span>{" "}
         </h2>
         <h2 className="dashboard-pagination-text">
@@ -282,19 +277,7 @@ const Dashboard = () => {
             {filteredAlarms?.alarms?.length}
           </span>
 
-=======
-          <span className="font-semibold">{alarms?.total_alarms}</span>{" "}
->>>>>>> 21713a181e1d2f375743baad148ba7ca6684ba77
         </h2>
-        {filteredAlarms?.total_alarms !== alarms.total_alarms && (
-          <h2 className="dashboard-pagination-text">
-            Total matching alarms:{" "}
-            <span className="font-semibold">
-              {" "}
-              {filteredAlarms?.total_alarms}
-            </span>
-          </h2>
-        )}
         <h2 className="dashboard-pagination-text">
           Page:{" "}
           <span className="dashboard-pagination-current">
