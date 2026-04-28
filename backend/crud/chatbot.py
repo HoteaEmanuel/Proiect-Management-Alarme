@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, text
+from sqlalchemy import select, text, inspect
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import ChatMessage, ChatCreate
@@ -218,37 +218,36 @@ def parse_file(filename: str, content: bytes) -> str:
         raise
     except Exception as e:
         raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
-    
+
 def save_conversation_file(db: Session, user_id: str, conversation_id: str, filename: str, content: bytes):
-    #verific apartenenta conversatiei la user
+    # verific ca conversatia apartine userului
     conversation = db.execute(
-        select(ConversationFileModel)
+        select(ConversationModel)
         .where(
-            ConversationFileModel.conversation_id == conversation_id,
-            ConversationFileModel.user_id == user_id
+            ConversationModel.conversation_id == conversation_id,
+            ConversationModel.user_id == user_id
         )
-    ).scalar()
-    
+    ).scalar_one_or_none()
+
     if conversation is None:
         raise AppError(status_code=404, detail="Conversation not found")
-    
-    #parsez si convertesc in JSON
-    parsed_content=parse_file(filename, content)
-    
-    #verific daca exista deja un fisier asociat conversatiei
+
+    # parsez fisierul si il convertesc in JSON string
+    parsed_content = parse_file(filename, content)
+
+    # verific daca exista deja un fisier asociat acestei conversatii
     existing = db.execute(
         select(ConversationFileModel)
-        .where(
-            ConversationFileModel.conversation_id == conversation_id
-        )
-    ).scalar()
-    
+        .where(ConversationFileModel.conversation_id == conversation_id)
+    ).scalar_one_or_none()
+
     try:
         if existing:
-            #daca exista deja, il inlocuiesc cu cel nou (schimb contextul pe noul fisier)
-            existing.file_name=filename
-            existing.file_content=parsed_content
+            # daca exista deja, il inlocuiesc cu cel nou
+            existing.file_name = filename
+            existing.file_content = parsed_content
         else:
+            # daca nu exista, creez o noua inregistrare
             db.add(ConversationFileModel(
                 conversation_id=conversation_id,
                 user_id=user_id,
@@ -258,7 +257,7 @@ def save_conversation_file(db: Session, user_id: str, conversation_id: str, file
         db.commit()
     except Exception as e:
         db.rollback()
-        raise AppError(status_code=500, detail=f"Database error: "{str(e)})
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
 #functie care returneaza fisierul (csv sau excel) asociat (daca exista) conversatiei
 def get_conversation_file(db: Session, conversation_id:str):
@@ -267,4 +266,5 @@ def get_conversation_file(db: Session, conversation_id:str):
         .where(
             ConversationFileModel.conversation_id == conversation_id
         )
-    ).scalar
+    ).scalar()
+    
