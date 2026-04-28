@@ -3,6 +3,6 @@
     AuthError (pentru ce tine de autentificare)
     DatabaseError (pentru ce tine de baza de date)
 
--implementat verificarea de autentificare la fiecare router (in routers/chatbot.py deja am bagat)
+-de verificat toate routerele sa fie la plural
 
--de modificat routerele sa fie la plural (/conversation -> /okconversations)
+-de generat mai multe alarme
