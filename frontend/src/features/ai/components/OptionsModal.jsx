@@ -13,7 +13,8 @@ const OptionsModal = ({
   const { mutateAsync: deleteConversation } = useDeleteConversation(
     conversation.conversation_id,
   );
-
+  console.log("CONVERSATION TO BE");
+  console.log(conversation);
   const modalRef = useRef(null);
   // Adaug event de mouse down, cand se da click inafara containerului de optiuni
   useEffect(() => {
