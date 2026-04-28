@@ -23,6 +23,7 @@ class Message(MessageCreate):
     model_config = ConfigDict(from_attributes=True)
 
 class MessageResponse(BaseModel):
+    conversation_id: str
     content: str
 
 class ConversationHistory(BaseModel):

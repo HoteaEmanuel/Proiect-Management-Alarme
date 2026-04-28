@@ -151,7 +151,8 @@ def user_chat_request(db: Session, request: MessageRequest):
 
         save_bot_response(db, request, final_text, is_query, query, user_message_id)
 
-        return MessageResponse(content=final_text)
+        return MessageResponse(conversation_id=request.conversation_id,
+                               content=final_text)
     
     except AppError:
         raise

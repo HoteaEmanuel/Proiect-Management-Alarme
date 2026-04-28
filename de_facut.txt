@@ -3,4 +3,10 @@
     AuthError (pentru ce tine de autentificare)
     DatabaseError (pentru ce tine de baza de date)
 
+<<<<<<< HEAD
 -de verificat toate routerele sa fie la plural
+=======
+-de generat mai multe alarme
+
+-de pus o limita pe export
+>>>>>>> 8476a13e9a4df09f0a839c6c3b0b7305319207a7
