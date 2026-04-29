@@ -3,18 +3,16 @@ import json
 from datetime import datetime
 
 from models import AppError
-from schemas import MessageRequest, MessageCreate, MessageResponse, LLMSQLResponse
-from crud import get_conversation_history, get_full_conversation, save_message_to_db, get_user_conversations
-from crud import create_new_conversation, run_llm_query, set_response_id, get_conversation_title, set_conversation_title, get_conversation_file
-from .client import llm_request
-from .prompt_builder import get_system_prompt
-from .query_validator import is_query_safe
+from schemas import MessageRequest, MessageCreate, MessageResponse, OutputBlock, AgentContext
+from crud import get_conversation_history, save_message_to_db, get_user_conversations
+from crud import create_new_conversation, set_response_id
+from .orchestrator import get_orchestrator_response
 
 def prepare_conversation(db: Session, request: MessageRequest):
     #daca e conversatie noua o creez si ii preiau id-ul creat de baza de date
     if request.new_chat:
-            conversation = create_new_conversation(db=db, user_id=request.user_id)
-            conversation_id = conversation.conversation_id
+        conversation = create_new_conversation(db=db, user_id=request.user_id)
+        conversation_id = conversation.conversation_id
     else:
         conversation_id = request.conversation_id
 
@@ -40,102 +38,14 @@ def prepare_conversation(db: Session, request: MessageRequest):
 
     return conversation_id, saved_user_message.id, context_history 
 
-def serialize_query_result(result: list) -> str:
-    return json.dumps(
-        result, 
-        ensure_ascii=False,
-        default=lambda x: x.isoformat() if isinstance(x, datetime) else str(x)
-    )
-
-def get_llm_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
-    
-    # aici voi schimba putin logica - va fi ceva provizoriu
-    # voi folosi functia din crud pentru a verifica daca exista fisier excel/csv atasat conversatiei
-    # daca exista -> flux cu fisier (LLM analizeaza datele direct, fara sql)
-    # daca nu exista -> flux normal cu SQL - neschimbat
-    
-    #verific daca exista fisier atasat conversatiei
-    conversation_file=get_conversation_file(db, request.conversation_id)
-    
-    #flux cu fisier
-    if conversation_file:
-        system_prompt=get_system_prompt(
-            persona_prompt=True,
-            language_prompt=True,
-            conversation_context_prompt=False if context_history==[] else True,
-            file_analysis_prompt=True
-        )
-        #injectez datele din fisier + intrebarea userului in prompt
-        user_prompt=(
-            f"Data from file '{conversation_file.file_name}':\n"
-            f"{conversation_file.file_content}\n\n"
-            f"User's question: {request.message}"
-        )
-        final_text=llm_request(system_prompt, user_prompt, context_history)
-        
-        #daca e chat nou, ii setez un titlu relevant
-        if request.new_chat:
-            title=request.message[:50]
-            set_conversation_title(db, request.conversation_id, title)
-            conversation_title=title
-        else:
-            conversation_title=get_conversation_title(db, request.conversation_id)
-            
-        return conversation_title, final_text, False, None
-
-    system_prompt = get_system_prompt(
-            new_conversation_prompt=request.new_chat,
-            persona_prompt=True,
-            language_prompt=True,
-            conversation_context_prompt=False if context_history == [] else True,
-            db_schema_prompt=True,
-            db_safety_prompt=True,
-            sql_output_prompt=True,
-            error_handling_prompt=True
-        )
-
-    llm_response = llm_request(system_prompt, request.message, context_history, LLMSQLResponse)
-
-    if request.new_chat:
-        conversation_title = llm_response.conversation_title
-        set_conversation_title(db, request.conversation_id, conversation_title)
-    else:
-        conversation_title = get_conversation_title(db, request.conversation_id)
-
-    query = None
-    is_query = llm_response.has_sql_query
-
-    if is_query:
-        query = llm_response.sql_query
-        if is_query_safe(query):
-            query_result = run_llm_query(db, query)
-
-            system_prompt = get_system_prompt(
-                persona_prompt=True,
-                language_prompt=True,
-                query_results_prompt=True,
-                conversation_context_prompt=False if context_history == [] else True,
-            )
-
-            final_text = llm_request(system_prompt, serialize_query_result(query_result), context_history)
-        else:
-            final_text = "Nu am putut executa interogarea din motive de securitate."
-    else:
-        final_text = llm_response.text_response
-
-    #salvez raspunsul bot-ului in baza de date
-    
-
-    return final_text, is_query, query 
-
-def save_bot_response(db: Session, request: MessageCreate, final_text: str, is_query: bool, query: str, user_message_id: int):
+def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[OutputBlock], agent_context: AgentContext, user_message_id: int):
     bot_message_data = MessageCreate(
         conversation_id=request.conversation_id,
         user_id=request.user_id,
         role="assistant",
-        content=final_text,
-        has_sql_query=is_query,
-        sql_query=query
+        content=str(output_blocks),
+        has_sql_query=True if agent_context.sql_query_text is not None else False,
+        sql_query=agent_context.sql_query_text
     )
     bot_reply = save_message_to_db(db=db, message_data=bot_message_data)
 
@@ -147,12 +57,12 @@ def user_chat_request(db: Session, request: MessageRequest):
     try:
         request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
 
-        final_text, is_query, query = get_llm_response(db, request, context_history)
+        output_blocks, agent_context = get_orchestrator_response(db, request, context_history)
 
-        save_bot_response(db, request, final_text, is_query, query, user_message_id)
+        save_bot_response(db, request, output_blocks, agent_context, user_message_id)
 
         return MessageResponse(conversation_id=request.conversation_id,
-                               content=final_text)
+                               content=output_blocks)
     
     except AppError:
         raise

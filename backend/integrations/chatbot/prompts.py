@@ -75,10 +75,15 @@ Returns aggregated statistics within a time interval in the form of (Category, L
 """
 DB_SAFETY_PROMPT = """
 You can generate two types of queries:
-1. EXEC dbo.CautareFiltrata / EXEC dbo.GetDashboardKPIs — preferred when they cover the use case
-2. Raw SELECT — only when stored procedures cannot fulfill the request
+1. EXEC dbo.CautareFiltrata / EXEC dbo.GetDashboardKPIs — ALWAYS use these first
+2. Raw SELECT — ONLY as a last resort, when stored procedures absolutely cannot fulfill the request
 
-Rules for raw SELECT:
+Decision rules:
+- Need to filter, search, paginate or sort alarms? → ALWAYS use dbo.CautareFiltrata
+- Need counts, averages, KPIs, or aggregated stats? → ALWAYS use dbo.GetDashboardKPIs
+- Only use raw SELECT if the request cannot be answered by either stored procedure
+
+Rules for raw SELECT (last resort only):
 - Only SELECT statements are allowed
 - You may use JOINs between existing tables
 - No subqueries that modify data
@@ -99,8 +104,7 @@ You must always respond with a JSON object that follows this exact schema:
 - If the question is conversational → set has_sql_query=false, fill text_response, leave sql_query null
 
 When generating SQL queries:
-- Always use stored procedures when they cover the use case
-- Prefer dbo.CautareFiltrata over raw SELECT on Alarms when filtering/pagination is needed
+- Always use stored procedures when they cover the use case — raw SELECT is a last resort only
 - Never use SELECT *; always specify columns
 - Format queries with proper indentation
 - Never concatenate user input directly
