@@ -204,7 +204,7 @@ export const Statistics = () => {
 
               <div className="statistics-chart-card">
                 <h2 className="statistics-card-title">Category 3</h2>
-                <GraficPie data={categoriesTier3} />
+                <GraficPie data={categoriesTier3} legend={false} />
               </div>
             </div>
           </section>
