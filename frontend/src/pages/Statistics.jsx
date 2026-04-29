@@ -41,7 +41,7 @@ export const Statistics = () => {
   }, [timeFilter]);
 
   if (statistics == null)
-    return <RiLoader2Fill className="animate-spin mx-auto" />;
+    return <RiLoader2Fill className="size-6 animate-spin mx-auto" />;
 
   const severities = Object.entries(statistics?.Severity ?? {}).map(
     ([name, value], i) => ({

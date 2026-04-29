@@ -45,7 +45,7 @@ const Dashboard = () => {
           pagination,
           sorting,
         });
-        // Un Blob e un obiect care reprezinta un fișier în memorie,  type e tipul — in cazul asta .xlsx
+        // blob e un obiect care reprezinta un fisier in memorie,  type e tipul — in cazul asta .xlsx
         const blob = new Blob([data], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
@@ -69,22 +69,22 @@ const Dashboard = () => {
         <h1 className="dashboard-title">Alarms</h1>
 
         <button
-            className="dashboard-export-button"
-            onClick={handleExport}
-            disabled={isExporting}
-          >
-            {isExporting ? (
-              <>
-                <span>Exporting...</span>
-                <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
-              </>
-            ) : (
-              <>
-                <span>Export</span>
-                <CiExport className="dashboard-export-icon" />
-              </>
-            )}
-          </button>
+          className="dashboard-export-button"
+          onClick={handleExport}
+          disabled={isExporting}
+        >
+          {isExporting ? (
+            <>
+              <span>Exporting...</span>
+              <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
+            </>
+          ) : (
+            <>
+              <span>Export</span>
+              <CiExport className="dashboard-export-icon" />
+            </>
+          )}
+        </button>
       </div>
 
       <div className="dashboard-filters">
@@ -268,16 +268,19 @@ const Dashboard = () => {
       <div className="dashboard-pagination-info">
         <h2 className="dashboard-pagination-text">
           Total alarms:{" "}
-          <span className="dashboard-pagination-value">{alarms?.length}</span>{" "}
-        </h2>
-        <h2 className="dashboard-pagination-text">
-          Total matching alarms:{" "}
           <span className="dashboard-pagination-value">
-            {" "}
-            {filteredAlarms?.alarms?.length}
-          </span>
-
+            {alarms?.length}
+          </span>{" "}
         </h2>
+        {filteredAlarms?.total_alarms !== alarms.total_alarms && (
+          <h2 className="dashboard-pagination-text">
+            Total matching alarms:{" "}
+            <span className="dashboard-pagination-value">
+              {" "}
+              {filteredAlarms?.alarms?.length}
+            </span>
+          </h2>
+        )}
         <h2 className="dashboard-pagination-text">
           Page:{" "}
           <span className="dashboard-pagination-current">
