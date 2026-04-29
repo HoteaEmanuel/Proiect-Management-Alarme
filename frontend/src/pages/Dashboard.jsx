@@ -10,6 +10,12 @@ import { CiExport, CiPlug1 } from "react-icons/ci";
 import "@styles/pages/Dashboard.css";
 import { RiLoader2Fill } from "react-icons/ri";
 import { toast } from "sonner";
+import {
+  AlarmSeverity,
+  AlarmStatus,
+  AlarmType,
+  PaginationSizes,
+} from "@constants/alarms.js";
 
 const Dashboard = () => {
   const [isExporting, startExporting] = useTransition();
@@ -142,11 +148,11 @@ const Dashboard = () => {
               }));
             }}
           >
-            <option value="">All</option>
-            <option value="Active">Active</option>
-            <option value="Closed">Closed</option>
-            <option value="Cleared">Cleared</option>
-            <option value="Acknowledged">Acknowledged</option>
+            {Object.entries(AlarmStatus).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value || "All"}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -166,12 +172,11 @@ const Dashboard = () => {
               }));
             }}
           >
-            <option value="">All</option>
-            <option value="Critical">Critical</option>
-            <option value="Major">Major</option>
-            <option value="Minor">Minor</option>
-            <option value="Warning">Warning</option>
-            <option value="Info">Info</option>
+            {Object.entries(AlarmSeverity).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value || "All"}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -191,10 +196,11 @@ const Dashboard = () => {
               }));
             }}
           >
-            <option value="">All</option>
-            <option value="System">System</option>
-            <option value="Application">Application</option>
-            <option value="Network">Network</option>
+            {Object.entries(AlarmType).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value || "All"}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -304,9 +310,11 @@ const Dashboard = () => {
             })
           }
         >
-          <option value={10}>10</option>
-          <option value={20}>25</option>
-          <option value={50}>50</option>
+          {Object.entries(PaginationSizes).map(([key, value]) => (
+            <option key={key} value={value}>
+              {value || "All"}
+            </option>
+          ))}
         </select>
       </div>
     </div>

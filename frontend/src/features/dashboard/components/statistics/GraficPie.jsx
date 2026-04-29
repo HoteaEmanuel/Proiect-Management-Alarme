@@ -1,6 +1,6 @@
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Tooltip, Legend } from "recharts";
-const GraficPie = ({ data}) => {
+const GraficPie = ({ data, legend=true}) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
@@ -14,7 +14,7 @@ const GraficPie = ({ data}) => {
           outerRadius={100}
         />
         <Tooltip formatter={(value) => `${value}%`} />
-        <Legend />
+       { legend && <Legend /> }
       </PieChart>
     </ResponsiveContainer>
   );
