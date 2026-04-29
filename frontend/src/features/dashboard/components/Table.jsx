@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table";
 import { formatDate } from "../../../utils/formatDate.js";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
-import "../../../styles/features/dashboard/components/Table.css";
+import "@styles/features/dashboard/components/Table.css";
 
 const columns = [
   {

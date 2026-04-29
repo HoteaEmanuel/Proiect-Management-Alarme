@@ -3,7 +3,7 @@ import { MdDashboard } from "react-icons/md";
 import { IoIosStats } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosChatboxes } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { RiChatAiFill } from "react-icons/ri";
 import { IoMdArrowBack } from "react-icons/io";
 import { RiChatNewFill } from "react-icons/ri";
@@ -16,14 +16,16 @@ import {
 } from "../api/chatBot.api";
 import OptionsModal from "./OptionsModal";
 import Input from "@components/Input";
+import { BsCloudFogFill } from "react-icons/bs";
 const Side = () => {
+  const { pathname } = useLocation();
   const {
     data: conversations,
     isLoading,
     isPending,
   } = useGetUserConversations();
 
-  const { mutateAsync: renameConversation } = useRenameConversation();
+  const { mutate: renameConversation } = useRenameConversation();
 
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -49,32 +51,42 @@ const Side = () => {
 
   const handleBlur = async () => {
     // rename(conv.id, editValue); // salvezi
-    await renameConversation(editingId, editValue);
+    renameConversation(editingId, editValue);
     console.log("HELLO");
     setEditingId(null);
+
   };
+
   return (
     <aside className="side">
-      <Link
+      <NavLink
         to={"/dashboard"}
         // className="flex items-center"
+        className={`side-nav-item  ${pathname === "/" && "active"}`}
         type="button"
-        className="side-nav-item"
       >
         <IoMdArrowBack className="size-7" />
         Go back
-      </Link>
+      </NavLink>
 
       <nav className="side-nav flex flex-col h-[90%]">
-        <Link type="button" className="side-nav-item" to={"/chat/new"}>
+        <NavLink
+          type="button"
+          className={`side-nav-item  ${pathname === "/chat/new" && "active"}`}
+          to={"/chat/new"}
+        >
           <RiChatNewFill className="side-nav-icon" />
           <span className="side-nav-text">New chat</span>
-        </Link>
+        </NavLink>
 
-        <Link type="button" className="side-nav-item" to={"/chats"}>
+        <NavLink
+          type="button"
+          className={`side-nav-item  ${pathname === "/chats" && "active"}`}
+          to={"/chats"}
+        >
           <PiChatsCircleFill className="side-nav-icon" />
           <span className="side-nav-text">Chats</span>
-        </Link>
+        </NavLink>
 
         <hr />
         <h1 className="text-sm opacity-50">Recents</h1>
@@ -100,7 +112,7 @@ const Side = () => {
                   onClick={() => navigate(`/chat/${conv.conversation_id}`)}
                   onMouseEnter={() => setSelectedConversation(conv)}
                   // onMouseLeave={() => setSelectedChat(null)}
-                  className={" cursor-pointer p-1 flex items-center gap-2"}
+                  className={` cursor-pointer p-1 flex items-center justify-between gap-2`}
                 >
                   <span className="truncate"> {conv.conversation_title}</span>
                   {selectedConversation?.conversation_id ===

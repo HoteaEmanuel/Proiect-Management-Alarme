@@ -28,7 +28,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Rootlayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/statistics" element={<Statistics />} />
+          <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route element={<Chatlayout />}>
