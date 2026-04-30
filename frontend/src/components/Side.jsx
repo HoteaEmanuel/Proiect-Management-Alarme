@@ -7,8 +7,7 @@ import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { RiChatAiFill } from "react-icons/ri";
-import "@styles/components/Side.css";
-
+import "@styles/components/Side.css"
 const Side = () => {
   const { pathname } = useLocation();
   return (

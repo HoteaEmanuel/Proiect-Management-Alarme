@@ -20,7 +20,9 @@ const columns = [
     accessorKey: "status",
     header: "Status",
     cell: ({ getValue }) => (
-      <span className={`alarm-table-status alarm-table-status-${getValue().toLowerCase()}`}>
+      <span
+        className={`alarm-table-status alarm-table-status-${getValue().toLowerCase()}`}
+      >
         {getValue()}
       </span>
     ),
@@ -29,7 +31,9 @@ const columns = [
     accessorKey: "severity",
     header: "Severity",
     cell: ({ getValue }) => (
-      <span className={`alarm-table-severity alarm-table-severity-${getValue().toLowerCase()}`}>
+      <span
+        className={`alarm-table-severity alarm-table-severity-${getValue().toLowerCase()}`}
+      >
         {getValue()}
       </span>
     ),
@@ -75,6 +79,7 @@ export const AlarmsTable = ({
   console.log(data);
   console.log(pagination);
   console.log(totalCount);
+  console.log(sorting);
   console.log(data?.length);
 
   const alarms = data;
@@ -85,7 +90,12 @@ export const AlarmsTable = ({
     state: { pagination, sorting: sorting ?? [] },
     manualPagination: true,
     rowCount: totalCount,
-    onPaginationChange: onPaginationChange,
+    onPaginationChange: (updater) => {
+      // Resolve the updater — it can be a function or a direct value
+      const next =
+        typeof updater === "function" ? updater(pagination) : updater;
+      onPaginationChange(next); // dam pass la { pageIndex, pageSize }
+    },
     manualSorting: true,
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -96,11 +106,6 @@ export const AlarmsTable = ({
       const safeSort = Array.isArray(newSort) ? newSort : [];
 
       onSortingChange?.(safeSort);
-
-      onPaginationChange((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
     },
     enableMultiSort: false,
     getCoreRowModel: getCoreRowModel(),
@@ -171,7 +176,9 @@ export const AlarmsTable = ({
           disabled={!getCanPreviousPage()}
           className="alarm-table-icon-button"
         >
-          {getCanPreviousPage() && <MdNavigateBefore className="alarm-table-icon" />}
+          {getCanPreviousPage() && (
+            <MdNavigateBefore className="alarm-table-icon" />
+          )}
         </button>
 
         <button

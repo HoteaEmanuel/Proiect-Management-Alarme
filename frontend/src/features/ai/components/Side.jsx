@@ -9,7 +9,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { RiChatNewFill } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { PiChatsCircleFill } from "react-icons/pi";
-import "../../../styles/components/Side.css";
+import "@styles/components/Side.css";
 import {
   useGetUserConversations,
   useRenameConversation,

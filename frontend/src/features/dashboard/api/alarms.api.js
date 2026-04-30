@@ -12,33 +12,34 @@ export const alarmsApi = {
     }
   },
 
-  getFilteredAlarms: async ({ filters, pagination, sorting }) => {
+  getFilteredAlarms: async ({ filters }) => {
     console.log("FILTERS: ", filters);
-    console.log(pagination);
-    console.log(sorting[0]);
     let url = `${VITE_URL_APP}/alarms/resources?`;
     if (filters?.startDate) url += "start_date=" + filters.startDate + "&&";
     if (filters?.endDate) url += "end_date=" + filters.endDate + "&&";
-    if (filters?.status) url += "status=" + filters.status + "&&";
-    if (filters?.severity) url += "severity=" + filters.severity + "&&";
-    if (filters?.type) url += "type=" + filters.type + "&&";
-    if (filters?.summary) url += "summary_like=" + filters.summary + "&&";
+    if (filters?.status !== "All") url += "status=" + filters.status + "&&";
+    if (filters?.severity !== "All")
+      url += "severity=" + filters.severity + "&&";
+    if (filters?.type !== "All") url += "type=" + filters.type + "&&";
+    if (filters?.summary_like.trim().length)
+      url += "summary_like=" + filters.summary_like + "&&";
 
-    if (filters?.server) url += "server_name_like=" + filters.server + "&&";
-    if (filters?.alert_description)
-      url += "alert_description_like=" + filters.alert_description + "&&";
+    if (filters?.server_like.trim().length)
+      url += "server_name_like=" + filters.server_like + "&&";
+    if (filters?.description_like.trim().length)
+      url += "alert_description_like=" + filters.description_like + "&&";
     url +=
       "current_page=" +
-      (pagination.pageIndex + 1) +
+      (filters.pageIndex + 1) +
       "&&page_size=" +
-      pagination.pageSize;
+      filters.pageSize;
 
-    if (sorting[0]?.id)
+    if (filters?.sort)
       url +=
         "&&sort_by=" +
-        sorting[0].id +
+        filters.sort +
         "&&sort_order=" +
-        (sorting[0].desc === false ? "asc" : "desc");
+        (filters.order === "asc" ? "asc" : "desc");
     console.log("URL: ");
     console.log(url);
     const response = await api.get(url);
@@ -56,7 +57,7 @@ export const alarmsApi = {
     const response = await api.get(url);
     return response.data;
   },
-  export: async ({ filters, pagination, sorting }) => {
+  export: async ({ filters }) => {
     try {
       let url = `${VITE_URL_APP}/alarms/export?`;
       if (filters?.startDate) url += "start_date=" + filters.startDate + "&&";
@@ -64,23 +65,25 @@ export const alarmsApi = {
       if (filters?.status) url += "status=" + filters.status + "&&";
       if (filters?.severity) url += "severity=" + filters.severity + "&&";
       if (filters?.type) url += "type=" + filters.type + "&&";
-      if (filters?.summary) url += "summary_like=" + filters.summary + "&&";
+      if (filters?.summary_like)
+        url += "summary_like=" + filters.summary_like + "&&";
 
-      if (filters?.server) url += "server_name_like=" + filters.server + "&&";
-      if (filters?.alert_description)
+      if (filters?.server_like)
+        url += "server_name_like=" + filters.server_like + "&&";
+      if (filters?.description_like)
         url += "alert_description_like=" + filters.alert_description + "&&";
       url +=
         "current_page=" +
-        (pagination.pageIndex + 1) +
+        (filters?.pageIndex + 1) +
         "&&page_size=" +
-        pagination.pageSize;
+        filters.pageSize;
 
-      if (sorting[0]?.id)
+      if (filters.sort)
         url +=
           "&&sort_by=" +
-          sorting[0].id +
+          filters.sort +
           "&&sort_order=" +
-          (sorting[0].desc === false ? "asc" : "desc");
+          (filters.order === "desc" ? "desc" : "asc");
       const response = await api.get(url, {
         responseType: "arraybuffer",
       });

@@ -17,28 +17,44 @@ import { alarmsApi } from "@features/dashboard/api/alarms.api";
 import { RiLoader2Fill } from "react-icons/ri";
 import GraficBara from "@features/dashboard/components/statistics/GraficBara";
 import GraficPie from "@features/dashboard/components/statistics/GraficPie";
+import { useSearchParams } from "react-router-dom";
 
 export const Statistics = () => {
-  const COLORS = ["#378ADD", "#E24B4A", "#EF9F27", "#1D9E75", "#7F77DD"];
   const year = new Date().getFullYear();
-
   const firstDay = `${year}-01-01`;
   const lastDay = `${year}-12-31`;
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const filters = {
+    start_date: searchParams.get("start_date") ?? firstDay,
+    end_date: searchParams.get("end_date") ?? lastDay,
+  };
+  const COLORS = ["#378ADD", "#E24B4A", "#EF9F27", "#1D9E75", "#7F77DD"];
+
   const [statistics, setStatistics] = useState(null);
-  const [timeFilter, setTimeFilter] = useState({
-    start_date: firstDay, // Prima zi din anul actual
-    end_date: lastDay, // Ultima zi din anul actual
-  });
+  // const [timeFilter, setTimeFilter] = useState({
+  //   start_date: firstDay, // Prima zi din anul actual
+  //   end_date: lastDay, // Ultima zi din anul actual
+  // });
 
   // Refresh la statistici la fiecare modificare a filtrelor
   useEffect(() => {
     async function fetchStatistics() {
-      const data = await alarmsApi.getStatistics(timeFilter);
+      const data = await alarmsApi.getStatistics(filters);
       setStatistics(data);
     }
 
     fetchStatistics();
-  }, [timeFilter]);
+  }, [searchParams]);
+
+  // Updateaza URL cu noul filtru, adaugandu l la URL
+  const handleFilterChange = (key, value) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set(key, value);
+      return next;
+    });
+  };
 
   if (statistics == null)
     return <RiLoader2Fill className="size-6 animate-spin mx-auto" />;
@@ -108,12 +124,7 @@ export const Statistics = () => {
               type="date"
               className="dashboard-filter-input"
               max={new Date().toISOString().split("T")[0]}
-              onChange={(e) => {
-                setTimeFilter((prev) => ({
-                  ...prev,
-                  start_date: e.target.value,
-                }));
-              }}
+              onChange={(e) => handleFilterChange("start_date", e.target.value)}
             />
           </div>
 
@@ -122,14 +133,9 @@ export const Statistics = () => {
             <input
               type="date"
               className="dashboard-filter-input"
-              min={timeFilter.start_date}
+              min={filters.start_date}
               max={new Date().toISOString().split("T")[0]}
-              onChange={(e) => {
-                setTimeFilter((prev) => ({
-                  ...prev,
-                  end_date: e.target.value,
-                }));
-              }}
+              onChange={(e) => handleFilterChange("end_date", e.target.value)}
             />
           </div>
         </div>
@@ -233,7 +239,11 @@ export const Statistics = () => {
                     </BarChart>
                   </ResponsiveContainer> */}
 
-                  <GraficBara data={companies} direction={"horizontal"} vertical={false}/>
+                  <GraficBara
+                    data={companies}
+                    direction={"horizontal"}
+                    vertical={false}
+                  />
                 </div>
               </div>
             </div>

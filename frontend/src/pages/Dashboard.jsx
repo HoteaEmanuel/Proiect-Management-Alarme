@@ -7,6 +7,7 @@ import { AlarmsTable } from "@features/dashboard/components/Table";
 import { useState } from "react";
 import { alarmsApi } from "@features/dashboard/api/alarms.api";
 import { CiExport, CiPlug1 } from "react-icons/ci";
+import { useSearchParams } from "react-router-dom";
 import "@styles/pages/Dashboard.css";
 import { RiLoader2Fill } from "react-icons/ri";
 import { toast } from "sonner";
@@ -18,29 +19,48 @@ import {
 } from "@constants/alarms.js";
 
 const Dashboard = () => {
+  const [searchParams, setSearchParams] = useSearchParams({ replace: false });
   const [isExporting, startExporting] = useTransition();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
-  const [filters, setFilters] = useState(undefined);
-
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-  const [sorting, setSorting] = useState([]);
+  // const [filters, setFilters] = useState(undefined);
+  const filters = {
+    startDate: searchParams.get("startDate"),
+    endDate: searchParams.get("endDate"),
+    status: searchParams.get("status") ?? "All",
+    severity: searchParams.get("severity") ?? "All",
+    type: searchParams.get("type") ?? "All",
+    summary_like: searchParams.get("summary_like") ?? "",
+    server_like: searchParams.get("server_like") ?? "",
+    description_like: searchParams.get("description_like") ?? "",
+    pageIndex: Number(searchParams.get("page") ?? 1) - 1,
+    pageSize: Number(searchParams.get("pageSize") ?? 10),
+    sort: searchParams.get("sort") ?? "alarm_number",
+    order: searchParams.get("order") ?? "desc",
+  };
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
 
-  // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a paginarii, a filtrelor sau a sortarii
+  // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
   useEffect(() => {
     const fetchAlarms = async () => {
       const data = await alarmsApi.getFilteredAlarms({
         filters,
-        pagination,
-        sorting,
       });
       setFilteredAlarms(data);
     };
 
     fetchAlarms();
-  }, [filters, pagination, sorting]);
+  }, [searchParams]);
 
+  // Updateaza URL cu noul filtru, adaugandu l la URL
+  const handleFilterChange = (key, value) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set(key, value);
+      next.set("pageIndex", "0"); // resetam la prima pagina la fiecare schimbare de filtru
+      return next;
+    });
+  };
   if (isPendingAlarms) return <p>Loading...</p>;
 
   const handleExport = async () => {
@@ -48,8 +68,6 @@ const Dashboard = () => {
       startExporting(async () => {
         const data = await alarmsApi.export({
           filters,
-          pagination,
-          sorting,
         });
         // blob e un obiect care reprezinta un fisier in memorie,  type e tipul — in cazul asta .xlsx
         const blob = new Blob([data], {
@@ -99,17 +117,7 @@ const Dashboard = () => {
           <input
             type="date"
             className="dashboard-filter-input"
-            onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                startDate: e.target.value,
-              }));
-
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
-            }}
+            onChange={(e) => handleFilterChange("startDate", e.target.value)}
           />
         </div>
 
@@ -118,17 +126,7 @@ const Dashboard = () => {
           <input
             type="date"
             className="dashboard-filter-input"
-            onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                endDate: e.target.value,
-              }));
-
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
-            }}
+            onChange={(e) => handleFilterChange("endDate", e.target.value)}
           />
         </div>
 
@@ -136,17 +134,7 @@ const Dashboard = () => {
           <label className="dashboard-filter-label">Status</label>
           <select
             className="dashboard-filter-input"
-            onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                status: e.target.value,
-              }));
-
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
-            }}
+            onChange={(e) => handleFilterChange("status", e.target.value)}
           >
             {Object.entries(AlarmStatus).map(([key, value]) => (
               <option key={key} value={value}>
@@ -160,17 +148,7 @@ const Dashboard = () => {
           <label className="dashboard-filter-label">Severity</label>
           <select
             className="dashboard-filter-input"
-            onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                severity: e.target.value,
-              }));
-
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
-            }}
+            onChange={(e) => handleFilterChange("severity", e.target.value)}
           >
             {Object.entries(AlarmSeverity).map(([key, value]) => (
               <option key={key} value={value}>
@@ -184,17 +162,7 @@ const Dashboard = () => {
           <label className="dashboard-filter-label">Type</label>
           <select
             className="dashboard-filter-input"
-            onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                type: e.target.value,
-              }));
-
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
-            }}
+            onChange={(e) => handleFilterChange("type", e.target.value)}
           >
             {Object.entries(AlarmType).map(([key, value]) => (
               <option key={key} value={value}>
@@ -210,15 +178,12 @@ const Dashboard = () => {
             className="dashboard-filter-input"
             placeholder="Summary"
             onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                summary: e.target.value,
-              }));
+              const timeOut = setTimeout(
+                () => handleFilterChange("summary_like", e.target.value),
+                500,
+              );
 
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
+              return () => clearTimeout(timeOut);
             }}
           />
         </div>
@@ -229,15 +194,12 @@ const Dashboard = () => {
             className="dashboard-filter-input"
             placeholder="Server name"
             onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                server: e.target.value,
-              }));
+              const timeOut = setTimeout(
+                () => handleFilterChange("server_like", e.target.value),
+                500,
+              );
 
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
+              return () => clearTimeout(timeOut);
             }}
           />
         </div>
@@ -248,15 +210,12 @@ const Dashboard = () => {
             className="dashboard-filter-input"
             placeholder="Description"
             onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                alert_description: e.target.value,
-              }));
+              const timeOut = setTimeout(
+                () => handleFilterChange("description_like", e.target.value),
+                500,
+              );
 
-              setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-              }));
+              return () => clearTimeout(timeOut);
             }}
           />
         </div>
@@ -265,10 +224,42 @@ const Dashboard = () => {
       <AlarmsTable
         data={filteredAlarms?.alarms || []}
         totalCount={filteredAlarms?.total_alarms}
-        pagination={pagination}
-        onPaginationChange={setPagination}
-        sorting={sorting}
-        onSortingChange={setSorting}
+        pagination={{
+          pageIndex: filters.pageIndex,
+          pageSize: filters.pageSize,
+        }}
+        onPaginationChange={(next) => {
+          // Actualizam numarul paginii si dimensiunea paginii in url
+          setSearchParams((prev) => {
+            const params = new URLSearchParams(prev);
+            params.set("page", next.pageIndex + 1);
+            params.set("pageSize", next.pageSize);
+            return params;
+          });
+        }}
+        sorting={
+          searchParams.get("sort")
+            ? [{ id: filters.sort, desc: filters.order === "desc" }]
+            : []
+        }
+        onSortingChange={(next) => {
+          const col = next[0];
+          // Actualizam parametrul de sortare si ordinea
+          setSearchParams((prev) => {
+            
+            const params = new URLSearchParams(prev);
+            if (col) {
+              params.set("sort", col.id);
+              params.set("order", col.desc ? "desc" : "asc");
+            } else {
+              params.delete("sort");
+              params.delete("order");
+            }
+
+            params.set("page", 1);
+            return params;
+          });
+        }}
       />
 
       <div className="dashboard-pagination-info">
@@ -290,7 +281,7 @@ const Dashboard = () => {
         <h2 className="dashboard-pagination-text">
           Page:{" "}
           <span className="dashboard-pagination-current">
-            {pagination.pageIndex + 1}
+            {filters.pageIndex + 1}
           </span>{" "}
           / {filteredAlarms?.total_pages}
         </h2>
@@ -301,14 +292,9 @@ const Dashboard = () => {
 
         <select
           id="page-size"
-          value={pagination.pageSize}
+          value={filters.pageSize}
           className="dashboard-page-size-select"
-          onChange={(e) =>
-            setPagination({
-              pageIndex: 0,
-              pageSize: e.target.value,
-            })
-          }
+          onChange={(e) => handleFilterChange("pageSize", e.target.value)}
         >
           {Object.entries(PaginationSizes).map(([key, value]) => (
             <option key={key} value={value}>
