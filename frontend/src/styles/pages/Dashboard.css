@@ -96,6 +96,7 @@
     margin-bottom: 1rem;
 }
 
+/* Filters */
 /* .dashboard-filters {
 
     display: grid;
@@ -215,6 +216,8 @@
 
     border-color: var(--color-accent);
 }
+/* Filters */
+
 
 .dashboard-pagination-info {
 
