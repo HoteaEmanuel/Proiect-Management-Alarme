@@ -36,13 +36,16 @@ class MessageResponse(BaseModel):
     conversation_id: str
     response: list[OutputBlock]
 
-class MessageHistoryItem(BaseModel):
-    role: str
-    blocks: list[OutputBlock] | None = None
-    content: str | None = None
+class UserMessage(BaseModel):
+    role: Literal["user"]
+    content: str
+
+class AssistantMessage(BaseModel):
+    role: Literal["assistant"]
+    blocks: list[OutputBlock]
 
 class ConversationHistory(BaseModel):
-    messages: list[MessageHistoryItem]
+    messages: list[UserMessage | AssistantMessage]
 
 class ConversationCreate(BaseModel):
     user_id: str
