@@ -153,9 +153,12 @@ For general conversation (no SQL involved):
 """
 
 FILE_ANALYSIS_PROMPT = """
-The user has attached a file containing data. The data is provided below in JSON format.
-Answer the user's questions based EXCLUSIVELY on this data.
-Do NOT generate SQL queries. Do NOT reference the database schema.
-If the requested information is not present in the data, state that clearly.
+The user has attached a file to this conversation.
+The extracted file content will be provided below.
+
+Answer the user's questions based EXCLUSIVELY on that file content.
+Do NOT generate SQL queries.
+Do NOT reference the database schema.
+If the requested information is not present in the file content, state that clearly.
 Always respond in the same language the user writes in.
 """

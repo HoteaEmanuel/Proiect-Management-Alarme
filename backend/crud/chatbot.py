@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, text, inspect
 import pandas as pd
 import io
+import fitz
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import Message, MessageCreate
@@ -201,19 +202,41 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
+def parse_pdf(content: bytes) -> str:
+    try:
+        doc = fitz.open(stream=content, filetype="pdf")
+        pages = []
+        for page_index, page in enumerate(doc):
+            text=page.get_text("text") or ""
+            if text.strip():
+                pages.append(
+                    f"\n\n[Pagina {page_index+1}]\n{text.strip()}"
+                )
+        extracted_text="\n".join(pages).strip()
+        if not extracted_text:
+            raise AppError(status_code=400, detail="PDF extraction failed")
+        return extracted_text
+    except AppError:
+        raise
+    except Exception as e:
+        raise AppError(status_code=400, detail=f"PDF parsing error: {str(e)}")
+    
 def parse_file(filename: str, content: bytes) -> str:
     #extrag extensia fisierului
     ext=filename.rsplit(".", 1)[-1].lower()
     try:
         #parsez in functie de extensie
-        if ext == "csv":
+        if ext=="pdf":
+            return parse_pdf(content)
+        elif ext == "csv":
             df=pd.read_csv(io.BytesIO(content))
+            return df.to_json(orient="records", force_ascii=False)
         elif ext in ("xlsx", "xls"):
             df=pd.read_excel(io.BytesIO(content))
+            return df.to_json(orient="records", force_ascii=False)
         else:
-            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls")
-        
-        return df.to_json(orient="records", force_ascii=False)
+            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls, .pdf")
+
     except AppError:
         raise
     except Exception as e:
@@ -232,7 +255,7 @@ def save_conversation_file(db: Session, user_id: str, conversation_id: str, file
     if conversation is None:
         raise AppError(status_code=404, detail="Conversation not found")
 
-    # parsez fisierul si il convertesc in JSON string
+    # parsez fisierul si salvez continutul extras ca string
     parsed_content = parse_file(filename, content)
 
     # verific daca exista deja un fisier asociat acestei conversatii
@@ -259,7 +282,7 @@ def save_conversation_file(db: Session, user_id: str, conversation_id: str, file
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-#functie care returneaza fisierul (csv sau excel) asociat (daca exista) conversatiei
+#functie care returneaza fisierul asociat conversatiei, daca exista
 def get_conversation_file(db: Session, conversation_id:str):
     return db.execute(
         select(ConversationFileModel)
