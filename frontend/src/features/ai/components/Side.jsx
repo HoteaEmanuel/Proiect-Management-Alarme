@@ -114,7 +114,7 @@ const Side = () => {
                   // onMouseLeave={() => setSelectedChat(null)}
                   className={` cursor-pointer p-1 flex items-center justify-between gap-2`}
                 >
-                  <span className="truncate"> {conv.conversation_title}</span>
+                  <span className="truncate text-sm"> {conv.conversation_title}</span>
                   {selectedConversation?.conversation_id ===
                     conv.conversation_id && (
                     <SlOptions

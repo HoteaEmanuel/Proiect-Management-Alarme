@@ -72,7 +72,7 @@ const MessageInput = ({
         </button>
       )}
       {loading && (
-        <div className="absolute right-1">
+        <div className="absolute right-2">
           {" "}
           <LoadingCircle />{" "}
         </div>

@@ -13,6 +13,8 @@ import Loading from "../../features/ai/components/Loading.jsx";
 import { useAuthStore } from "../../store/authStore.js";
 import { api } from "../../lib/axios.js";
 import Loading1 from "../../features/ai/components/Loading1.jsx";
+import ResponseType from "./ChatResponse.jsx";
+import ChatResponse from "./ChatResponse.jsx";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -137,9 +139,11 @@ const ChatWindow = () => {
       handleScrollDown();
 
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, mesaj);
+      console.log("AI RESPONSE");
+      console.log(response);
       setMessages((prev) => [
         ...prev,
-        { content: response.data.content, role: "assistant" },
+        { role: "assistant", blocks: response.data.response },
       ]);
       console.log("RESP AICI");
       console.log(response);
@@ -154,7 +158,7 @@ const ChatWindow = () => {
       className="w-full h-full overflow-y-auto overflow-x-hidden"
       ref={conversationRef}
     >
-      <section className="w-full pl-3 pr-1 pb-30 flex justify-center">
+      <section className="w-full px-3 pb-30 flex justify-center">
         <ol className="flex flex-col gap-4 w-2/3 p-2">
           {messages?.length > 0 &&
             messages.map((message, index) => (
@@ -171,7 +175,11 @@ const ChatWindow = () => {
                   }`}
                   onMouseEnter={() => setShowCopy(index)}
                 >
-                  <p className="whitespace-pre-wrap"> {message.content}</p>
+                  {message.role === "user" ? (
+                    <p className="whitespace-pre-wrap"> {message.content}</p>
+                  ) : (
+                    <ChatResponse blocks={message?.blocks} />
+                  )}
                 </div>
                 <div className="relative">
                   <div className="absolute bottom-0 left-1">
