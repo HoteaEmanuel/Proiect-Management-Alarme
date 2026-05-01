@@ -66,12 +66,16 @@ Returns: all Alarms columns + severity (severity name) + TotalAlarms (total coun
 ### dbo.GetDashboardKPIs
 Returns aggregated statistics within a time interval in the form of (Category, Label, CountValue):
 - Time Filters: @start_date, @end_date
+- @start_date and @end_date must be concrete datetime strings in format 'YYYY-MM-DD HH:MM:SS'
 - General: total alarm count
 - Severity: alarm count per severity
 - Status: alarm count per status
 - Company, Project, ServerName, AlertKey: alarm count per value
 - CategoryTier1, CategoryTier2, CategoryTier3: alarm count per category
 - TimeKPI: Avg_Resolution_Time_Minutes, Avg_Time_Between_Occurrences_Minutes
+- Never use SQL functions like GETDATE() as parameter values — use a concrete date instead
+- To query all data, use @start_date = '1900-01-01 00:00:00' and @end_date = '2099-12-31 23:59:59'
+
 """
 DB_SAFETY_PROMPT = """
 You can generate two types of queries:

@@ -9,6 +9,7 @@ from .query_validator import is_query_safe
 def get_sql_agent_response(db: Session, context: AgentContext, call: AgentCall):
 
     system_prompt = get_system_prompt(
+        persona_prompt=True,
         db_schema_prompt=True,
         db_safety_prompt=True,
         sql_output_prompt=True

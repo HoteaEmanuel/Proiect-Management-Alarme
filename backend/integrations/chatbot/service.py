@@ -45,7 +45,7 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
         conversation_id=request.conversation_id,
         user_id=request.user_id,
         role="assistant",
-        content=output_blocks[0].content if output_blocks else "",
+        content=json.dumps([block.model_dump() for block in output_blocks], ensure_ascii=False),
         has_sql_query=True if agent_context.sql_query_text is not None else False,
         sql_query=agent_context.sql_query_text
     )
@@ -110,7 +110,7 @@ def user_chat_request(db: Session, request: MessageRequest):
         save_bot_response(db, request, output_blocks, agent_context, user_message_id)
 
         return MessageResponse(conversation_id=request.conversation_id,
-                               content=output_blocks)
+                               response=output_blocks)
     
     except AppError:
         raise

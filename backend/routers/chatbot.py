@@ -32,7 +32,7 @@ def get_conversations_list(user_id: str = Depends(get_current_user), db: Session
 def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
         conversation = get_full_conversation(db=db, user_id=user_id["id"], conversation_id=conversation_id)
-        return ConversationHistory(messages=conversation["messages"])
+        return ConversationHistory(messages=conversation)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

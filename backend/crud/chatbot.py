@@ -3,6 +3,7 @@ from sqlalchemy import select, text, inspect
 import pandas as pd
 import io
 import fitz
+import json
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import Message, MessageCreate
@@ -28,39 +29,70 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
     #inversez pentru ordinea cronologica
-    rows = list(reversed(rows))
+    messages = list(reversed(rows))
     
-    #parsez rezultatete ca sa le am sub forma de dictionare
-    return [{"role": row.role, "content": row.content} for row in rows]
+    #parsez rezultatete ca sa le am sub forma de lista de dictionare
+    result = []
+    for msg in messages:
+        if msg.role == "assistant":
+            try:
+                blocks = json.loads(msg.content)
+                # extrage doar textul din blockuri pentru context
+                content = " ".join(
+                    block["content"] for block in blocks 
+                    if block.get("type") == "text"
+                )
+            except:
+                content = msg.content
+        else:
+            content = msg.content
+    
+        result.append({"role": msg.role, "content": content})
+
+    return result
+
 
 #functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
 def get_full_conversation(db: Session, user_id: str, conversation_id: str):
-    stmt = (
-        select(MessageModel)
-        .where(
-            MessageModel.user_id == user_id,
-            MessageModel.conversation_id == conversation_id
-        )
-        .order_by(MessageModel.created_at.asc())
-    )
-
     try:
         conversation = db.execute(
             select(ConversationModel)
             .where(ConversationModel.conversation_id == conversation_id)
         ).scalar()
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
 
-        if conversation is None:
-            raise AppError(status_code=404, detail="Conversation not found")
+    if conversation is None:
+        raise AppError(status_code=404, detail="Conversation not found")
 
-        rows = db.execute(stmt).scalars().all()
+    try:
+        stmt = (
+            select(MessageModel)
+            .where(
+                MessageModel.user_id == user_id,
+                MessageModel.conversation_id == conversation_id
+            )
+            .order_by(MessageModel.created_at.asc())
+        )
+        messages = db.execute(stmt).scalars().all()
     except Exception as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-    return {
-        "conversation_title": conversation.conversation_title, 
-        "messages": [Message.model_validate(row) for row in rows]
-    }
+    result = []
+    for msg in messages:
+        if msg.role == "assistant":
+            try:
+                content = json.loads(msg.content)
+            except:
+                content = msg.content
+
+            result.append({"role": msg.role, "blocks": json.loads(msg.content)})
+            
+        else:
+            content = msg.content
+            result.append({"role": msg.role, "content": content})
+    
+    return result
 
 #functie ce returneaza lista de conversatii ale user ului
 def get_user_conversations(db: Session, user_id: str):

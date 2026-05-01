@@ -34,10 +34,15 @@ OutputBlock = Union[TextBlock, ChartBlock]
 
 class MessageResponse(BaseModel):
     conversation_id: str
-    content: list[OutputBlock]
+    response: list[OutputBlock]
+
+class MessageHistoryItem(BaseModel):
+    role: str
+    blocks: list[OutputBlock] | None = None
+    content: str | None = None
 
 class ConversationHistory(BaseModel):
-    messages: list[Message]
+    messages: list[MessageHistoryItem]
 
 class ConversationCreate(BaseModel):
     user_id: str
