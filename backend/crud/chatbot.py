@@ -274,44 +274,45 @@ def parse_file(filename: str, content: bytes) -> str:
     except Exception as e:
         raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
 
-def save_conversation_file(db: Session, user_id: str, conversation_id: str, filename: str, content: bytes):
-    # verific apartenenta conversatiei la user
-    conversation = db.execute(
-        select(ConversationModel)
-        .where(
-            ConversationModel.conversation_id == conversation_id,
-            ConversationModel.user_id == user_id
-        )
-    ).scalar_one_or_none()
+import uuid
+from models import ConversationFileModel
 
-    if conversation is None:
-        raise AppError(status_code=404, detail="Conversation not found")
 
-    # parsez fisierul si salvez continutul extras ca string
-    parsed_content = parse_file(filename, content)
+def save_conversation_file(
+    db,
+    user_id: str,
+    conversation_id: str,
+    filename: str,
+    file_url: str,
+    public_id: str | None = None,
+    resource_type: str | None = None,
+    file_format: str | None = None,
+    file_size: int | None = None,
+):
+    db_file = ConversationFileModel(
+        file_id=str(uuid.uuid4()),
+        user_id=user_id,
+        conversation_id=conversation_id,
+        filename=filename,
+        file_url=file_url,
+        public_id=public_id,
+        resource_type=resource_type,
+        file_format=file_format,
+        file_size=file_size,
+    )
 
-    try:
-        db.add(
-            ConversationFileModel(
-            conversation_id=conversation_id,
-            user_id=user_id,
-            file_name=filename,
-            file_content=parsed_content
-            )
-        )
-        db.commit()
-    
-    except Exception as e:
-        db.rollback()
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    db.add(db_file)
+    db.commit()
+    db.refresh(db_file)
+
+    return db_file
     
 #functie care returneaza toate fisierele asociate conversatiei, daca exista
-def get_conversation_files(db: Session, conversation_id:str):
+def get_conversation_files(db: Session, conversation_id: str):
     return db.execute(
         select(ConversationFileModel)
         .where(
             ConversationFileModel.conversation_id == conversation_id
         )
-        .order_by(ConversationFileModel.uploaded_at.asc())
+        .order_by(ConversationFileModel.created_at.asc())
     ).scalars().all()
-    

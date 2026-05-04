@@ -78,35 +78,81 @@ def edit_conversation_title(conversation_id: str, body: ConversationTitleUpdate,
         }
     }
 )
-def upload_conversation_file(conversation_id: str, file: List[UploadFile] = File(...), user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
-    print("user_id:", user_id)
-    print("conversation_id:", conversation_id)
+def upload_conversation_file(
+    conversation_id: str,
+    file: List[UploadFile] = File(...),
+    user_id: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     try:
         uploaded_files = []
+
         for uploaded_file in file:
-            content = uploaded_file.file.read()
-            save_conversation_file(db, user_id["id"], conversation_id, uploaded_file.filename, content)
-            uploaded_files.append(uploaded_file.filename)
+            cloudinary_file = upload_file_to_cloudinary(uploaded_file)
+
+            save_conversation_file(
+                db=db,
+                user_id=user_id["id"],
+                conversation_id=conversation_id,
+                filename=uploaded_file.filename,
+                file_url=cloudinary_file["url"],
+                public_id=cloudinary_file["public_id"],
+                resource_type=cloudinary_file["resource_type"],
+                file_format=cloudinary_file["format"],
+                file_size=cloudinary_file["bytes"],
+            )
+
+            uploaded_files.append({
+                "filename": uploaded_file.filename,
+                "url": cloudinary_file["url"],
+                "public_id": cloudinary_file["public_id"],
+            })
 
         return {
             "detail": "Files uploaded successfully",
-            "files": uploaded_files
+            "files": uploaded_files,
         }
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.post("/upload/cloudinary")
-def upload_to_cloudinary(file: UploadFile = File(...)):
+@router.post("/conversations/{conversation_id}/upload-cloudinary", status_code=201)
+def upload_conversation_file_to_cloudinary(
+    conversation_id: str,
+    file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
     try:
-        uploaded_file = upload_file_to_cloudinary(file)
+        cloudinary_file = upload_file_to_cloudinary(file)
+
+        save_conversation_file(
+            db=db,
+            user_id=user_id["id"],
+            conversation_id=conversation_id,
+            filename=file.filename,
+            file_url=cloudinary_file["url"],
+            public_id=cloudinary_file["public_id"],
+            resource_type=cloudinary_file["resource_type"],
+            file_format=cloudinary_file["format"],
+            file_size=cloudinary_file["bytes"],
+        )
 
         return {
-            "message": "File uploaded successfully",
-            "file": uploaded_file,
+            "detail": "File uploaded successfully",
+            "conversation_id": conversation_id,
+            "file": {
+                "filename": file.filename,
+                "url": cloudinary_file["url"],
+                "public_id": cloudinary_file["public_id"],
+                "resource_type": cloudinary_file["resource_type"],
+                "format": cloudinary_file["format"],
+                "bytes": cloudinary_file["bytes"],
+            },
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Upload failed: {str(e)}",
-        )
+        raise HTTPException(status_code=500, detail=str(e))
