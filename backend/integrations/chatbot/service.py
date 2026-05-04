@@ -5,7 +5,7 @@ from datetime import datetime
 from models import AppError
 from schemas import MessageRequest, MessageCreate, MessageResponse, OutputBlock, AgentContext, TextBlock
 from crud import get_conversation_history, save_message_to_db, get_user_conversations
-from crud import create_new_conversation, set_response_id, get_conversation_file
+from crud import create_new_conversation, set_response_id, get_conversation_files
 from .orchestrator import get_orchestrator_response
 from .client import llm_request
 from .prompt_builder import get_system_prompt
@@ -53,10 +53,10 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
 
     set_response_id(db, user_message_id, bot_reply.id)
     
-#conversatia are fisier atasat -> raspuns pe baza fisierului -> nu mai este folosit orchestratorul
+#conversatia are fisiere atasate -> raspuns pe baza fisierelor -> nu mai este folosit orchestratorul
 def get_file_based_response(db: Session, request: MessageRequest, context_history: list[dict[str, str]]):
-    conversation_file=get_conversation_file(db=db, conversation_id=request.conversation_id)
-    if conversation_file is None:
+    conversation_files=get_conversation_files(db=db, conversation_id=request.conversation_id)
+    if not conversation_files:
         return None
 
     system_prompt=get_system_prompt(
@@ -66,21 +66,27 @@ def get_file_based_response(db: Session, request: MessageRequest, context_histor
         file_analysis_prompt=True
     )
     
+    files_context="\n\n".join(
+        f"""
+        --- File: {conversation_file.file_name} ---
+        {conversation_file.file_content}
+        """
+        for conversation_file in conversation_files
+    )
+    
     user_prompt=f"""
-    Conversation's attached file: {conversation_file.file_name}
+    Conversation's attached files: 
     
-    Extracted content from file: 
-    ---
-    {conversation_file.file_content}
-    ---
+    {files_context}
     
-    User's question: {request.message} 
+    User's question:
+    {request.message} 
     """
     
     answer = llm_request(
         system_prompt=system_prompt,
         user_prompt=user_prompt,
-        context=context_history
+        context=context_history[:-1]
     )
     
     agent_context=AgentContext(

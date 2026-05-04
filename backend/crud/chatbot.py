@@ -275,7 +275,7 @@ def parse_file(filename: str, content: bytes) -> str:
         raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
 
 def save_conversation_file(db: Session, user_id: str, conversation_id: str, filename: str, content: bytes):
-    # verific ca conversatia apartine userului
+    # verific apartenenta conversatiei la user
     conversation = db.execute(
         select(ConversationModel)
         .where(
@@ -290,36 +290,28 @@ def save_conversation_file(db: Session, user_id: str, conversation_id: str, file
     # parsez fisierul si salvez continutul extras ca string
     parsed_content = parse_file(filename, content)
 
-    # verific daca exista deja un fisier asociat acestei conversatii
-    existing = db.execute(
-        select(ConversationFileModel)
-        .where(ConversationFileModel.conversation_id == conversation_id)
-    ).scalar_one_or_none()
-
     try:
-        if existing:
-            # daca exista deja, il inlocuiesc cu cel nou
-            existing.file_name = filename
-            existing.file_content = parsed_content
-        else:
-            # daca nu exista, creez o noua inregistrare
-            db.add(ConversationFileModel(
-                conversation_id=conversation_id,
-                user_id=user_id,
-                file_name=filename,
-                file_content=parsed_content
-            ))
+        db.add(
+            ConversationFileModel(
+            conversation_id=conversation_id,
+            user_id=user_id,
+            file_name=filename,
+            file_content=parsed_content
+            )
+        )
         db.commit()
+    
     except Exception as e:
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-#functie care returneaza fisierul asociat conversatiei, daca exista
-def get_conversation_file(db: Session, conversation_id:str):
+#functie care returneaza toate fisierele asociate conversatiei, daca exista
+def get_conversation_files(db: Session, conversation_id:str):
     return db.execute(
         select(ConversationFileModel)
         .where(
             ConversationFileModel.conversation_id == conversation_id
         )
-    ).scalar()
+        .order_by(ConversationFileModel.uploaded_at.asc())
+    ).scalars().all()
     

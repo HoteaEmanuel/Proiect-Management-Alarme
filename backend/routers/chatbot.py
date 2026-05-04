@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from database import get_db
 from sqlalchemy.orm import Session
+from typing import List
 
 from schemas import MessageRequest, MessageResponse, ConversationListresponse, ConversationTitleUpdate, ConversationHistory
 from integrations.chatbot import user_chat_request
@@ -51,14 +52,44 @@ def edit_conversation_title(conversation_id: str, body: ConversationTitleUpdate,
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-#router pentru upload file in conversatie
-@router.post("/conversations/{conversation_id}/upload-file", status_code=201)
-def upload_conversation_file(conversation_id: str, file: UploadFile=File(...), user_id: str=Depends(get_current_user), db: Session=Depends(get_db)):
+# router incarcare fisiere multiple (excel/csv/pdf) in conversatie
+# Swagger UI interpreteaza List[UploadFile] ca array<string> in loc de file picker
+# openapi_extra suprascrie schema generata automat: format binary = file picker cu multi-select
+@router.post(
+    "/conversations/{conversation_id}/upload-file",
+    status_code=201,
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "multipart/form-data": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "file": {
+                                "type": "array",
+                                "items": {"type": "string", "format": "binary"}
+                            }
+                        },
+                        "required": ["file"]
+                    }
+                }
+            }
+        }
+    }
+)
+def upload_conversation_file(conversation_id: str, file: List[UploadFile] = File(...), user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
     print("user_id:", user_id)
     print("conversation_id:", conversation_id)
     try:
-        content=file.file.read()
-        save_conversation_file(db, user_id["id"], conversation_id, file.filename, content)
-        return {"detail": "File uploaded succesfully"}
+        uploaded_files = []
+        for uploaded_file in file:
+            content = uploaded_file.file.read()
+            save_conversation_file(db, user_id["id"], conversation_id, uploaded_file.filename, content)
+            uploaded_files.append(uploaded_file.filename)
+
+        return {
+            "detail": "Files uploaded successfully",
+            "files": uploaded_files
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
