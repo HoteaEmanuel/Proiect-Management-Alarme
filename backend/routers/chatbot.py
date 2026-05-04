@@ -5,6 +5,7 @@ from typing import List
 
 from schemas import MessageRequest, MessageResponse, ConversationListresponse, ConversationTitleUpdate, ConversationHistory
 from integrations.chatbot import user_chat_request
+from integrations.chatbot.cloudinary_service import upload_file_to_cloudinary
 from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, save_conversation_file
 from auth_utils import get_current_user
 
@@ -93,3 +94,19 @@ def upload_conversation_file(conversation_id: str, file: List[UploadFile] = File
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/upload/cloudinary")
+def upload_to_cloudinary(file: UploadFile = File(...)):
+    try:
+        uploaded_file = upload_file_to_cloudinary(file)
+
+        return {
+            "message": "File uploaded successfully",
+            "file": uploaded_file,
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Upload failed: {str(e)}",
+        )
