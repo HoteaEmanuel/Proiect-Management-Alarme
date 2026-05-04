@@ -1,8 +1,14 @@
 import os
+import re
 from io import BytesIO
 
 import cloudinary
 import cloudinary.uploader
+from dotenv import load_dotenv
+
+
+import os
+import cloudinary
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,19 +20,21 @@ cloudinary.config(
     secure=True,
 )
 
-
 def upload_file_to_cloudinary(file_content: bytes, filename: str):
     file_stream = BytesIO(file_content)
+    file_stream.name = filename  # îi dai explicit numele fișierului
 
     result = cloudinary.uploader.upload(
         file_stream,
         resource_type="auto",
         folder="chatbot-files",
-        public_id=filename.rsplit(".", 1)[0],
         use_filename=True,
         unique_filename=True,
+        type="upload",  # asigură că e public
+        access_mode="public",  # explicit public
     )
-
+    print("CLOUDINARY FULL RESULT:")
+    print(result)  
     return {
         "url": result.get("secure_url"),
         "public_id": result.get("public_id"),

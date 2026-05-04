@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
 import FilePreview from "./FilePreview";
 import FileList from "./FileList";
-import { uploadToCloudinary } from "../api/upload.api.js";
+import { uploadFiles } from "../api/upload.api.js";
 
 // Constants
 const MESSAGE_LIMIT = 5000;
@@ -81,8 +81,6 @@ const MessageInput = ({
       return;
     }
 
-    console.log("VALID FILES");
-    console.log(valid);
 
     // Salvez fisierele temporale, cele valide, care nu depasesc marimea maxima
     const tempFiles = valid.map((file) => ({
@@ -97,27 +95,28 @@ const MessageInput = ({
     setFiles((prev) => [...prev, ...tempFiles]);
 
     // // Upload to cloudinary
+    console.log(tempFiles);
 
-    console.log("FILES HERE");
     console.log(files);
-    const uploaded = await Promise.all(
-      files.map((file) => uploadToCloudinary(file)),
-    );
+    const toUploadFiles = tempFiles.map((file) => file.file);
+    console.log("ZORO");
+    console.log(toUploadFiles);
+    const uploaded = await uploadFiles(toUploadFiles);
 
     console.log("BATMAN");
     console.log(uploaded);
     // Actualizarea cu url urile de la cloudinary, folositor pentru afisarea ulterioara in conversatie
-    // setFiles((prev) =>
-    //   prev.map((f, i) =>
-    //     tempFiles.find((t) => t.id === f.id)
-    //       ? {
-    //           ...f,
-    //           url: uploaded[i].secure_url,
-    //           status: "uploaded",
-    //         }
-    //       : f,
-    //   ),
-    // );
+    setFiles((prev) =>
+      prev.map((f, i) =>
+        tempFiles.find((t) => t.id === f.id)
+          ? {
+              ...f,
+              url: uploaded.files[i].url,
+              status: "uploaded",
+            }
+          : f,
+      ),
+    );
   };
 
   return (

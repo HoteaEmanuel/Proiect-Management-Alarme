@@ -156,3 +156,32 @@ def upload_conversation_file_to_cloudinary(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+    
+    
+@router.post("/upload-files", status_code=201)
+def upload_files(
+    files: List[UploadFile] = File(...),
+):
+    
+    print(files)
+    try:
+        uploaded_files = []
+        for file in files:
+            file_content = file.file.read()
+            cloudinary_file = upload_file_to_cloudinary(file_content, file.filename)
+            uploaded_files.append({
+                "filename": file.filename,
+                "url": cloudinary_file["url"],
+                "public_id": cloudinary_file["public_id"],
+                "resource_type": cloudinary_file["resource_type"],
+                "format": cloudinary_file["format"],
+                "bytes": cloudinary_file["bytes"],
+            })
+
+        return {"files": uploaded_files}
+
+    except Exception as e:
+        print(f"EROARE: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

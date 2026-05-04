@@ -16,6 +16,8 @@ import Loading1 from "../../features/ai/components/Loading1.jsx";
 import ResponseType from "./ChatResponse.jsx";
 import ChatResponse from "./ChatResponse.jsx";
 import { RiLoader2Fill } from "react-icons/ri";
+import UserMessage from "@features/ai/components/UserMessage.jsx";
+import FilePreview from "@features/ai/components/FilePreview.jsx";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -26,7 +28,9 @@ const ChatWindow = () => {
   const { data, isPending, isFetching } = useGetConversation(id);
   const [copied, setCopied] = useState(false);
   const [messages, setMessages] = useState([]);
-   const [files, setFiles] = useState([]);
+
+  const [previewFile, setPreviewFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const isInitialLoad = useRef(true);
   const [showCopy, setShowCopy] = useState(null);
 
@@ -53,6 +57,9 @@ const ChatWindow = () => {
 
   console.log("MESSAGES");
   console.log(messages);
+
+  console.log("FILES");
+  console.log(files);
   const handleScrollDown = () => {
     console.log("SCROLL DOWN");
     chatEnd?.current.scrollIntoView({ behavior: "smooth" });
@@ -133,6 +140,7 @@ const ChatWindow = () => {
           role: "user",
           has_sql_query: false,
           content: message,
+          files: files,
         },
       ]);
       const mesaj = {
@@ -151,6 +159,9 @@ const ChatWindow = () => {
         ...prev,
         { role: "assistant", blocks: response.data.response },
       ]);
+
+      setFiles([]);
+
       console.log("RESP AICI");
       console.log(response);
     } finally {
@@ -182,7 +193,11 @@ const ChatWindow = () => {
                   onMouseEnter={() => setShowCopy(index)}
                 >
                   {message.role === "user" ? (
-                    <p className="whitespace-pre-wrap"> {message.content}</p>
+                    <UserMessage
+                      message={message}
+                      onFileClick={setPreviewFile}
+                      previewFile={previewFile}
+                    />
                   ) : (
                     <ChatResponse blocks={message?.blocks} />
                   )}
@@ -207,6 +222,13 @@ const ChatWindow = () => {
             ))}
           <div ref={chatEnd} />
         </ol>
+
+        {previewFile && (
+          <FilePreview
+            file={previewFile}
+            onClose={() => setPreviewFile(null)}
+          />
+        )}
       </section>
 
       <div className="absolute flex flex-col bottom-0 right-5 w-4/5 z-10 items-center justify-center gap-4">
