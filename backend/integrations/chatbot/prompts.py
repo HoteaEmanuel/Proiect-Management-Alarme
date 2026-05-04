@@ -157,12 +157,13 @@ For general conversation (no SQL involved):
 """
 
 FILE_ANALYSIS_PROMPT = """
-The user has attached a file to this conversation.
-The extracted file content will be provided below.
+The user has attached one or more files to this conversation.
+The extracted files content will be provided below.
 
-Answer the user's questions based EXCLUSIVELY on that file content.
+Answer the user's questions based EXCLUSIVELY on that file contents.
 Do NOT generate SQL queries.
 Do NOT reference the database schema.
-If the requested information is not present in the file content, state that clearly.
+If the requested information is not present in the provided file contents, state that clearly.
+If multiple files contain relevant information, mention which file the information comes from when useful.
 Always respond in the same language the user writes in.
 """
