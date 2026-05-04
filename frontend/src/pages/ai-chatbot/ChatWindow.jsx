@@ -15,6 +15,7 @@ import { api } from "../../lib/axios.js";
 import Loading1 from "../../features/ai/components/Loading1.jsx";
 import ResponseType from "./ChatResponse.jsx";
 import ChatResponse from "./ChatResponse.jsx";
+import { RiLoader2Fill } from "react-icons/ri";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -25,6 +26,7 @@ const ChatWindow = () => {
   const { data, isPending, isFetching } = useGetConversation(id);
   const [copied, setCopied] = useState(false);
   const [messages, setMessages] = useState([]);
+   const [files, setFiles] = useState([]);
   const isInitialLoad = useRef(true);
   const [showCopy, setShowCopy] = useState(null);
 
@@ -56,7 +58,6 @@ const ChatWindow = () => {
     chatEnd?.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  //! Important fix ( mi a mancat zilele )
   useEffect(() => {
     isInitialLoad.current = true;
   }, [id]); // Resetare ref la fiecare intrarea pe un chat
@@ -113,7 +114,12 @@ const ChatWindow = () => {
   // const { mutateAsync: sendMessage, isPending: isPendingAIResponse } =
   //   useSendMessage({ id });
 
-  if (isPending) return <p>Loading...</p>;
+  if (isPending)
+    return (
+      <>
+        <RiLoader2Fill className="size-4 mx-auto animate-spin" />
+      </>
+    );
 
   const handleSubmit = async () => {
     if (isTyping) return;
@@ -158,7 +164,7 @@ const ChatWindow = () => {
       className="w-full h-full overflow-y-auto overflow-x-hidden"
       ref={conversationRef}
     >
-      <section className="w-full px-3 pb-30 flex justify-center">
+      <section className="w-full px-5 pb-30 flex justify-center">
         <ol className="flex flex-col gap-4 w-2/3 p-2">
           {messages?.length > 0 &&
             messages.map((message, index) => (
@@ -207,7 +213,7 @@ const ChatWindow = () => {
         {isTyping && (
           <div className="w-full flex justify-center mb-5 h-full ">
             <div
-              className="w-14 z-100 rounded-2xl p-2 cursor-pointer bg-[#0b1220] border border-black"
+              className="w-14 z-100 rounded-2xl p-2 cursor-pointer bg-[#0b1220] border border-gray-700"
               onClick={handleScrollDown}
             >
               <Loading />
@@ -216,16 +222,18 @@ const ChatWindow = () => {
         )}
         {showScrollBtn && !isTyping && (
           <button onClick={handleScrollDown}>
-            <FaArrowDown className="size-6 cursor-pointer  bg-gray-800 border border-black p-1 text-gray-400 rounded-full" />{" "}
+            <FaArrowDown className="size-6 cursor-pointer  bg-gray-800 border border-gray-500 p-1 text-gray-400 rounded-full" />{" "}
           </button>
         )}
         <div className="w-2/3 flex justify-center p-4 pt-0 bg-[#0b1220]">
           <MessageInput
             onSubmit={handleSubmit}
             message={message}
+            files={files}
             loading={isTyping}
             placeholder={"Ask anything"}
             setMessage={setMessage}
+            setFiles={setFiles}
           />
         </div>
       </div>
