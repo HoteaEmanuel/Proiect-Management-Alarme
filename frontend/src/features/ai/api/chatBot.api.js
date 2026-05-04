@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../../lib/axios.js";
+import { api } from "@lib/axios.js";
 import { useAuthStore } from "../../../store/authStore.js";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";

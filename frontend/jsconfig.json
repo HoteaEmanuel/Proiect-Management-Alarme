@@ -6,7 +6,8 @@
       "@styles/*": ["src/styles/*"],
       "@features/*": ["src/features/*"],
       "@components/*": ["src/components/*"],
-      "@constants/*":["src/constants/*"]
+      "@constants/*":["src/constants/*"],
+      "@lib/*":["src/constants/*"]
     }
   }
 }

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
 import FilePreview from "./FilePreview";
 import FileList from "./FileList";
+import { uploadToCloudinary } from "../api/upload.api.js";
 
 // Constants
 const MESSAGE_LIMIT = 5000;
@@ -88,7 +89,7 @@ const MessageInput = ({
       id: crypto.randomUUID(),
       name: file.name,
       preview: URL.createObjectURL(file),
-      file:file,
+      file: file,
       type: file.type,
       status: "uploading", // fisierele urmeaza sa fie uploadate, statusul e uploading
       url: null,
@@ -96,10 +97,16 @@ const MessageInput = ({
     setFiles((prev) => [...prev, ...tempFiles]);
 
     // // Upload to cloudinary
-    // const uploaded = await Promise.all(
-    //   files.map((file) => uploadToCloudinary(file)),
-    // );
-    // // Actualizarea cu url urile de la cloudinary, folositor pentru afisarea ulterioara in conversatie
+
+    console.log("FILES HERE");
+    console.log(files);
+    const uploaded = await Promise.all(
+      files.map((file) => uploadToCloudinary(file)),
+    );
+
+    console.log("BATMAN");
+    console.log(uploaded);
+    // Actualizarea cu url urile de la cloudinary, folositor pentru afisarea ulterioara in conversatie
     // setFiles((prev) =>
     //   prev.map((f, i) =>
     //     tempFiles.find((t) => t.id === f.id)
