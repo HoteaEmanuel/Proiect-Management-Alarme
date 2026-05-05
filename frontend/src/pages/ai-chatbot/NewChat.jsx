@@ -26,6 +26,7 @@ const NewChat = () => {
         content: message,
         files: filesToSend,
       };
+      setFiles([]);
     await sendMessage(mesaj);
   };
   return (

@@ -11,7 +11,7 @@ const FILE_ICONS = {
 };
 
 const File = ({ file, onClick }) => {
-  const ext = file.file.name.split(".").pop().toLowerCase();
+  const ext = file.filename.split(".").pop().toLowerCase();
   const icon = FILE_ICONS[ext] ?? FILE_ICONS.default;
 
   return (
@@ -23,7 +23,7 @@ const File = ({ file, onClick }) => {
     >
       <span className="text-lg shrink-0">{icon}</span>
       <div className="overflow-hidden">
-        <p className="text-xs text-white truncate">{file.name}</p>
+        <p className="text-xs text-white truncate">{file.filename}</p>
       </div>
     </button>
   );

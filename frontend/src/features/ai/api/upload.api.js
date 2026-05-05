@@ -1,9 +1,7 @@
-
 import axios from "axios";
 
-const cloud_name="dtyszphgc"
+const cloud_name = "dtyszphgc";
 const uploadFile = async (file) => {
-
   console.log("FILE SENT TO UPLOAD");
   console.log(file);
   const formData = new FormData();
@@ -12,20 +10,20 @@ const uploadFile = async (file) => {
   formData.append("folder", "chatbot-files");
 
   const response = await axios.post(
-    `https://api.cloudinary.com/v1_1/${cloud_name}/auto/upload`,
+    `https://api.cloudinary.com/v1_1/${cloud_name}/raw/upload`,
     formData,
   );
 
+  console.log("RESPONSE AFTER FILE UPLOAD");
+  console.log(response.data);
   return {
     url: response.data.secure_url,
     public_id: response.data.public_id,
     filename: file.name,
     bytes: response.data.bytes,
-    format: response.data.format,
+    format: file.name.split(".").pop(),
     resource_type: response.data.resource_type,
   };
 };
 
 export default uploadFile;
-
-

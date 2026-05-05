@@ -102,14 +102,9 @@ const MessageInput = ({
 
     // // Upload to cloudinary
     console.log(tempFiles);
-
-    console.log(files);
-
-    console.log("ZORO");
     const uploaded = await Promise.all(
       tempFiles.map((file) => uploadFile(file.file)),
     );
-
     console.log("BATMAN");
     console.log(uploaded);
 
@@ -132,6 +127,8 @@ const MessageInput = ({
         };
       }),
     );
+    console.log("UPDATED FILES");
+    console.log(files)
   };
 
   return (

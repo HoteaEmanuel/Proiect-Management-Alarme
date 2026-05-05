@@ -133,8 +133,8 @@ const ChatWindow = () => {
         <RiLoader2Fill className="size-4 mx-auto animate-spin" />
       </>
     );
-    console.log("DATA");
-    console.log(data);
+  console.log("DATA");
+  console.log(data);
   const handleSubmit = async () => {
     if (isTyping) return;
     setIsTyping(true);
@@ -157,7 +157,7 @@ const ChatWindow = () => {
         url: file.url,
         public_id: file.public_id,
         resource_type: file.resource_type,
-        file_format: file.format,
+        file_format: file.file_format,
         file_size: file.file_size,
       }));
       const mesaj = {
@@ -169,6 +169,7 @@ const ChatWindow = () => {
       console.log("MESSAGE TO SENT");
       console.log(mesaj);
       setMessage("");
+      setFiles([]);
       handleScrollDown();
 
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, mesaj);
@@ -178,8 +179,6 @@ const ChatWindow = () => {
         ...prev,
         { role: "assistant", blocks: response.data.response },
       ]);
-
-      setFiles([]);
 
       console.log("RESP AICI");
       console.log(response);
@@ -250,7 +249,7 @@ const ChatWindow = () => {
         )}
       </section>
 
-      <div className="absolute flex flex-col bottom-0 right-5 w-4/5 bg-[#0b1220] z-10 items-center justify-center gap-4">
+      <div className="absolute flex flex-col bottom-0 right-5 w-4/5  z-10 items-center justify-center gap-4">
         {isTyping && (
           <div className="w-full flex justify-center mb-5 h-full ">
             <div
@@ -266,7 +265,7 @@ const ChatWindow = () => {
             <FaArrowDown className="size-6 cursor-pointer  bg-gray-800 border border-gray-500 p-1 text-gray-400 rounded-full" />{" "}
           </button>
         )}
-        <div className="w-2/3 flex justify-center p-4 pt-0">
+        <div className="w-2/3 flex justify-center bg-[#0b1220] p-4 pt-0">
           <MessageInput
             onSubmit={handleSubmit}
             message={message}
@@ -274,7 +273,7 @@ const ChatWindow = () => {
             setFiles={setFiles}
             loading={isTyping}
             placeholder={"Ask anything"}
-            setMessage={setFiles}
+            setMessage={setMessage}
           />
         </div>
       </div>

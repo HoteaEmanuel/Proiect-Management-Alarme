@@ -6,7 +6,7 @@ import { FaFilePdf, FaRegFileExcel } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 
-const FileIcon = ({type}) => {
+const FileIcon = ({ type }) => {
   console.log("TYPE");
   console.log(type);
   if (type.toLowerCase() === "pdf") return <FaFilePdf />;
@@ -39,7 +39,7 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
 
   console.log("FILES HERE");
   console.log(files);
-
+  if (files.length == 0) return;
   return (
     <div className="flex gap-1 overflow-x-auto shadow-2xl">
       <ul className="flex gap-1 overflow-x-auto py-3 px-2">
