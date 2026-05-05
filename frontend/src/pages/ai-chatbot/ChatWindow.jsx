@@ -188,7 +188,7 @@ const ChatWindow = () => {
                   className={`${
                     message.role === "assistant"
                       ? "text-left p-2 rounded-2xl"
-                      : "bg-gray-800 p-2 rounded-2xl max-w-[75%] self-end"
+                      : "max-w-[75%]"
                   }`}
                   onMouseEnter={() => setShowCopy(index)}
                 >

@@ -32,14 +32,14 @@ const File = ({ file, onClick }) => {
 const UserMessage = ({ message, onFileClick, previewFile }) => {
   console.log("MESSAGE IN THE COMPONENT: ", message);
   const hasFiles = message.files?.length > 0;
-  const hasText = message.text?.trim().length > 0;
+  const hasText = message.content?.trim().length > 0;
   const handleFileClick = (file) => {
     if (previewFile) onFileClick(null);
     else onFileClick(file);
   };
   return (
-    <div className="flex justify-end mb-4">
-      <div className="flex flex-col items-end gap-2 max-w-[75%]">
+    <div className="flex">
+      <div className="flex flex-col items-end gap-2">
         {hasFiles && (
           <div className="flex flex-wrap gap-2 justify-end">
             {message.files.map((file, i) => (
@@ -49,9 +49,9 @@ const UserMessage = ({ message, onFileClick, previewFile }) => {
         )}
 
         {hasText && (
-          <div className="bg-gray-800 text-white rounded-2xl rounded-tr-sm px-4 py-2 text-sm">
-            {message.text}
-          </div>
+          <p className="whitespace-pre-wrap wrap-break-word bg-gray-800 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm leading-relaxed">
+            {message.content}
+          </p>
         )}
       </div>
     </div>
