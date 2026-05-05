@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
 import { useParams } from "react-router-dom";
-import MessageInput from "../../features/ai/components/MessageInput.jsx";
+import MessageInput from "@features/ai/components/MessageInput.jsx";
 import {
   FaArrowAltCircleDown,
   FaArrowCircleDown,
@@ -133,7 +133,8 @@ const ChatWindow = () => {
         <RiLoader2Fill className="size-4 mx-auto animate-spin" />
       </>
     );
-
+    console.log("DATA");
+    console.log(data);
   const handleSubmit = async () => {
     if (isTyping) return;
     setIsTyping(true);
@@ -149,11 +150,23 @@ const ChatWindow = () => {
           files: files,
         },
       ]);
+      console.log("FILES");
+      console.log(files);
+      const filesToSend = files.map((file) => ({
+        filename: file.filename,
+        url: file.url,
+        public_id: file.public_id,
+        resource_type: file.resource_type,
+        file_format: file.format,
+        file_size: file.file_size,
+      }));
       const mesaj = {
         user_id: user.user_id,
         conversation_id: id,
         message: message,
+        files: filesToSend,
       };
+      console.log("MESSAGE TO SENT");
       console.log(mesaj);
       setMessage("");
       handleScrollDown();
@@ -258,10 +271,10 @@ const ChatWindow = () => {
             onSubmit={handleSubmit}
             message={message}
             files={files}
+            setFiles={setFiles}
             loading={isTyping}
             placeholder={"Ask anything"}
-            setMessage={setMessage}
-            setFiles={setFiles}
+            setMessage={setFiles}
           />
         </div>
       </div>

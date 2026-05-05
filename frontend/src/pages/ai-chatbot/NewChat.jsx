@@ -2,16 +2,31 @@ import React, { useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import Input from "@components/Input";
 import MessageInput from "@features/ai/components/MessageInput.jsx";
-import {  useCreateConversation } from "@features/ai/api/chatBot.api.js";
+import { useCreateConversation } from "@features/ai/api/chatBot.api.js";
 
 const NewChat = () => {
   const { user } = useAuthStore();
   const [message, setMessage] = useState("");
+  const [files, setFiles] = useState([]);
   console.log(user);
-  const { mutate: sendMessage, isPending } = useCreateConversation();
+  const { mutateAsync: sendMessage, isPending } = useCreateConversation();
   const onSubmit = async () => {
     if (isPending) return;
-    await sendMessage(message);
+
+     const filesToSend = files.map((file) => ({
+        filename: file.filename,
+        url: file.url,
+        public_id: file.public_id,
+        resource_type: file.resource_type,
+        file_format: file.format,
+        file_size: file.file_size,
+      }));
+      const mesaj = {
+        user_id: user.user_id,
+        content: message,
+        files: filesToSend,
+      };
+    await sendMessage(mesaj);
   };
   return (
     <div className="w-screen h-full  flex flex-col gap-10 justify-center items-center ">
@@ -34,6 +49,8 @@ const NewChat = () => {
           message={message}
           loading={isPending}
           setMessage={setMessage}
+          files={files}
+          setFiles={setFiles}
         />
       </div>
     </div>

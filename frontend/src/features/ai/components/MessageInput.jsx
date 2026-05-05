@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
 import FilePreview from "./FilePreview";
 import FileList from "./FileList";
-import { uploadFiles } from "../api/upload.api.js";
+import uploadFile from "../api/upload.api.js";
 
 // Constants
 const MESSAGE_LIMIT = 5000;
@@ -24,6 +24,11 @@ const MessageInput = ({
   setMessage,
   setFiles,
 }) => {
+  console.log("MESSAGE");
+  console.log(message);
+  console.log(setMessage);
+  console.log("SET FILES");
+  console.log(setFiles);
   const input = useRef();
 
   const [previewFile, setPreviewFile] = useState(null);
@@ -76,20 +81,20 @@ const MessageInput = ({
       return true;
     });
 
-    if (files.length + e.target.files.length > MAX_ALLOWED_FILES) {
+    if (files?.length + e.target.files.length > MAX_ALLOWED_FILES) {
       toast.error(`You can upload maximum ${MAX_ALLOWED_FILES} files`);
       return;
     }
 
-
     // Salvez fisierele temporale, cele valide, care nu depasesc marimea maxima
     const tempFiles = valid.map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name,
-      preview: URL.createObjectURL(file),
+      public_id: crypto.randomUUID(),
+      filename: file.name,
       file: file,
-      type: file.type,
-      size:file.bytes,
+      preview: URL.createObjectURL(file),
+      resource_type: "",
+      file_format: file.type,
+      file_size: file.bytes,
       status: "uploading", // fisierele urmeaza sa fie uploadate, statusul e uploading
       url: null,
     }));
@@ -99,24 +104,33 @@ const MessageInput = ({
     console.log(tempFiles);
 
     console.log(files);
-    const toUploadFiles = tempFiles.map((file) => file.file);
+
     console.log("ZORO");
-    console.log(toUploadFiles);
-    const uploaded = await uploadFiles(toUploadFiles);
+    const uploaded = await Promise.all(
+      tempFiles.map((file) => uploadFile(file.file)),
+    );
 
     console.log("BATMAN");
     console.log(uploaded);
-    // Actualizarea cu url urile de la cloudinary, folositor pentru afisarea ulterioara in conversatie
+
+    // Actualizarea cu datele de la cloudinary, folositor pentru afisarea ulterioara in conversatie
     setFiles((prev) =>
-      prev.map((f, i) =>
-        tempFiles.find((t) => t.id === f.id)
-          ? {
-              ...f,
-              url: uploaded.files[i]?.url,
-              status: "uploaded",
-            }
-          : f,
-      ),
+      prev.map((f) => {
+        const tempIndex = tempFiles.findIndex(
+          (t) => t.public_id === f.public_id,
+        );
+        if (tempIndex === -1) return f;
+        return {
+          ...f,
+          filename: uploaded[tempIndex]?.filename,
+          url: uploaded[tempIndex]?.url,
+          public_id: uploaded[tempIndex]?.public_id,
+          resource_type: uploaded[tempIndex]?.resource_type,
+          file_format: uploaded[tempIndex]?.format,
+          file_size: uploaded[tempIndex]?.bytes,
+          status: "uploaded",
+        };
+      }),
     );
   };
 

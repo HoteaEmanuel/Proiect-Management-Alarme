@@ -10,11 +10,14 @@ export const useCreateConversation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (message) => {
+      console.log("MESSAGE TO SENT HERE");
+      console.log(message);
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, {
         new_chat: true,
         user_id: user.user_id,
-        conversation_id: undefined,
-        message,
+        conversation_id: null,
+        message: message.content,
+        files: message.files ?? [],
       });
       return response.data;
     },
