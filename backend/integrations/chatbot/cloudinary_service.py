@@ -1,14 +1,7 @@
 import os
-import re
 from io import BytesIO
-
 import cloudinary
 import cloudinary.uploader
-from dotenv import load_dotenv
-
-
-import os
-import cloudinary
 from dotenv import load_dotenv
 
 load_dotenv()

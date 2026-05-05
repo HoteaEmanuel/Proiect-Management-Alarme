@@ -3,6 +3,7 @@ CREATE TABLE ConversationFiles (
 
     conversation_id NVARCHAR(36) NOT NULL,
     user_id NVARCHAR(36) NOT NULL,
+    message_id INT NULL,
 
     filename NVARCHAR(255) NOT NULL,
     file_url NVARCHAR(1000) NOT NULL,
@@ -12,6 +13,9 @@ CREATE TABLE ConversationFiles (
     file_format NVARCHAR(50) NULL,
     file_size BIGINT NULL,
 
+    is_deleted BIT NOT NULL DEFAULT 0,
+    deleted_at DATETIME NULL,
+
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
 
     CONSTRAINT FK_ConversationFiles_Conversations
@@ -20,5 +24,9 @@ CREATE TABLE ConversationFiles (
 
     CONSTRAINT FK_ConversationFiles_Users
         FOREIGN KEY (user_id)
-        REFERENCES Users(id)
+        REFERENCES Users(id),
+
+    CONSTRAINT FK_ConversationFiles_Messages
+        FOREIGN KEY (message_id)
+        REFERENCES Messages(id)
 );

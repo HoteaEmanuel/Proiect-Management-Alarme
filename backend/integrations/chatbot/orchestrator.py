@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
-from datetime import datetime
-import json
+import requests
 
-from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock
+from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock, FileAttachment
 from .client import llm_request
 from .prompt_builder import get_system_prompt
-from crud import get_conversation_history, get_conversation_title, set_conversation_title, set_response_id
+from crud import get_conversation_title, set_conversation_title, parse_file
 from .sql_query_agent import get_sql_agent_response
 from .text_agent import get_text_agent_response
 
@@ -42,14 +41,22 @@ CRITICAL — Context awareness:
 - If the user's message refers to previous results (e.g. "of those", "from these", "how many have..."), include the relevant context in the agent instruction
 - Example: user asks "how many have Major severity?" after "how many active alarms are there?" → instruction must be "Count active alarms with Major severity", not just "Count alarms with Major severity"
 
-Example of a BAD instruction: "Inspectează schema bazei de date pentru a identifica tabelele... consideră valorile active: 1, true, 'ACTIVE'..."
-Example of a GOOD instruction: "Count how many alarms are currently active."
+{files_context}
 
 Available agents:
 {agents_list}
 """
 
-AVALABILE_AGENTS = {
+FILES_CONTEXT_PROMPT = """
+IMPORTANT — The user has attached the following files to this message:
+{files_list}
+
+- Agents are already aware of file contents — do NOT re-explain or summarize them
+- If the user's question is about the attached files, instruct the relevant agent to use the file contents
+- If the user's question requires both file data and database data, use both sql and text agents
+"""
+
+AVAILABLE_AGENTS = {
     "sql": {
         "run": get_sql_agent_response,
         "description": "Executes SQL queries and returns data from the database"
@@ -61,13 +68,24 @@ AVALABILE_AGENTS = {
 }
     
 
-def build_orchestrator_system_prompt():
+def build_orchestrator_system_prompt(files: list[FileAttachment] | None = None):
     language_rule = get_system_prompt(persona_prompt=False, language_prompt=True)
+    
     agents_list = "\n".join(
         f"- {name}: {meta['description']}"
-        for name, meta in AVALABILE_AGENTS.items()
+        for name, meta in AVAILABLE_AGENTS.items()
     )
-    return language_rule + ORCHESTRATOR_PROMPT.format(agents_list=agents_list)
+
+    if files:
+        files_list = "\n".join(f"- {f.filename} ({f.file_format})" for f in files)
+        files_context = FILES_CONTEXT_PROMPT.format(files_list=files_list)
+    else:
+        files_context = ""
+
+    return language_rule + ORCHESTRATOR_PROMPT.format(
+        agents_list=agents_list,
+        files_context=files_context
+    )
 
 def build_output_blocks(context: AgentContext):
     blocks = []
@@ -79,7 +97,7 @@ def build_output_blocks(context: AgentContext):
 
 def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
     
-    system_prompt = build_orchestrator_system_prompt()
+    system_prompt = build_orchestrator_system_prompt(files=request.files or None)
 
     orchestrator_response = llm_request(system_prompt, request.message, context_history, OrchestratorResponse)
 
@@ -97,8 +115,29 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
         conversation_history=context_history
     )
 
+    if request.files:
+        parsed = []
+        for file in request.files:
+            try:
+                print(f"[FILES] Descarcă: {file.url}")
+                file_bytes = requests.get(file.url).content
+                print(f"[FILES] Bytes descărcați: {len(file_bytes)}")
+                content = parse_file(file.filename, file_bytes)
+                print(f"[FILES] Parsat cu succes: {len(content)} caractere")
+                parsed.append(f"[{file.filename}]:\n{content}")
+            except Exception as e:
+                print(f"[FILES] EROARE la {file.filename}: {str(e)}")
+                continue
+        if parsed:
+            agent_context.file_contents = "\n\n".join(parsed)
+            print(f"[FILES] file_contents setat: {len(agent_context.file_contents)} caractere")
+        else:
+            print("[FILES] Niciun fișier parsat cu succes")
+    else:
+        print("[FILES] request.files e gol")
+
     for agent_call in orchestrator_response.agents:
-        agent = AVALABILE_AGENTS.get(agent_call.agent)
+        agent = AVAILABLE_AGENTS.get(agent_call.agent)
         if not agent:
             continue
         agent_context = agent["run"](db, agent_context, agent_call)

@@ -6,7 +6,7 @@ from typing import List
 from schemas import MessageRequest, MessageResponse, ConversationListresponse, ConversationTitleUpdate, ConversationHistory
 from integrations.chatbot import user_chat_request
 from integrations.chatbot.cloudinary_service import upload_file_to_cloudinary
-from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, save_conversation_file
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, save_conversation_files
 from auth_utils import get_current_user
 
 router = APIRouter(
@@ -53,135 +53,49 @@ def edit_conversation_title(conversation_id: str, body: ConversationTitleUpdate,
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-# router incarcare fisiere multiple (excel/csv/pdf) in conversatie
-# Swagger UI interpreteaza List[UploadFile] ca array<string> in loc de file picker
-# openapi_extra suprascrie schema generata automat: format binary = file picker cu multi-select
-@router.post(
-    "/conversations/{conversation_id}/upload-file",
-    status_code=201,
-    openapi_extra={
-        "requestBody": {
-            "content": {
-                "multipart/form-data": {
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "file": {
-                                "type": "array",
-                                "items": {"type": "string", "format": "binary"}
-                            }
-                        },
-                        "required": ["file"]
-                    }
+@router.post("/conversations/{conversation_id}/upload-file", status_code=201, openapi_extra={
+    "requestBody": {
+        "content": {
+            "multipart/form-data": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "file": {
+                            "type": "array",
+                            "items": {"type": "string", "format": "binary"}
+                        }
+                    },
+                    "required": ["file"]
                 }
             }
         }
     }
-)
-def upload_conversation_file(
-    conversation_id: str,
+})
+async def upload_conversation_file(
     file: List[UploadFile] = File(...),
-    user_id: str = Depends(get_current_user),
-    db: Session = Depends(get_db),
 ):
     try:
         uploaded_files = []
-
         for uploaded_file in file:
-            cloudinary_file = upload_file_to_cloudinary(uploaded_file)
+            if not uploaded_file.filename:
+                raise HTTPException(status_code=400, detail="One of the files has no name")
+            
 
-            save_conversation_file(
-                db=db,
-                user_id=user_id["id"],
-                conversation_id=conversation_id,
-                filename=uploaded_file.filename,
-                file_url=cloudinary_file["url"],
-                public_id=cloudinary_file["public_id"],
-                resource_type=cloudinary_file["resource_type"],
-                file_format=cloudinary_file["format"],
-                file_size=cloudinary_file["bytes"],
-            )
+            file_bytes = await uploaded_file.read()
+            cloudinary_file = upload_file_to_cloudinary(file_bytes, uploaded_file.filename)
 
             uploaded_files.append({
                 "filename": uploaded_file.filename,
                 "url": cloudinary_file["url"],
                 "public_id": cloudinary_file["public_id"],
-            })
-
-        return {
-            "detail": "Files uploaded successfully",
-            "files": uploaded_files,
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-@router.post("/conversations/{conversation_id}/upload-cloudinary", status_code=201)
-def upload_conversation_file_to_cloudinary(
-    conversation_id: str,
-    file: UploadFile = File(...),
-    user_id: str = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No file provided")
-
-    try:
-        cloudinary_file = upload_file_to_cloudinary(file)
-
-        save_conversation_file(
-            db=db,
-            user_id=user_id["id"],
-            conversation_id=conversation_id,
-            filename=file.filename,
-            file_url=cloudinary_file["url"],
-            public_id=cloudinary_file["public_id"],
-            resource_type=cloudinary_file["resource_type"],
-            file_format=cloudinary_file["format"],
-            file_size=cloudinary_file["bytes"],
-        )
-
-        return {
-            "detail": "File uploaded successfully",
-            "conversation_id": conversation_id,
-            "file": {
-                "filename": file.filename,
-                "url": cloudinary_file["url"],
-                "public_id": cloudinary_file["public_id"],
                 "resource_type": cloudinary_file["resource_type"],
-                "format": cloudinary_file["format"],
-                "bytes": cloudinary_file["bytes"],
-            },
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-    
-    
-    
-@router.post("/upload-files", status_code=201)
-def upload_files(
-    files: List[UploadFile] = File(...),
-):
-    
-    print(files)
-    try:
-        uploaded_files = []
-        for file in files:
-            file_content = file.file.read()
-            cloudinary_file = upload_file_to_cloudinary(file_content, file.filename)
-            uploaded_files.append({
-                "filename": file.filename,
-                "url": cloudinary_file["url"],
-                "public_id": cloudinary_file["public_id"],
-                "resource_type": cloudinary_file["resource_type"],
-                "format": cloudinary_file["format"],
-                "bytes": cloudinary_file["bytes"],
+                "file_format": cloudinary_file["format"] or uploaded_file.filename.rsplit(".", 1)[-1].lower(),
+                "file_size": cloudinary_file["bytes"],
             })
 
         return {"files": uploaded_files}
 
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"EROARE: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

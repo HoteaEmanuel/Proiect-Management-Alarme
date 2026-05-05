@@ -49,58 +49,21 @@ class MessageModel(Base):
 class ConversationFileModel(Base):
     __tablename__ = "ConversationFiles"
 
-    file_id: Mapped[str] = mapped_column(
-        String(36),
-        primary_key=True,
-        default=lambda: str(uuid.uuid4())
-    )
+    file_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    
+    conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("Conversations.conversation_id"), nullable=False)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("Users.id"), nullable=False)
+    message_id: Mapped[int | None] = mapped_column(ForeignKey("Messages.id"), nullable=True)
 
-    conversation_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("Conversations.conversation_id"),
-        nullable=False,
-        index=True
-    )
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(1000), nullable=False)
+    public_id: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
-    user_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("Users.id"),
-        nullable=False,
-        index=True
-    )
+    resource_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    file_format: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    file_size: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
-    filename: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    is_deleted: Mapped[bool] = mapped_column(default=False, nullable=False)
+    deleted_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
-    file_url: Mapped[str] = mapped_column(
-        String(1000),
-        nullable=False
-    )
-
-    public_id: Mapped[str] = mapped_column(
-        String(500),
-        nullable=True
-    )
-
-    resource_type: Mapped[str] = mapped_column(
-        String(50),
-        nullable=True
-    )
-
-    file_format: Mapped[str] = mapped_column(
-        String(50),
-        nullable=True
-    )
-
-    file_size: Mapped[int] = mapped_column(
-        BigInteger,
-        nullable=True
-    )
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=False,
-        server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)

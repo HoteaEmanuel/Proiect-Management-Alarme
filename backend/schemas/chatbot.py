@@ -2,11 +2,20 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Literal, Union
 
+class FileAttachment(BaseModel):
+    filename: str
+    url: str
+    public_id: str
+    resource_type: str
+    file_format: str
+    file_size: int
+
 class MessageRequest(BaseModel):
     user_id: str | None = None
     conversation_id: str | None = None
     message: str
     new_chat: bool = False
+    files: list[FileAttachment] = []
 
 class MessageCreate(BaseModel):
     user_id: str
@@ -39,6 +48,7 @@ class MessageResponse(BaseModel):
 class UserMessage(BaseModel):
     role: Literal["user"]
     content: str
+    files: list[FileAttachment]
 
 class AssistantMessage(BaseModel):
     role: Literal["assistant"]
@@ -80,6 +90,7 @@ class OrchestratorResponse(BaseModel):
 class AgentContext(BaseModel):
     user_message: str
     conversation_history: list[dict]
+    file_contents: str | None = None
 
     sql_query_text: str | None = None
     sql_result: list[dict] | None = None

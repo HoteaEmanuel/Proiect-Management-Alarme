@@ -30,7 +30,10 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
     
     instruction = call.instruction
     if context.sql_result is not None:
-        instruction += f"\n\nRezultatele query-ului SQL:\n{context.sql_result}"
+        instruction += f"\n\nSQL Query Results:\n{context.sql_result}"
+
+    if context.file_contents is not None:
+        instruction += f"\n\nFile contents:\n{context.file_contents}"
 
     system_prompt = get_system_prompt(
         persona_prompt=False,

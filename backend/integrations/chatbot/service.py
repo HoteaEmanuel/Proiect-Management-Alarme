@@ -3,12 +3,10 @@ import json
 from datetime import datetime
 
 from models import AppError
-from schemas import MessageRequest, MessageCreate, MessageResponse, OutputBlock, AgentContext, TextBlock
+from schemas import MessageRequest, MessageCreate, MessageResponse, AgentContext, OutputBlock
 from crud import get_conversation_history, save_message_to_db, get_user_conversations
-from crud import create_new_conversation, set_response_id, get_conversation_files
+from crud import create_new_conversation, set_response_id, save_conversation_files
 from .orchestrator import get_orchestrator_response
-from .client import llm_request
-from .prompt_builder import get_system_prompt
 
 def prepare_conversation(db: Session, request: MessageRequest):
     #daca e conversatie noua o creez si ii preiau id-ul creat de baza de date
@@ -34,6 +32,8 @@ def prepare_conversation(db: Session, request: MessageRequest):
     )
     saved_user_message = save_message_to_db(db=db, message_data=user_message_data)
 
+    save_conversation_files(db, request.user_id, conversation_id, saved_user_message.id, request.files)
+
     context_history = get_conversation_history(db=db, user_id=request.user_id, 
                                     conversation_id=conversation_id, 
                                     limit=10)
@@ -52,66 +52,13 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
     bot_reply = save_message_to_db(db=db, message_data=bot_message_data)
 
     set_response_id(db, user_message_id, bot_reply.id)
-    
-#conversatia are fisiere atasate -> raspuns pe baza fisierelor -> nu mai este folosit orchestratorul
-def get_file_based_response(db: Session, request: MessageRequest, context_history: list[dict[str, str]]):
-    conversation_files=get_conversation_files(db=db, conversation_id=request.conversation_id)
-    if not conversation_files:
-        return None
-
-    system_prompt=get_system_prompt(
-        persona_prompt=True,
-        language_prompt=True,
-        conversation_context_prompt=True,
-        file_analysis_prompt=True
-    )
-    
-    files_context="\n\n".join(
-        f"""
-        --- File: {conversation_file.file_name} ---
-        {conversation_file.file_content}
-        """
-        for conversation_file in conversation_files
-    )
-    
-    user_prompt=f"""
-    Conversation's attached files: 
-    
-    {files_context}
-    
-    User's question:
-    {request.message} 
-    """
-    
-    answer = llm_request(
-        system_prompt=system_prompt,
-        user_prompt=user_prompt,
-        context=context_history[:-1]
-    )
-    
-    agent_context=AgentContext(
-        user_message=request.message,
-        conversation_history=context_history,
-        text_response=answer
-    )
-    
-    output_blocks=[
-        TextBlock(type="text", content=answer)
-    ]
-    
-    return output_blocks, agent_context
 
 #functie ce gestioneaza conversatiile user-agent din pagina de chat (practic un agent)
 def user_chat_request(db: Session, request: MessageRequest):
     try:
         request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
         
-        file_response = get_file_based_response(db=db, request=request, context_history=context_history)
-        
-        if file_response is not None:
-            output_blocks, agent_context = file_response
-        else:
-            output_blocks, agent_context = get_orchestrator_response(db, request, context_history)
+        output_blocks, agent_context = get_orchestrator_response(db, request, context_history)
 
         save_bot_response(db, request, output_blocks, agent_context, user_message_id)
 

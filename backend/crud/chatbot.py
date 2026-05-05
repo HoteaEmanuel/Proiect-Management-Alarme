@@ -1,24 +1,88 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, text, inspect
+from sqlalchemy import select, text
 import pandas as pd
 import io
 import fitz
 import json
+import requests
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
-from schemas import Message, MessageCreate
+from schemas import MessageCreate, FileAttachment
 
-#functie ce returneaza istoricul unei conversatii, cu limita de mesaje (de folosit pentru fereastra de context a agentilor)
-def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
+def parse_pdf(content: bytes) -> str:
+    try:
+        doc = fitz.open(stream=content, filetype="pdf")
+        pages = []
+        for page_index, page in enumerate(doc):
+            text=page.get_text("text") or ""
+            if text.strip():
+                pages.append(
+                    f"\n\n[Pagina {page_index+1}]\n{text.strip()}"
+                )
+        extracted_text="\n".join(pages).strip()
+        if not extracted_text:
+            raise AppError(status_code=400, detail="PDF extraction failed")
+        return extracted_text
+    except AppError:
+        raise
+    except Exception as e:
+        raise AppError(status_code=400, detail=f"PDF parsing error: {str(e)}")
     
-    #querry ff simplu pentru a prelua mesajele
+def parse_file(filename: str, content: bytes) -> str:
+    #extrag extensia fisierului
+    if "." not in filename:
+        raise AppError(status_code=400, detail="File has no extension")
+    ext = filename.rsplit(".", 1)[-1].lower()
+
+    try:
+        #parsez in functie de extensie
+        if ext=="pdf":
+            return parse_pdf(content)
+        elif ext == "csv":
+            df=pd.read_csv(io.BytesIO(content), on_bad_lines="skip")
+            return df.to_json(orient="records", force_ascii=False)
+        elif ext in ("xlsx", "xls"):
+            df=pd.read_excel(io.BytesIO(content))
+            return df.to_markdown(index=False)
+        else:
+            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls, .pdf")
+
+    except AppError:
+        raise
+    except Exception as e:
+        raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
+
+def get_message_files(db: Session, message_id: int):
+    try:
+        rows = db.execute(
+            select(ConversationFileModel)
+            .where(
+                ConversationFileModel.message_id == message_id,
+                ConversationFileModel.is_deleted == False
+            )
+        ).scalars().all()
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+
+    return [
+        {
+            "filename": f.filename,
+            "url": f.file_url,
+            "public_id": f.public_id,
+            "resource_type": f.resource_type,
+            "file_format": f.file_format,
+            "file_size": f.file_size,
+        }
+        for f in rows
+    ]
+
+def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
     stmt = (
         select(MessageModel)
         .where(
             MessageModel.user_id == user_id,
             MessageModel.conversation_id == conversation_id
         )
-        #ordonez descrescator ca sa le am pe cele mai recente, apoi in le reordonez ca sa fie cronologic
         .order_by(MessageModel.created_at.desc())
         .limit(limit)
     )
@@ -28,29 +92,40 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
     except Exception as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-    #inversez pentru ordinea cronologica
     messages = list(reversed(rows))
     
-    #parsez rezultatete ca sa le am sub forma de lista de dictionare
     result = []
     for msg in messages:
         if msg.role == "assistant":
             try:
                 blocks = json.loads(msg.content)
-                # extrage doar textul din blockuri pentru context
                 content = " ".join(
                     block["content"] for block in blocks 
                     if block.get("type") == "text"
                 )
             except:
                 content = msg.content
+            result.append({"role": msg.role, "content": content})
         else:
             content = msg.content
-    
-        result.append({"role": msg.role, "content": content})
+
+            files = get_message_files(db, msg.id)
+            if files:
+                parsed_files = []
+                for file in files:
+                    try:
+                        file_bytes = requests.get(file["url"]).content
+                        parsed = parse_file(file["filename"], file_bytes)
+                        parsed_files.append(f"[{file['filename']}]:\n{parsed}")
+                    except Exception:
+                        continue  # fisierul nu poate fi parsat, il sarim
+
+                if parsed_files:
+                    content += "\n\nFișiere atașate:\n\n" + "\n\n".join(parsed_files)
+
+            result.append({"role": msg.role, "content": content})
 
     return result
-
 
 #functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
 def get_full_conversation(db: Session, user_id: str, conversation_id: str):
@@ -82,15 +157,16 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
     for msg in messages:
         if msg.role == "assistant":
             try:
-                content = json.loads(msg.content)
+                blocks = json.loads(msg.content)
             except:
-                content = msg.content
-
-            result.append({"role": msg.role, "blocks": json.loads(msg.content)})
-            
+                blocks = msg.content
+            result.append({"role": msg.role, "blocks": blocks})
         else:
-            content = msg.content
-            result.append({"role": msg.role, "content": content})
+            files = get_message_files(db, msg.id)
+            entry = {"role": msg.role, "content": msg.content}
+            if files:
+                entry["files"] = files
+            result.append(entry)
     
     return result
 
@@ -234,78 +310,36 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
         db.rollback()
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
-def parse_pdf(content: bytes) -> str:
-    try:
-        doc = fitz.open(stream=content, filetype="pdf")
-        pages = []
-        for page_index, page in enumerate(doc):
-            text=page.get_text("text") or ""
-            if text.strip():
-                pages.append(
-                    f"\n\n[Pagina {page_index+1}]\n{text.strip()}"
-                )
-        extracted_text="\n".join(pages).strip()
-        if not extracted_text:
-            raise AppError(status_code=400, detail="PDF extraction failed")
-        return extracted_text
-    except AppError:
-        raise
-    except Exception as e:
-        raise AppError(status_code=400, detail=f"PDF parsing error: {str(e)}")
-    
-def parse_file(filename: str, content: bytes) -> str:
-    #extrag extensia fisierului
-    ext=filename.rsplit(".", 1)[-1].lower()
-    try:
-        #parsez in functie de extensie
-        if ext=="pdf":
-            return parse_pdf(content)
-        elif ext == "csv":
-            df=pd.read_csv(io.BytesIO(content))
-            return df.to_json(orient="records", force_ascii=False)
-        elif ext in ("xlsx", "xls"):
-            df=pd.read_excel(io.BytesIO(content))
-            return df.to_json(orient="records", force_ascii=False)
-        else:
-            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls, .pdf")
-
-    except AppError:
-        raise
-    except Exception as e:
-        raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
-
-import uuid
-from models import ConversationFileModel
 
 
-def save_conversation_file(
-    db,
+def save_conversation_files(
+    db: Session,
     user_id: str,
     conversation_id: str,
-    filename: str,
-    file_url: str,
-    public_id: str | None = None,
-    resource_type: str | None = None,
-    file_format: str | None = None,
-    file_size: int | None = None,
+    message_id: int | None,
+    files: list[FileAttachment]
 ):
-    db_file = ConversationFileModel(
-        file_id=str(uuid.uuid4()),
-        user_id=user_id,
-        conversation_id=conversation_id,
-        filename=filename,
-        file_url=file_url,
-        public_id=public_id,
-        resource_type=resource_type,
-        file_format=file_format,
-        file_size=file_size,
-    )
+    db_files = [
+        ConversationFileModel(
+            user_id=user_id,
+            conversation_id=conversation_id,
+            message_id=message_id,
+            filename=file.filename,
+            file_url=file.url,
+            public_id=file.public_id,
+            resource_type=file.resource_type,
+            file_format=file.file_format,
+            file_size=file.file_size,
+        )
+        for file in files
+    ]
 
-    db.add(db_file)
+    db.add_all(db_files)
     db.commit()
-    db.refresh(db_file)
+    for f in db_files:
+        db.refresh(f)
 
-    return db_file
+    return db_files
     
 #functie care returneaza toate fisierele asociate conversatiei, daca exista
 def get_conversation_files(db: Session, conversation_id: str):
