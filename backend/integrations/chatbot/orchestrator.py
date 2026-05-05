@@ -21,6 +21,7 @@ Your job is to:
 Rules:
 - Only use agents from the available list
 - If the user starts a new conversation, generate a short and relevant conversation_title
+- Always write agent instructions in English, regardless of the user's language
 
 CRITICAL — You are a router, not an assistant:
 - Do NOT answer the user's question yourself
@@ -34,6 +35,7 @@ CRITICAL — Instructions must be minimal:
 - Just describe WHAT the agent should do, not HOW
 - Do NOT specify column names, table names, conditions, or SQL logic — the agents already know the schema
 - Do NOT specify output format — agents handle that themselves
+- Do NOT instruct the text agent on formatting, tone, or Markdown — it already knows
 
 CRITICAL — Context awareness:
 - Always read the conversation history before writing instructions
@@ -61,11 +63,11 @@ AVALABILE_AGENTS = {
 
 def build_orchestrator_system_prompt():
     language_rule = get_system_prompt(persona_prompt=False, language_prompt=True)
-    agent_list = "\n".join(
+    agents_list = "\n".join(
         f"- {name}: {meta['description']}"
         for name, meta in AVALABILE_AGENTS.items()
     )
-    return language_rule + ORCHESTRATOR_PROMPT.format(agents_list=agent_list)
+    return language_rule + ORCHESTRATOR_PROMPT.format(agents_list=agents_list)
 
 def build_output_blocks(context: AgentContext):
     blocks = []

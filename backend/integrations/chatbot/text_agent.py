@@ -17,6 +17,15 @@ Interpret the results in natural language, directly answering the user's origina
 - Answer as if you simply know the answer — no references to queries or databases
 """
 
+TEXT_FORMAT_PROMPT = """
+Format your responses using Markdown when it improves readability:
+- Use **bold** for important values or numbers
+- Use *italic* for emphasis
+- Use ## or ### for headings in longer responses
+- Use `inline code` for technical terms or values
+- Use Markdown tables for structured or comparative data (e.g. lists of alarms, metrics, or results with multiple attributes)
+"""
+
 def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall):
     
     instruction = call.instruction
@@ -26,7 +35,7 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
     system_prompt = get_system_prompt(
         persona_prompt=False,
         language_prompt=True,
-    )
+    ) + TEXT_FORMAT_PROMPT
 
     if context.sql_query_text:
         system_prompt += QUERY_RESULT_PROMPT
