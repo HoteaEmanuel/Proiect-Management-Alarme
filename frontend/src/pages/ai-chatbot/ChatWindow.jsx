@@ -13,8 +13,7 @@ import Loading from "../../features/ai/components/Loading.jsx";
 import { useAuthStore } from "../../store/authStore.js";
 import { api } from "../../lib/axios.js";
 import Loading1 from "../../features/ai/components/Loading1.jsx";
-import ResponseType from "./ChatResponse.jsx";
-import ChatResponse from "./ChatResponse.jsx";
+import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
 import { RiLoader2Fill } from "react-icons/ri";
 import UserMessage from "@features/ai/components/UserMessage.jsx";
 import FilePreview from "@features/ai/components/FilePreview.jsx";
@@ -105,9 +104,16 @@ const ChatWindow = () => {
   }, [conversationRef]);
 
   // Functie care copiaza contentul unui mesaj in clipboard
-  const handleCopy = async (text) => {
+  const handleCopy = async (message) => {
     try {
-      await navigator.clipboard.writeText(text);
+      let content = "";
+      if (message?.content) content = message?.content;
+      else {
+        message?.blocks.forEach((block) => {
+          if (block.type === "text") content += block.content;
+        });
+      }
+      await navigator.clipboard.writeText(content);
       setCopied(true);
       // Feedback copiere
       setTimeout(() => {
@@ -187,7 +193,7 @@ const ChatWindow = () => {
                 <div
                   className={`${
                     message.role === "assistant"
-                      ? "text-left p-2 rounded-2xl"
+                      ? "text-left p-2 rounded-2xl min-w-0 overflow-hidden"
                       : "max-w-[75%]"
                   }`}
                   onMouseEnter={() => setShowCopy(index)}
@@ -203,11 +209,11 @@ const ChatWindow = () => {
                   )}
                 </div>
                 <div className="relative">
-                  <div className="absolute bottom-0 left-1">
+                  <div className="absolute w-full bottom-0 left-1">
                     {showCopy === index && !copied && (
                       <button
                         className="cursor-pointer hover:scale-125"
-                        onClick={() => handleCopy(message.content)}
+                        onClick={() => handleCopy(message)}
                       >
                         <MdContentCopy className="size-3 text-gray-500" />
                       </button>
@@ -231,7 +237,7 @@ const ChatWindow = () => {
         )}
       </section>
 
-      <div className="absolute flex flex-col bottom-0 right-5 w-4/5 z-10 items-center justify-center gap-4">
+      <div className="absolute flex flex-col bottom-0 right-5 w-4/5 bg-[#0b1220] z-10 items-center justify-center gap-4">
         {isTyping && (
           <div className="w-full flex justify-center mb-5 h-full ">
             <div
@@ -247,7 +253,7 @@ const ChatWindow = () => {
             <FaArrowDown className="size-6 cursor-pointer  bg-gray-800 border border-gray-500 p-1 text-gray-400 rounded-full" />{" "}
           </button>
         )}
-        <div className="w-2/3 flex justify-center p-4 pt-0 bg-[#0b1220]">
+        <div className="w-2/3 flex justify-center p-4 pt-0">
           <MessageInput
             onSubmit={handleSubmit}
             message={message}

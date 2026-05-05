@@ -89,6 +89,7 @@ const MessageInput = ({
       preview: URL.createObjectURL(file),
       file: file,
       type: file.type,
+      size:file.bytes,
       status: "uploading", // fisierele urmeaza sa fie uploadate, statusul e uploading
       url: null,
     }));
@@ -111,7 +112,7 @@ const MessageInput = ({
         tempFiles.find((t) => t.id === f.id)
           ? {
               ...f,
-              url: uploaded.files[i].url,
+              url: uploaded.files[i]?.url,
               status: "uploaded",
             }
           : f,

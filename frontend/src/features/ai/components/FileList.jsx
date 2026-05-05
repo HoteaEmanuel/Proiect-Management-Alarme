@@ -2,6 +2,19 @@ import React, { useState } from "react";
 import { CiFileOn } from "react-icons/ci";
 import { CiCircleRemove } from "react-icons/ci";
 
+import { FaFilePdf, FaRegFileExcel } from "react-icons/fa";
+import { FaFileCsv } from "react-icons/fa";
+import { FaFile } from "react-icons/fa";
+
+const FileIcon = ({type}) => {
+  console.log("TYPE");
+  console.log(type);
+  if (type.toLowerCase() === "pdf") return <FaFilePdf />;
+  if (type.toLowerCase() === "xlsx") return <FaRegFileExcel />;
+  if (type.toLowerCase() === "csv") return <FaFileCsv />;
+  return <FaFile />;
+};
+
 const fileTypeColor = (fileType) => {
   console.log(fileType);
   const extension = fileType.toUpperCase();
@@ -52,7 +65,7 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
             <div
               className={`flex rounded-md items-center px-2 py-1 ${fileTypeColor(file.name.split(".").pop())}`}
             >
-              <CiFileOn className="size-5" />
+              <FileIcon type={file.name.split(".").pop()} />
             </div>
 
             <div className="flex flex-col gap-1 max-w-50">
