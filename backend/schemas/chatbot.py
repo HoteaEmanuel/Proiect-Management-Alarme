@@ -88,3 +88,11 @@ class AgentContext(BaseModel):
 
 class LLMTextResponse(BaseModel):
     text_response: str
+
+class LLMChartResponse(BaseModel):
+    chart_type: Literal["bar", "line", "pie", "area"]
+    title: str
+    data: list[dict]
+    x_key: str
+    y_keys: list[str]
+
