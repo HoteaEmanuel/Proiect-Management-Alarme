@@ -6,7 +6,7 @@ from typing import List
 from schemas import MessageRequest, MessageResponse, ConversationListresponse, ConversationTitleUpdate, ConversationHistory
 from integrations.chatbot import user_chat_request
 from integrations.chatbot.cloudinary_service import upload_file_to_cloudinary
-from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, save_conversation_files
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title
 from auth_utils import get_current_user
 
 router = APIRouter(

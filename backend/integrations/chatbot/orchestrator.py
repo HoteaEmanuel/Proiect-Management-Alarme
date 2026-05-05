@@ -133,7 +133,11 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
         for file in request.files:
             try:
                 print(f"[FILES] Descarcă: {file.url}")
-                file_bytes = requests.get(file.url).content
+                file_bytes = requests.get(
+                    file.url,
+                    headers={"Accept": "application/pdf"},
+                    allow_redirects=True
+                ).content
                 print(f"[FILES] Bytes descărcați: {len(file_bytes)}")
                 content = parse_file(file.filename, file_bytes)
                 print(f"[FILES] Parsat cu succes: {len(content)} caractere")
