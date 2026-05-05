@@ -7,6 +7,7 @@ from .prompt_builder import get_system_prompt
 from crud import get_conversation_title, set_conversation_title, parse_file
 from .sql_query_agent import get_sql_agent_response
 from .text_agent import get_text_agent_response
+from .graphics_agent import get_graphics_agent_response
 
 ORCHESTRATOR_PROMPT = """
 You are an orchestrator that analyzes the user's message and decides which agents are needed and in what order.
@@ -36,6 +37,14 @@ CRITICAL — Instructions must be minimal:
 - Do NOT specify output format — agents handle that themselves
 - Do NOT instruct the text agent on formatting, tone, or Markdown — it already knows
 
+CRITICAL — Agent selection:
+- Use the chart agent ONLY when the user explicitly asks for a chart, graph, or visualization
+- If data comes from the database: sql → chart
+- If data comes from attached files: chart (file contents are already in context)
+- If data comes from both: sql → chart
+- text and chart can be used together: text explains, chart visualizes
+- Never use chart agent for tabular data or simple summaries — use text instead
+
 CRITICAL — Context awareness:
 - Always read the conversation history before writing instructions
 - If the user's message refers to previous results (e.g. "of those", "from these", "how many have..."), include the relevant context in the agent instruction
@@ -60,6 +69,10 @@ AVAILABLE_AGENTS = {
     "sql": {
         "run": get_sql_agent_response,
         "description": "Executes SQL queries and returns data from the database"
+    },
+    "chart": {
+        "run": get_graphics_agent_response,
+        "description": "Generates a chart configuration based on available data — use only when the user explicitly asks for a chart, graph, or visualization"
     },
     "text": {
         "run": get_text_agent_response,
