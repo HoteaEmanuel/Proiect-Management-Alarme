@@ -39,3 +39,16 @@ def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime):
         stats[category][label] = value
         
     return stats
+
+def get_raw_alarms_by_category(db: Session, category: str, label: str):
+    #apelez procedura stocata
+    query = text("""
+        EXEC dbo.GetAlarmsByCategory
+            @category = :category,
+            @label    = :label
+    """)
+    #execut si mapez rezultatele
+    result = db.execute(query, {"category": category, "label": label})
+    
+    #returnez o lista de dictionare (usor de transformat in JSON sau EXCEL)
+    return [dict(row) for row in result.mappings().all()]

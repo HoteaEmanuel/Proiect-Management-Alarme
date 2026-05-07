@@ -1,12 +1,14 @@
 import io
 from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Font
+import pandas as pd
 
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category
 from models import Alarm, AppError
 from database import get_db
 from auth_utils import get_current_user
@@ -109,8 +111,33 @@ def export_alarms(filters: RequestFilters=Depends(), db: Session=Depends(get_db)
     output.seek(0)
     
     #returnez fisiserul
-    return Response(
-        content=output.getvalue(),
+    return StreamingResponse(
+        content=output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=alarms_export.xlsx"}
     )
+    
+@router.get("/chart-details")
+def get_chart_details(category: str, label: str, export: bool=False, db: Session=Depends(get_db)):
+    #iau datele din DB
+    raw_data = get_raw_alarms_by_category(db, category=category, label=label)
+    
+    #daca frontend-ul vrea doar datele pentru pop-ul => returnez raw_data
+    if not export:
+        return raw_data
+    
+    #daca frontend-ul cere exportul in excel
+    df=pd.DataFrame(raw_data)
+    stream=io.BytesIO()
+    
+    with pd.ExcelWriter(stream, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="Alarms Data")
+        
+    stream.seek(0)
+    
+    return StreamingResponse(
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=statistics_export.xlsx"}
+    )
+    
