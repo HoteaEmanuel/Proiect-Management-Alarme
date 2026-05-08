@@ -48,7 +48,7 @@ class MessageResponse(BaseModel):
 class UserMessage(BaseModel):
     role: Literal["user"]
     content: str
-    files: list[FileAttachment]
+    files: list[FileAttachment] = []
 
 class AssistantMessage(BaseModel):
     role: Literal["assistant"]

@@ -36,6 +36,9 @@ def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_u
         conversation = get_full_conversation(db=db, user_id=user_id["id"], conversation_id=conversation_id)
         return ConversationHistory(messages=conversation)
     except Exception as e:
+        print(f"EROARE GET CONVERSATION: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.delete("/conversations/{conversation_id}", status_code=204)
