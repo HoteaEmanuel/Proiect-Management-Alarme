@@ -7,7 +7,7 @@ import json
 import requests
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
-from schemas import MessageCreate, FileAttachment
+from schemas import MessageCreate, CloudinaryFileAttachment
 
 def parse_pdf(content: bytes) -> str:
     try:
@@ -117,7 +117,8 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
                         file_bytes = requests.get(file["url"]).content
                         parsed = parse_file(file["filename"], file_bytes)
                         parsed_files.append(f"[{file['filename']}]:\n{parsed}")
-                    except Exception:
+                    except Exception as e:
+                        print(f"[ISTORIC] nu am putut parsa fisierul {str(e)}")
                         continue  # fisierul nu poate fi parsat, il sarim
 
                 if parsed_files:
@@ -314,15 +315,11 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
 
 def save_conversation_files(
     db: Session,
-    user_id: str,
-    conversation_id: str,
-    message_id: int | None,
-    files: list[FileAttachment]
+    message_id: int,
+    files: list[CloudinaryFileAttachment]
 ):
     db_files = [
         ConversationFileModel(
-            user_id=user_id,
-            conversation_id=conversation_id,
             message_id=message_id,
             filename=file.filename,
             file_url=file.url,

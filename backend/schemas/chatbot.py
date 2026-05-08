@@ -1,8 +1,15 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
-from typing import Literal, Union
+from typing import Literal, Union, Annotated
+from fastapi import UploadFile, File
 
-class FileAttachment(BaseModel):
+class RawFileAttachment(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    filename: str
+    content: bytes
+    preserve: bool = False
+
+class CloudinaryFileAttachment(BaseModel):
     filename: str
     url: str
     public_id: str
@@ -15,7 +22,7 @@ class MessageRequest(BaseModel):
     conversation_id: str | None = None
     message: str
     new_chat: bool = False
-    files: list[FileAttachment] = []
+    files: list[RawFileAttachment] = []
 
 class MessageCreate(BaseModel):
     user_id: str
@@ -25,40 +32,33 @@ class MessageCreate(BaseModel):
     content: str
     sql_query: str | None = None
 
-class Message(MessageCreate):
-    id: int
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
 class TextBlock(BaseModel):
-    type: Literal["text"]
+    type: Literal["text"] = "text"
     content: str
 
 class ChartBlock(BaseModel):
-    type: Literal["chart"]
+    type: Literal["chart"] = "chart"
     content: dict
 
 OutputBlock = Union[TextBlock, ChartBlock]
 
-class MessageResponse(BaseModel):
-    conversation_id: str
-    response: list[OutputBlock]
-
 class UserMessage(BaseModel):
-    role: Literal["user"]
+    role: Literal["user"] = "user"
     content: str
-    files: list[FileAttachment]
+    files: list[CloudinaryFileAttachment] = []
 
 class AssistantMessage(BaseModel):
-    role: Literal["assistant"]
+    conversation_id: str | None = None
+    role: Literal["assistant"] = "assistant"
     blocks: list[OutputBlock]
 
-class ConversationHistory(BaseModel):
-    messages: list[UserMessage | AssistantMessage]
+ChatMessage = Annotated[
+    Union[UserMessage, AssistantMessage],
+    Field(discriminator="role")
+]
 
-class ConversationCreate(BaseModel):
-    user_id: str
+class ConversationHistory(BaseModel):
+    messages: list[ChatMessage]
 
 class ConversationResponse(BaseModel):
     conversation_id: str
@@ -74,10 +74,6 @@ class LLMSQLResponse(BaseModel):
     has_sql_query: bool
     sql_query: str | None
     text_response: str | None
-    
-class ConversationTitleUpdate(BaseModel):
-    new_title: str
-
 
 class AgentCall(BaseModel):
     agent: str
@@ -96,7 +92,3 @@ class AgentContext(BaseModel):
     sql_result: list[dict] | None = None
     text_response: str | None = None
     chart_config: dict | None = None
-
-class LLMTextResponse(BaseModel):
-    text_response: str
-

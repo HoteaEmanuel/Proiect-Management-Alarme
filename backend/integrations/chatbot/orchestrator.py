@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 import requests
 
-from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock, FileAttachment
+from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock, RawFileAttachment
 from .client import llm_request
 from .prompt_builder import get_system_prompt
 from crud import get_conversation_title, set_conversation_title, parse_file
@@ -81,7 +81,7 @@ AVAILABLE_AGENTS = {
 }
     
 
-def build_orchestrator_system_prompt(files: list[FileAttachment] | None = None):
+def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = None):
     language_rule = get_system_prompt(persona_prompt=False, language_prompt=True)
     
     agents_list = "\n".join(
@@ -90,7 +90,10 @@ def build_orchestrator_system_prompt(files: list[FileAttachment] | None = None):
     )
 
     if files:
-        files_list = "\n".join(f"- {f.filename} ({f.file_format})" for f in files)
+        files_list = "\n".join(
+            f"- {f.filename} ({f.filename.rsplit('.', 1)[-1] if '.' in f.filename else 'unknown'})"
+            for f in files
+        )
         files_context = FILES_CONTEXT_PROMPT.format(files_list=files_list)
     else:
         files_context = ""
@@ -109,6 +112,10 @@ def build_output_blocks(context: AgentContext):
     return blocks
 
 def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
+
+    print(f"[ORCHESTRATOR] request.files: {len(request.files)}")
+    for f in request.files:
+        print(f"[ORCHESTRATOR] - {f.filename}, {len(f.content)} bytes")
     
     system_prompt = build_orchestrator_system_prompt(files=request.files or None)
 
@@ -128,30 +135,18 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
         conversation_history=context_history
     )
 
+    parsed = []
     if request.files:
-        parsed = []
         for file in request.files:
             try:
-                print(f"[FILES] Descarcă: {file.url}")
-                file_bytes = requests.get(
-                    file.url,
-                    headers={"Accept": "application/pdf"},
-                    allow_redirects=True
-                ).content
-                print(f"[FILES] Bytes descărcați: {len(file_bytes)}")
-                content = parse_file(file.filename, file_bytes)
-                print(f"[FILES] Parsat cu succes: {len(content)} caractere")
+                content = parse_file(file.filename, file.content)  # bytes direct, nu mai descarci
                 parsed.append(f"[{file.filename}]:\n{content}")
             except Exception as e:
                 print(f"[FILES] EROARE la {file.filename}: {str(e)}")
                 continue
-        if parsed:
-            agent_context.file_contents = "\n\n".join(parsed)
-            print(f"[FILES] file_contents setat: {len(agent_context.file_contents)} caractere")
-        else:
-            print("[FILES] Niciun fișier parsat cu succes")
-    else:
-        print("[FILES] request.files e gol")
+
+    if parsed:
+        agent_context.file_contents = "\n\n".join(parsed)
 
     for agent_call in orchestrator_response.agents:
         agent = AVAILABLE_AGENTS.get(agent_call.agent)
