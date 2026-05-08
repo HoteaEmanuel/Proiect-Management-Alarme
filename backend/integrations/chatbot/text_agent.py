@@ -1,7 +1,7 @@
 # text_agent.py
 from sqlalchemy.orm import Session
 
-from schemas import AgentCall, AgentContext, LLMTextResponse
+from schemas import AgentCall, AgentContext
 from .prompt_builder import get_system_prompt
 from .client import llm_request
 
@@ -45,8 +45,6 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
 
     print(f"\n\n[TEXT AGENT] System Prompt: {system_prompt}\n\n")
 
-    llm_response = llm_request(system_prompt, instruction, context.conversation_history, LLMTextResponse)
-
-    context.text_response = llm_response.text_response
+    context.text_response = llm_request(system_prompt, instruction, context.conversation_history)
 
     return context

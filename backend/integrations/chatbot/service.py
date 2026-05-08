@@ -3,9 +3,10 @@ import json
 from datetime import datetime
 
 from models import AppError
-from schemas import MessageRequest, MessageCreate, MessageResponse, AgentContext, OutputBlock
+from schemas import MessageRequest, MessageCreate, AssistantMessage, AgentContext, OutputBlock, RawFileAttachment, CloudinaryFileAttachment
 from crud import get_conversation_history, save_message_to_db, get_user_conversations
 from crud import create_new_conversation, set_response_id, save_conversation_files
+from integrations.cloudinary import upload_file_to_cloudinary
 from .orchestrator import get_orchestrator_response
 
 def prepare_conversation(db: Session, request: MessageRequest):
@@ -32,8 +33,6 @@ def prepare_conversation(db: Session, request: MessageRequest):
     )
     saved_user_message = save_message_to_db(db=db, message_data=user_message_data)
 
-    save_conversation_files(db, request.user_id, conversation_id, saved_user_message.id, request.files)
-
     context_history = get_conversation_history(db=db, user_id=request.user_id, 
                                     conversation_id=conversation_id, 
                                     limit=10)
@@ -53,6 +52,27 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
 
     set_response_id(db, user_message_id, bot_reply.id)
 
+
+def upload_and_save_preserve_files(
+    db: Session,
+    message_id: int,
+    files: list[RawFileAttachment]
+):
+    preserve_files = [f for f in files if f.preserve]
+    if not preserve_files:
+        return []
+
+    uploaded = []
+    for file in preserve_files:
+        try:
+            cloudinary_file = upload_file_to_cloudinary(file)
+            uploaded.append(cloudinary_file)
+        except Exception as e:
+            print(f"[CLOUDINARY] EROARE upload {file.filename}: {e}")
+            continue
+
+    return save_conversation_files(db, message_id, uploaded)
+
 #functie ce gestioneaza conversatiile user-agent din pagina de chat (practic un agent)
 def user_chat_request(db: Session, request: MessageRequest):
     try:
@@ -62,8 +82,10 @@ def user_chat_request(db: Session, request: MessageRequest):
 
         save_bot_response(db, request, output_blocks, agent_context, user_message_id)
 
-        return MessageResponse(conversation_id=request.conversation_id,
-                               response=output_blocks)
+        upload_and_save_preserve_files(db, user_message_id, request.files)
+
+        return AssistantMessage(conversation_id=request.conversation_id,
+                               blocks=output_blocks)
     
     except AppError:
         raise
