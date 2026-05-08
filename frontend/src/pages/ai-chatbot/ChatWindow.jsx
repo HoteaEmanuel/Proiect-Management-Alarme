@@ -9,6 +9,7 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
+
 import Loading from "../../features/ai/components/Loading.jsx";
 import { useAuthStore } from "../../store/authStore.js";
 import { api } from "../../lib/axios.js";
@@ -17,6 +18,7 @@ import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
 import { RiLoader2Fill } from "react-icons/ri";
 import UserMessage from "@features/ai/components/UserMessage.jsx";
 import FilePreview from "@features/ai/components/FilePreview.jsx";
+import Button from "@components/Button.jsx";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -261,9 +263,12 @@ const ChatWindow = () => {
           </div>
         )}
         {showScrollBtn && !isTyping && (
-          <button onClick={handleScrollDown}>
-            <FaArrowDown className="size-6 cursor-pointer  bg-gray-800 border border-gray-500 p-1 text-gray-400 rounded-full" />{" "}
-          </button>
+          <Button
+            onClick={handleScrollDown}
+            className="scroll-btn rounded-full"
+          >
+            <FaArrowDown className="size-3" />{" "}
+          </Button>
         )}
         <div className="w-2/3 flex justify-center bg-[#0b1220] p-4 pt-0">
           <MessageInput

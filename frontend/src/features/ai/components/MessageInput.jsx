@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
+import { MdKeyboardVoice } from "react-icons/md";
 import LoadingCircle from "../../../components/LoadingCircle";
 import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
 import FilePreview from "./FilePreview";
 import FileList from "./FileList";
 import uploadFile from "../api/upload.api.js";
+import Button from "@components/Button";
 
 // Constants
 const MESSAGE_LIMIT = 5000;
@@ -128,7 +130,7 @@ const MessageInput = ({
       }),
     );
     console.log("UPDATED FILES");
-    console.log(files)
+    console.log(files);
   };
 
   return (
@@ -165,21 +167,28 @@ const MessageInput = ({
           multiple="yes"
           accept=".pdf,.xlsx,.csv"
         />
-        <button>
-          <Tooltip text={"Add files"}>
-            <IoAdd
-              className="size-5 hover:bg-gray-800 rounded-full cursor-pointer"
-              onClick={() => fileInput.current.click()}
-            />
-          </Tooltip>
-        </button>
+        <Tooltip text={"Add files"}>
+          <Button onClick={() => fileInput.current.click()}>
+            <IoAdd className="size-4 hover:bg-gray-800 rounded-full cursor-pointer" />
+          </Button>
+        </Tooltip>
 
-        {(message.trim().length > 0 || files?.length > 0) && !loading && (
-          <button onClick={onSubmit}>
-            <FaArrowUp className="size-8 cursor-pointer hover:scale-105 bg-gray-900 p-2 rounded-2xl border border-blue-950" />
-          </button>
-        )}
-        {loading && <LoadingCircle />}
+        <div className="flex items-center gap-2">
+          <Button className="cursor-pointer hover:scale-105">
+            <MdKeyboardVoice className="size-5" />
+          </Button>
+
+          {!loading && (
+            <Button
+              onClick={onSubmit}
+              disabled={message.length === 0 && files.length === 0}
+            >
+              <FaArrowUp className="size-8 cursor-pointer hover:scale-105 bg-gray-900 p-2 rounded-2xl border border-blue-950" />
+            </Button>
+          )}
+
+          {loading && <LoadingCircle />}
+        </div>
       </div>
     </div>
   );

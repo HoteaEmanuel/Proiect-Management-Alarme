@@ -17,6 +17,8 @@ import {
   AlarmType,
   PaginationSizes,
 } from "@constants/alarms.js";
+import Button from "@components/Button";
+import Tooltip from "@components/ToolTip";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams({ replace: false });
@@ -91,24 +93,26 @@ const Dashboard = () => {
     <div className="dashboard-page">
       <div className="dashboard-header">
         <h1 className="dashboard-title">Alarms</h1>
+        <Tooltip text={"Export as xlsx"}>
+          <Button
+            className="dashboard-export-button"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <>
+                <span>Exporting...</span>
+                <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
+              </>
+            ) : (
+              <>
+                <span>Export</span>
+                <CiExport className="dashboard-export-icon" />
+              </>
+            )}
 
-        <button
-          className="dashboard-export-button"
-          onClick={handleExport}
-          disabled={isExporting}
-        >
-          {isExporting ? (
-            <>
-              <span>Exporting...</span>
-              <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
-            </>
-          ) : (
-            <>
-              <span>Export</span>
-              <CiExport className="dashboard-export-icon" />
-            </>
-          )}
-        </button>
+          </Button>
+        </Tooltip>
       </div>
 
       <div className="dashboard-filters">
@@ -246,7 +250,6 @@ const Dashboard = () => {
           const col = next[0];
           // Actualizam parametrul de sortare si ordinea
           setSearchParams((prev) => {
-            
             const params = new URLSearchParams(prev);
             if (col) {
               params.set("sort", col.id);
