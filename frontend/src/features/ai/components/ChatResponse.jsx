@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import remarkGfm from "remark-gfm";
 
 const COLORS = [
   "#6366f1",
@@ -144,7 +145,7 @@ const ChatResponse = ({ blocks }) => {
             
           ) : (
             <div className="prose prose-invert min-w-0">
-              <ReactMarkdown>{block.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{block.content}</ReactMarkdown>
             </div>
           )}
         </div>

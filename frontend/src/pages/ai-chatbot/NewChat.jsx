@@ -13,20 +13,20 @@ const NewChat = () => {
   const onSubmit = async () => {
     if (isPending) return;
 
-     const filesToSend = files.map((file) => ({
-        filename: file.filename,
-        url: file.url,
-        public_id: file.public_id,
-        resource_type: file.resource_type,
-        file_format: file.format,
-        file_size: file.file_size,
-      }));
-      const mesaj = {
-        user_id: user.user_id,
-        content: message,
-        files: filesToSend,
-      };
-      setFiles([]);
+    const filesToSend = files.map((file) => ({
+      filename: file.filename,
+      url: file.url,
+      public_id: file.public_id,
+      resource_type: file.resource_type,
+      file_format: file.format,
+      file_size: file.file_size,
+    }));
+    const mesaj = {
+      user_id: user.user_id,
+      content: message,
+      files: filesToSend,
+    };
+    setFiles([]);
     await sendMessage(mesaj);
   };
   return (
