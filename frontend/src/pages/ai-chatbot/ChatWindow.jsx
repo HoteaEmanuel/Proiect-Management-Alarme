@@ -142,7 +142,6 @@ const ChatWindow = () => {
           files: files,
         },
       ]);
-
       const filesToSend = files.map((item) => item.file);
       const filesPreserveStatus = files.map((item) => item.persist);
       const mesaj = {
@@ -154,32 +153,40 @@ const ChatWindow = () => {
       };
       console.log("MESSAGE TO SENT");
       console.log(mesaj);
-      setMessage("");
-      setFiles([]);
-      handleScrollDown();
 
       const formData = new FormData();
       formData.append("message", mesaj.message);
       formData.append("new_chat", String(mesaj.new_chat ?? false));
+      console.log("PLM");
+      console.log(id);
+      formData.append("conversation_id", id);
 
       mesaj.files.forEach((file) => {
         formData.append("files", file);
       });
-
+      console.log("MESAJJJ");
+      console.log(mesaj);
       mesaj.file_preserve_flags.forEach((persist) => {
         formData.append("file_preserve_flags", String(persist === true));
       });
 
+      console.log("FORM DATA");
+      console.log([...formData.entries()]);
+
+      setMessage("");
+      setFiles([]);
+      handleScrollDown();
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
         headers: {
           "Content-Type": "multipart/formdata",
         },
       });
+
       console.log("AI RESPONSE");
       console.log(response);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", blocks: response.data.response },
+        { role: "assistant", blocks: response.data.blocks },
       ]);
     } finally {
       setIsTyping(false);
@@ -251,18 +258,18 @@ const ChatWindow = () => {
       <div className="absolute flex flex-col bottom-0 right-5 w-4/5  z-10 items-center justify-center gap-4">
         {isTyping && (
           <div className="w-full flex justify-center mb-5 h-full ">
-            <div
-              className="w-14 z-100 rounded-2xl p-2 cursor-pointer bg-[#0b1220] border border-gray-700"
+            <Button
+              className="w-14 z-100 rounded-2xl p-2 cursor-pointer culor-inherit  glassy-container glassy-container-darker"
               onClick={handleScrollDown}
             >
               <Loading />
-            </div>
+            </Button>
           </div>
         )}
         {showScrollBtn && !isTyping && (
           <Button
             onClick={handleScrollDown}
-            className="scroll-btn rounded-full"
+            className="scroll-btn glassy-container"
           >
             <FaArrowDown className="size-3" />{" "}
           </Button>

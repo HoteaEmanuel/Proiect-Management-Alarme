@@ -12,13 +12,29 @@ export const useCreateConversation = () => {
     mutationFn: async (message) => {
       console.log("MESSAGE TO SENT HERE");
       console.log(message);
-      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, {
-        new_chat: true,
-        user_id: user.user_id,
-        conversation_id: null,
-        message: message.content,
-        files: message.files ?? [],
+      const formData = new FormData();
+      formData.append("message", message.message);
+      formData.append("new_chat", "true");
+
+      message.files.forEach((file) => {
+        formData.append("files", file);
       });
+
+      message.file_preserve_flags.forEach((persist) => {
+        formData.append("file_preserve_flags", String(persist === true));
+      });
+
+      console.log("FORM DATA NEW");
+      console.log(...formData.entries());
+      const response = await api.post(
+        `${VITE_URL_APP}/api/chatbot`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/formdata",
+          },
+        },
+      );
       return response.data;
     },
     mutationKey: ["conversations"],
@@ -26,7 +42,7 @@ export const useCreateConversation = () => {
       toast.error("Could not send the message");
     },
     onSuccess: (response) => {
-      toast.success("Yey");
+      // toast.success("Yey");
       queryClient.invalidateQueries({
         queryKey: ["conversations", user.user_id],
       });
@@ -91,11 +107,11 @@ export const useRenameConversation = () => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ conversationId, title }) => {
+    mutationFn: async ({ conversationId, new_title }) => {
       console.log("DATA HERE: ");
-      console.log(conversationId, title);
+      console.log(conversationId, new_title);
       await api.patch(`${VITE_URL_APP}/api/conversations/${conversationId}`, {
-        new_title: title,
+        new_title: new_title,
       });
     },
     mutationKey: ["conversations", user.user_id],

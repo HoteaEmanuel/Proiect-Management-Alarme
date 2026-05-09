@@ -2,12 +2,13 @@ import XlsxPreview from "./XlsxPreview";
 
 const FilePreview = ({ file, onClose, ...props }) => {
   console.log("FILE HERE");
-
   console.log(file);
-  const type = file?.type || file.file_format;
+  const fileItem = file?.file;
+  console.log(file);
+  const type = fileItem?.type || file.file_format;
   console.log("FILE TYPE");
   console.log(type);
- 
+
   return (
     <div
       className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
@@ -15,25 +16,29 @@ const FilePreview = ({ file, onClose, ...props }) => {
       {...props}
     >
       <div
-        className="max-w-4xl max-h-[90vh] w-full"
+        className="max-w-6xl h-[90vh] w-full"
         onClick={(e) => e.stopPropagation()}
       >
         {type.includes("image") && (
           <img
-            src={file?.preview || file?.url}
+            src={file?.url}
             className="max-h-[90vh] mx-auto object-contain"
           />
         )}
 
         {type.includes("pdf") && (
           <iframe
-            src={`https://docs.google.com/gview?url=${encodeURIComponent(file.url)}&embedded=true`}
-            className="w-full h-[90vh]"
+            src={file?.url}
+            title={file?.filename || fileItem.name}
+            width={"100%"}
+            height={"100%"}
+            style={{ border: "none", borderRadius: "8px" }}
           />
         )}
 
-        {type ===
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && (
+        {(type ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+          type.toLowerCase() === "xlsx") && (
           <XlsxPreview file={file?.file} url={file?.url} />
         )}
 

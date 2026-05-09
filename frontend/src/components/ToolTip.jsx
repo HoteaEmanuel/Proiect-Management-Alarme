@@ -3,7 +3,7 @@ const Tooltip = ({ text, children, ...props }) => (
     {children}
     <div
       className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50
-                 bg-gray-800 text-white text-xs px-2.5 py-1.5 rounded-md whitespace-nowrap
+                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap
                  pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150
                  shadow-lg"
     >

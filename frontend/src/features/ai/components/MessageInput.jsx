@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
 import FilePreview from "./FilePreview";
 import FileList from "./FileList";
-import uploadFile from "../api/upload.api.js";
 import Button from "@components/Button";
 
 // Constants
@@ -26,11 +25,6 @@ const MessageInput = ({
   setMessage,
   setFiles,
 }) => {
-  console.log("MESSAGE");
-  console.log(message);
-  console.log(setMessage);
-  console.log("SET FILES");
-  console.log(setFiles);
   const input = useRef();
 
   const [previewFile, setPreviewFile] = useState(null);
@@ -90,47 +84,53 @@ const MessageInput = ({
 
     // Salvez fisierele temporale, cele valide, care nu depasesc marimea maxima
     const tempFiles = valid.map((file) => ({
-      public_id: crypto.randomUUID(),
-      filename: file.name,
+      // public_id: crypto.randomUUID(),
+      // filename: file.name,
       file: file,
-      preview: URL.createObjectURL(file),
-      resource_type: "",
-      file_format: file.type,
-      file_size: file.bytes,
-      status: "uploading", // fisierele urmeaza sa fie uploadate, statusul e uploading
-      url: null,
+      // preview: URL.createObjectURL(file),
+      // resource_type: "",
+      // file_format: file.type,
+      // file_size: file.bytes,
+      // status: "uploading", // fisierele urmeaza sa fie uploadate, statusul e uploading
+      url: URL.createObjectURL(file),
+      persist: false,
     }));
-    setFiles((prev) => [...prev, ...tempFiles]);
+    // Actualizez fisierele, le pastrez doar pe cele cu nume unic
+    setFiles((prev) => {
+      const existingNames = new Set(prev.map((f) => f.name));
+      const unique = tempFiles.filter((f) => !existingNames.has(f.name));
+      return [...prev, ...unique];
+    });
 
     // // Upload to cloudinary
-    console.log(tempFiles);
-    const uploaded = await Promise.all(
-      tempFiles.map((file) => uploadFile(file.file)),
-    );
-    console.log("BATMAN");
-    console.log(uploaded);
+    // console.log(tempFiles);
+    // const uploaded = await Promise.all(
+    //   tempFiles.map((file) => uploadFile(file.file)),
+    // );
+    // console.log("BATMAN");
+    // console.log(uploaded);
 
     // Actualizarea cu datele de la cloudinary, folositor pentru afisarea ulterioara in conversatie
-    setFiles((prev) =>
-      prev.map((f) => {
-        const tempIndex = tempFiles.findIndex(
-          (t) => t.public_id === f.public_id,
-        );
-        if (tempIndex === -1) return f;
-        return {
-          ...f,
-          filename: uploaded[tempIndex]?.filename,
-          url: uploaded[tempIndex]?.url,
-          public_id: uploaded[tempIndex]?.public_id,
-          resource_type: uploaded[tempIndex]?.resource_type,
-          file_format: uploaded[tempIndex]?.format,
-          file_size: uploaded[tempIndex]?.bytes,
-          status: "uploaded",
-        };
-      }),
-    );
-    console.log("UPDATED FILES");
-    console.log(files);
+    // setFiles((prev) =>
+    //   prev.map((f) => {
+    //     const tempIndex = tempFiles.findIndex(
+    //       (t) => t.public_id === f.public_id,
+    //     );
+    //     if (tempIndex === -1) return f;
+    //     return {
+    //       ...f,
+    //       filename: uploaded[tempIndex]?.filename,
+    //       url: uploaded[tempIndex]?.url,
+    //       public_id: uploaded[tempIndex]?.public_id,
+    //       resource_type: uploaded[tempIndex]?.resource_type,
+    //       file_format: uploaded[tempIndex]?.format,
+    //       file_size: uploaded[tempIndex]?.bytes,
+    //       status: "uploaded",
+    //     };
+    //   }),
+    // );
+    // console.log("UPDATED FILES");
+    // console.log(files);
   };
 
   return (

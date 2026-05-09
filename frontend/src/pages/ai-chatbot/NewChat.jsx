@@ -13,20 +13,30 @@ const NewChat = () => {
   const onSubmit = async () => {
     if (isPending) return;
 
-    const filesToSend = files.map((file) => ({
-      filename: file.filename,
-      url: file.url,
-      public_id: file.public_id,
-      resource_type: file.resource_type,
-      file_format: file.format,
-      file_size: file.file_size,
-    }));
+    const filesToSend = files.map((item) => item.file);
+    const filesPreserveStatus = files.map((item) => item.persist);
     const mesaj = {
       user_id: user.user_id,
-      content: message,
+      message: message,
+      conversation_id:123,
       files: filesToSend,
+      file_preserve_flags: filesPreserveStatus,
     };
+
+    const formData = new FormData();
+    formData.append("message", mesaj.message);
+    formData.append("new_chat", String(mesaj.new_chat ?? false));
+
+    mesaj.files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    mesaj.file_preserve_flags.forEach((persist) => {
+      formData.append("file_preserve_flags", String(persist === true));
+    });
+
     setFiles([]);
+    setMessage("");
     await sendMessage(mesaj);
   };
   return (

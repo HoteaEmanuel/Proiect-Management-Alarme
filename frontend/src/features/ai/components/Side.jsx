@@ -25,7 +25,7 @@ const Side = () => {
     isPending,
   } = useGetUserConversations();
 
-  const { mutate: renameConversation } = useRenameConversation();
+  const { mutateAsync: renameConversation } = useRenameConversation();
 
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -41,7 +41,7 @@ const Side = () => {
   const handleRename = async (e) => {
     if (e.key === "Enter") {
       // rename(conv.id, editValue);
-      await renameConversation({ conversationId: editingId, title: editValue });
+      await renameConversation({ conversationId: editingId, new_title: editValue });
       setEditingId(null);
     }
     if (e.key === "Escape") {

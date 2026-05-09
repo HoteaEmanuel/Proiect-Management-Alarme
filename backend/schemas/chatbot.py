@@ -17,10 +17,17 @@ class CloudinaryFileAttachment(BaseModel):
     file_format: str
     file_size: int
 
+
+
+class UpdateTitleRequest(BaseModel):
+    new_title: str
+    
+    
+    
 class MessageRequest(BaseModel):
     user_id: str | None = None
     conversation_id: str | None = None
-    message: str
+    message: str | None = None
     new_chat: bool = False
     files: list[RawFileAttachment] = []
 
@@ -45,6 +52,10 @@ OutputBlock = Union[TextBlock, ChartBlock]
 class UserMessage(BaseModel):
     role: Literal["user"] = "user"
     content: str
+<<<<<<< HEAD
+=======
+
+>>>>>>> cf9cfb7 (Files support and fixes)
     files: list[CloudinaryFileAttachment] = []
 
 class AssistantMessage(BaseModel):

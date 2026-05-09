@@ -1,3 +1,6 @@
+import IconCheckbox from "@components/CheckboxButton";
+import CheckboxButton from "@components/CheckboxButton";
+import Tooltip from "@components/ToolTip";
 import React, { useState } from "react";
 import { CiFileOn } from "react-icons/ci";
 import { CiCircleRemove } from "react-icons/ci";
@@ -5,6 +8,7 @@ import { CiCircleRemove } from "react-icons/ci";
 import { FaFilePdf, FaRegFileExcel } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
+
 
 const FileIcon = ({ type }) => {
   console.log("TYPE");
@@ -34,27 +38,28 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const handleRemoveFile = (e, file) => {
     e.stopPropagation();
-    setFiles((prev) => prev.filter((f) => f.filename !== file.filename));
+    setFiles((prev) => prev.filter((f) => f.file.name !== file.file.name));
   };
 
   console.log("FILES HERE");
   console.log(files);
-  if (files.length == 0) return;
+  if (!files || files?.length == 0) return;
+
   return (
-    <div className="flex gap-1 overflow-x-auto shadow-2xl">
-      <ul className="flex gap-1 overflow-x-auto py-3 px-2">
-        {files.map((file) => (
+    <div className="flex gap-1 overflow-hidden shadow-2xl">
+      <ul className="flex gap-1 overflow-x-auto overflow-y-hidden p-5 px-7">
+        {files.map((item) => (
           <li
-            key={file.public_id}
+            key={item?.url}
             className="relative overflow-visible flex flex-1 gap-2 hover:bg-gray-900 p-1 rounded-md"
-            onMouseOver={() => setSelectedFile(file.filename)}
+            onMouseOver={() => setSelectedFile(item.file.name)}
             onMouseLeave={() => setSelectedFile(null)}
-            onClick={() => setPreviewFile(file)}
+            onClick={() => setPreviewFile(item)}
           >
-            {selectedFile === file.filename && (
+            {selectedFile === item.file.name && (
               <div className="absolute -top-2 -right-2 z-50 hover:text-white">
                 <button
-                  onClick={(e) => handleRemoveFile(e, file)}
+                  onClick={(e) => handleRemoveFile(e, item)}
                   classfilename="cursor-pointer"
                 >
                   <CiCircleRemove classfilename="size-6" />
@@ -62,19 +67,33 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
               </div>
             )}
 
+            <Tooltip text={"Persist"}>
+              <IconCheckbox
+                checked={item.persist === true}
+                onChange={() =>
+                  setFiles((prev) =>
+                    prev.map((f) =>
+                      f.file.name === item.file.name
+                        ? { ...f, persist: !f.persist }
+                        : f,
+                    ),
+                  )
+                }
+              />
+            </Tooltip>
+
             <div
-              className={`flex rounded-md items-center px-2 py-1 ${fileTypeColor(file.filename.split(".").pop())}`}
+              className={`flex rounded-md items-center px-2 py-1 ${fileTypeColor(item.file.name.split(".").pop())}`}
             >
-              <FileIcon type={file.filename.split(".").pop()} />
+              <FileIcon type={item.file.name.split(".").pop()} />
             </div>
 
             <div className="flex flex-col gap-1 max-w-50">
               <span className="font-semibold text-sm truncate">
-                {file.filename}
-                {file.status === "pending" && "Uploading..."}
+                {item.file.name}
               </span>
               <span className="uppercase opacity-50 text-xs">
-                {file.filename.split(".").pop()}
+                {item.file.name.split(".").pop()}
                 {/* File extension */}
               </span>
             </div>

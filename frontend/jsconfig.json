@@ -7,7 +7,7 @@
       "@features/*": ["src/features/*"],
       "@components/*": ["src/components/*"],
       "@constants/*":["src/constants/*"],
-      "@lib/*":["src/constants/*"]
+      "@lib/*":["src/lib/*"]
     }
   }
 }

@@ -134,18 +134,21 @@ const Chart = ({ content }) => {
 };
 
 const ChatResponse = ({ blocks }) => {
+  console.log("BLOCKS");
+  console.log(blocks);
   return (
     <div className="min-w-0 w-full">
       {blocks.map((block, index) => (
         <div key={index} className="min-w-0 w-screen">
           {block.type === "chart" ? (
-            <div className="w-screen flex px-20"> 
-              <Chart content={block.content}  />
-              </div>
-            
+            <div className="w-screen flex px-20">
+              <Chart content={block.content} />
+            </div>
           ) : (
             <div className="prose prose-invert min-w-0">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{block.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {block.content}
+              </ReactMarkdown>
             </div>
           )}
         </div>

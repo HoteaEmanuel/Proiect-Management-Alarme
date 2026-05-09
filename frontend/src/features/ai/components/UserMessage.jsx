@@ -11,7 +11,10 @@ const FILE_ICONS = {
 };
 
 const File = ({ file, onClick }) => {
-  const ext = file.filename.split(".").pop().toLowerCase();
+  console.log(file);
+  const fileName=file?.filename || file?.file?.name;
+  console.log(fileName);
+  const ext = fileName.split(".").pop().toLowerCase();
   const icon = FILE_ICONS[ext] ?? FILE_ICONS.default;
 
   return (
