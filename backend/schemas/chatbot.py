@@ -45,11 +45,7 @@ OutputBlock = Union[TextBlock, ChartBlock]
 class UserMessage(BaseModel):
     role: Literal["user"] = "user"
     content: str
-<<<<<<< HEAD
-    files: list[FileAttachment] = []
-=======
     files: list[CloudinaryFileAttachment] = []
->>>>>>> 85a6cc8d104a98077d5b375da3425dcb5d77c59f
 
 class AssistantMessage(BaseModel):
     conversation_id: str | None = None
