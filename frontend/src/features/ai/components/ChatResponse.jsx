@@ -141,7 +141,7 @@ const ChatResponse = ({ blocks }) => {
       {blocks.map((block, index) => (
         <div key={index} className="min-w-0 w-screen">
           {block.type === "chart" ? (
-            <div className="w-screen flex px-20">
+            <div className="min-w-full">
               <Chart content={block.content} />
             </div>
           ) : (

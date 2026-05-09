@@ -19,6 +19,7 @@ import { RiLoader2Fill } from "react-icons/ri";
 import UserMessage from "@features/ai/components/UserMessage.jsx";
 import FilePreview from "@features/ai/components/FilePreview.jsx";
 import Button from "@components/Button.jsx";
+import { toast } from "sonner";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -151,9 +152,7 @@ const ChatWindow = () => {
         files: filesToSend,
         file_preserve_flags: filesPreserveStatus,
       };
-      console.log("MESSAGE TO SENT");
-      console.log(mesaj);
-
+   
       const formData = new FormData();
       formData.append("message", mesaj.message);
       formData.append("new_chat", String(mesaj.new_chat ?? false));
@@ -164,14 +163,11 @@ const ChatWindow = () => {
       mesaj.files.forEach((file) => {
         formData.append("files", file);
       });
-      console.log("MESAJJJ");
-      console.log(mesaj);
+
       mesaj.file_preserve_flags.forEach((persist) => {
         formData.append("file_preserve_flags", String(persist === true));
       });
 
-      console.log("FORM DATA");
-      console.log([...formData.entries()]);
 
       setMessage("");
       setFiles([]);
@@ -182,13 +178,16 @@ const ChatWindow = () => {
         },
       });
 
-      console.log("AI RESPONSE");
-      console.log(response);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", blocks: response.data.blocks },
       ]);
-    } finally {
+    }
+    catch(e)
+    {
+      toast.error(e.message);
+    } 
+    finally {
       setIsTyping(false);
     }
   };
