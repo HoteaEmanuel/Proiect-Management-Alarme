@@ -20,10 +20,23 @@ import cloudinary.uploader
 import io
 from uuid import uuid4
 
+def get_signed_url(public_id: str, resource_type: str = "raw") -> str:
+    url, _ = cloudinary.utils.cloudinary_url(
+        public_id,
+        resource_type=resource_type,
+        sign_url=True,
+        secure=True
+    )
+    return url
+
 def upload_file_to_cloudinary(file: RawFileAttachment) -> CloudinaryFileAttachment:
+    extension = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    image_types = {"jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff"}
+    resource_type = "image" if extension in image_types else "raw"
+
     result = cloudinary.uploader.upload(
         io.BytesIO(file.content),
-        resource_type="auto",
+        resource_type=resource_type,
         public_id=f"chat_files/{uuid4().hex}_{file.filename}",
         use_filename=True,
         unique_filename=True,

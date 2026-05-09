@@ -1,1 +1,1 @@
-from .cloudinary_service import upload_file_to_cloudinary
+from .cloudinary_service import *

@@ -8,6 +8,7 @@ import requests
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import MessageCreate, CloudinaryFileAttachment
+from integrations.cloudinary import get_signed_url
 
 def parse_pdf(content: bytes) -> str:
     try:
@@ -114,12 +115,16 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
                 parsed_files = []
                 for file in files:
                     try:
-                        file_bytes = requests.get(file["url"]).content
-                        parsed = parse_file(file["filename"], file_bytes)
+                        signed_url = get_signed_url(file["public_id"], file["resource_type"])
+                        print(f"[SIGNED URL] {signed_url}")
+                        response = requests.get(signed_url, allow_redirects=True)
+                        print(f"[ISTORIC] {file['filename']} - Status: {response.status_code}, Bytes: {len(response.content)}")
+                        
+                        parsed = parse_file(file["filename"], response.content)
                         parsed_files.append(f"[{file['filename']}]:\n{parsed}")
                     except Exception as e:
-                        print(f"[ISTORIC] nu am putut parsa fisierul {str(e)}")
-                        continue  # fisierul nu poate fi parsat, il sarim
+                        print(f"[ISTORIC] nu am putut parsa fisierul {file['filename']}: {str(e)}")
+                        continue
 
                 if parsed_files:
                     content += "\n\nFișiere atașate:\n\n" + "\n\n".join(parsed_files)
