@@ -93,7 +93,7 @@ const Dashboard = () => {
     <div className="dashboard-page">
       <div className="dashboard-header">
         <h1 className="dashboard-title">Alarms</h1>
-        <Tooltip text={"Export as xlsx"}>
+        <Tooltip text={"Export as .xlsx"}>
           <Button
             className="dashboard-export-button"
             onClick={handleExport}

@@ -56,13 +56,7 @@ const ChatWindow = () => {
   const chatEnd = useRef(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
-  console.log("MESSAGES");
-  console.log(messages);
-
-  console.log("FILES");
-  console.log(files);
   const handleScrollDown = () => {
-    console.log("SCROLL DOWN");
     chatEnd?.current.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -81,8 +75,6 @@ const ChatWindow = () => {
     isInitialLoad.current = false;
   }, [messages, isFetching]);
 
-  console.log("DATA FROM CONV");
-  console.log(data);
   useEffect(() => {
     setMessages(data?.messages);
   }, [setMessages, data]);
@@ -101,7 +93,6 @@ const ChatWindow = () => {
     };
 
     el.addEventListener("scroll", handleScroll);
-    console.log("EVENT ADDED");
     return () => el.removeEventListener("scroll", handleScroll);
   }, [conversationRef]);
 
@@ -135,8 +126,7 @@ const ChatWindow = () => {
         <RiLoader2Fill className="size-4 mx-auto animate-spin" />
       </>
     );
-  console.log("DATA");
-  console.log(data);
+
   const handleSubmit = async () => {
     if (isTyping) return;
     setIsTyping(true);
@@ -152,21 +142,15 @@ const ChatWindow = () => {
           files: files,
         },
       ]);
-      console.log("FILES");
-      console.log(files);
-      const filesToSend = files.map((file) => ({
-        filename: file.filename,
-        url: file.url,
-        public_id: file.public_id,
-        resource_type: file.resource_type,
-        file_format: file.file_format,
-        file_size: file.file_size,
-      }));
+
+      const filesToSend = files.map((item) => item.file);
+      const filesPreserveStatus = files.map((item) => item.persist);
       const mesaj = {
         user_id: user.user_id,
         conversation_id: id,
         message: message,
         files: filesToSend,
+        file_preserve_flags: filesPreserveStatus,
       };
       console.log("MESSAGE TO SENT");
       console.log(mesaj);
@@ -174,16 +158,29 @@ const ChatWindow = () => {
       setFiles([]);
       handleScrollDown();
 
-      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, mesaj);
+      const formData = new FormData();
+      formData.append("message", mesaj.message);
+      formData.append("new_chat", String(mesaj.new_chat ?? false));
+
+      mesaj.files.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      mesaj.file_preserve_flags.forEach((persist) => {
+        formData.append("file_preserve_flags", String(persist === true));
+      });
+
+      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
+        headers: {
+          "Content-Type": "multipart/formdata",
+        },
+      });
       console.log("AI RESPONSE");
       console.log(response);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", blocks: response.data.response },
       ]);
-
-      console.log("RESP AICI");
-      console.log(response);
     } finally {
       setIsTyping(false);
     }

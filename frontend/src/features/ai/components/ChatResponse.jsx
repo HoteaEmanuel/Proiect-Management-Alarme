@@ -71,7 +71,7 @@ const Chart = ({ content }) => {
     });
 
   return (
-    <div className="my-4">
+    <div className="my-4  w-1/2 flex  flex-col items-center justify-center">
       {title && (
         <p className="text-sm font-medium text-gray-300 mb-2">{title}</p>
       )}
@@ -137,7 +137,7 @@ const ChatResponse = ({ blocks }) => {
   return (
     <div className="min-w-0 w-full">
       {blocks.map((block, index) => (
-        <div key={index} className="min-w-0 w-full">
+        <div key={index} className="min-w-0 w-screen">
           {block.type === "chart" ? (
             <div className="w-screen flex px-20"> 
               <Chart content={block.content}  />
