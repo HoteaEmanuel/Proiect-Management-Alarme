@@ -6,8 +6,7 @@ const FilePreview = ({ file, onClose, ...props }) => {
   const fileItem = file?.file;
   console.log(file);
   const type = fileItem?.type || file.file_format;
-  console.log("FILE TYPE");
-  console.log(type);
+
 
   return (
     <div

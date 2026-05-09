@@ -170,6 +170,7 @@ const ChatWindow = () => {
 
 
       setMessage("");
+      
       setFiles([]);
       handleScrollDown();
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {

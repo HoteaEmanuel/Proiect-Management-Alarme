@@ -18,7 +18,6 @@ const NewChat = () => {
     const mesaj = {
       user_id: user.user_id,
       message: message,
-      conversation_id:123,
       files: filesToSend,
       file_preserve_flags: filesPreserveStatus,
     };
@@ -30,6 +29,7 @@ const NewChat = () => {
     mesaj.files.forEach((file) => {
       formData.append("files", file);
     });
+    
 
     mesaj.file_preserve_flags.forEach((persist) => {
       formData.append("file_preserve_flags", String(persist === true));

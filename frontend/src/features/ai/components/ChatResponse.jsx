@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import { useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -17,7 +18,11 @@ import {
   Cell,
 } from "recharts";
 import remarkGfm from "remark-gfm";
-
+import ToolTip from "@components/ToolTip";
+import Button from "@components/Button";
+import { BiDownload } from "react-icons/bi";
+import { GoDownload } from "react-icons/go";
+import { toPng } from "html-to-image";
 const COLORS = [
   "#6366f1",
   "#22d3ee",
@@ -28,6 +33,55 @@ const COLORS = [
 ];
 
 const Chart = ({ content }) => {
+  console.log("CHART CONTENT ");
+  console.log(content);
+  const chartRef = useRef(null);
+
+  const downloadPNG = async () => {
+    if (!chartRef.current) return;
+
+    const dataUrl = await toPng(chartRef.current, {
+      cacheBust: true,
+      pixelRatio: 3,
+      backgroundColor: "#111827",
+    });
+
+    const a = document.createElement("a");
+
+    a.download = `${title || "chart"}.png`;
+    a.href = dataUrl;
+    a.click();
+  };
+
+  const downloadSVG = () => {
+    const svg = chartRef.current?.querySelector("svg");
+    if (!svg) return;
+
+    const serializer = new XMLSerializer();
+    let source = serializer.serializeToString(svg);
+
+    // add namespaces if missing
+    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+      source = source.replace(
+        /^<svg/,
+        '<svg xmlns="http://www.w3.org/2000/svg"',
+      );
+    }
+
+    const blob = new Blob([source], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "chart.svg";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   let config;
   try {
     config = typeof content === "string" ? JSON.parse(content) : content;
@@ -71,11 +125,23 @@ const Chart = ({ content }) => {
     });
 
   return (
-    <div className="my-4  w-1/2 flex  flex-col items-center justify-center">
+    <div
+      className="statistics-chart-card  max-w-1/2 flex  flex-col items-center justify-center "
+      style={{
+        width: "800px",
+        height: "500px",
+      }}
+      ref={chartRef}
+    >
       {title && (
         <p className="text-sm font-medium text-gray-300 mb-2">{title}</p>
       )}
-      <ResponsiveContainer width={"100%"} height={280}>
+
+      <ResponsiveContainer
+        width={"100%"}
+        height={"100%"}
+        className={"space-y-4"}
+      >
         {chart_type === "pie" ? (
           <PieChart>
             <Pie
@@ -129,6 +195,18 @@ const Chart = ({ content }) => {
           </AreaChart>
         )}
       </ResponsiveContainer>
+      <div className="relative bg-red-500 w-full">
+        <div className="absolute bottom-0 right-0">
+          <ToolTip text={".Png"}>
+            <Button
+              onClick={downloadPNG}
+              className="p-2 rounded-full hover:bg-gray-800 hover:scale-110 cursor-pointer"
+            >
+              <GoDownload className="size-5" />
+            </Button>
+          </ToolTip>
+        </div>
+      </div>
     </div>
   );
 };

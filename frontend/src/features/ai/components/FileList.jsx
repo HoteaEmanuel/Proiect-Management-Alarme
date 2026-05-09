@@ -57,7 +57,7 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
             onClick={() => setPreviewFile(item)}
           >
             {selectedFile === item.file.name && (
-              <div className="absolute -top-2 -right-2 z-50 hover:text-white">
+              <div className="absolute -top-2 -right-2 z-100 hover:text-white">
                 <button
                   onClick={(e) => handleRemoveFile(e, item)}
                   classfilename="cursor-pointer"
@@ -66,6 +66,8 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
                 </button>
               </div>
             )}
+
+
 
             <Tooltip text={"Persist"}>
               <IconCheckbox

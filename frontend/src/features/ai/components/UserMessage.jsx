@@ -33,7 +33,6 @@ const File = ({ file, onClick }) => {
 };
 
 const UserMessage = ({ message, onFileClick, previewFile }) => {
-  console.log("MESSAGE IN THE COMPONENT: ", message);
   const hasFiles = message.files?.length > 0;
   const hasText = message.content?.trim().length > 0;
   const handleFileClick = (file) => {
