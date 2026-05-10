@@ -52,10 +52,6 @@ OutputBlock = Union[TextBlock, ChartBlock]
 class UserMessage(BaseModel):
     role: Literal["user"] = "user"
     content: str
-<<<<<<< HEAD
-=======
-
->>>>>>> cf9cfb7 (Files support and fixes)
     files: list[CloudinaryFileAttachment] = []
 
 class AssistantMessage(BaseModel):
