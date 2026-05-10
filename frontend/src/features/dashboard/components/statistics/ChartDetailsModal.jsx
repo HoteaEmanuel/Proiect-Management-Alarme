@@ -48,8 +48,11 @@ const ChartDetailsModal = ({
     chartDetails,
     chartDetailsLoading,
     onClose,
+    onExport,
 }) => {
+
     return (
+
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <div
@@ -85,22 +88,41 @@ const ChartDetailsModal = ({
                         </p>
                     </div>
 
-                    <Button
-                        variant="outlined"
-                        onClick={onClose}
-                        sx={{
-                            color: "#e5e7eb",
-                            borderColor: "#334155",
-                            textTransform: "none",
-                            fontWeight: 700,
-                            "&:hover": {
-                                borderColor: "#60a5fa",
-                                backgroundColor: "#172033",
-                            },
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "10px",
                         }}
                     >
-                        Close
-                    </Button>
+                        <Button
+                            variant="contained"
+                            onClick={onExport}
+                            disabled={chartDetailsLoading || chartDetails.length === 0}
+                            sx={{
+                                textTransform: "none",
+                                fontWeight: 700,
+                            }}
+                        >
+                            Download
+                        </Button>
+
+                        <Button
+                            variant="outlined"
+                            onClick={onClose}
+                            sx={{
+                                color: "#e5e7eb",
+                                borderColor: "#334155",
+                                textTransform: "none",
+                                fontWeight: 700,
+                                "&:hover": {
+                                    borderColor: "#60a5fa",
+                                    backgroundColor: "#172033",
+                                },
+                            }}
+                        >
+                            Close
+                        </Button>
+                    </div>
                 </div>
 
                 {chartDetailsLoading ? (
@@ -142,7 +164,7 @@ const ChartDetailsModal = ({
                                         <TableCell sx={bodyCellStyle}>{alarm.ALARM_NUMBER}</TableCell>
                                         <TableCell sx={bodyCellStyle}>{alarm.STATUS}</TableCell>
                                         <TableCell sx={bodyCellStyle}>{alarm.SEVERITY_ID}</TableCell>
-                                        <TableCell sx={bodyCellStyle}>{alarm.SERVER_NAME}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.SERVER_NAME}</TableCell>  
                                         <TableCell sx={bodyCellStyle}>{alarm.SUMMARY}</TableCell>
                                         <TableCell sx={bodyCellStyle}>{alarm.TYPE}</TableCell>
                                         <TableCell sx={bodyCellStyle}>{alarm.ALERT_GROUP}</TableCell>

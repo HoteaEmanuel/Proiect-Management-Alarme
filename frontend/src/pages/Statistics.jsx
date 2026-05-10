@@ -32,7 +32,7 @@ export const Statistics = () => {
 
     const [statistics, setStatistics] = useState(null);
 
-    // Logica apasare chart si descarcare
+    // Logica apasare chart si descarcare/vizualizare
 
     // ce e apasat, gen category: Status, label: Active
     const [selectedChart, setSelectedChart] = useState(null);
@@ -62,13 +62,36 @@ export const Statistics = () => {
             setChartDetailsLoading(false);
         }
     };
-
     const handleCloseChartDetails = () => {
 
         setSelectedChart(null);
         setChartDetails([]);
     };
-    // Logica apasare chart si descarcare
+
+    const handleExportChartDetails = async () => {
+
+        if(!selectedChart)
+            return;
+
+        const data = await alarmsApi.exportChartDetails({
+            category: selectedChart.category,
+            label: selectedChart.label,
+        });
+
+        const blob = new Blob([data], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = `alarms_${selectedChart.category}_${selectedChart.label}.xlsx`;
+        link.click();
+
+        window.URL.revokeObjectURL(url);
+    };
+    // Logica apasare chart si descarcare/vizualizare
 
 
     // Refresh la statistici la fiecare modificare a filtrelor
@@ -367,6 +390,7 @@ export const Statistics = () => {
                 chartDetails={chartDetails}
                 chartDetailsLoading={chartDetailsLoading}
                 onClose={handleCloseChartDetails}
+                onExport={handleExportChartDetails}
             />
         </div>
     );
