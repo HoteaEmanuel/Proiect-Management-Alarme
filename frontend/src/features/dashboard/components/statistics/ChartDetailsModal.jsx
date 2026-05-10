@@ -1,21 +1,45 @@
 import React from "react";
-import { Box, Button, Modal } from "@mui/material";
+import {
+    Box,
+    Button,
+    Modal,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+} from "@mui/material";
 
 const modalStyle = {
-
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "80%",
-    maxHeight: "80vh",
-    overflow: "auto",
+    width: "78%",
+    maxHeight: "82vh",
+    overflow: "hidden",
     backgroundColor: "#0f172a",
     border: "1px solid #24324a",
     borderRadius: "8px",
     boxShadow: 24,
     padding: "24px",
     color: "white",
+};
+
+const headerCellStyle = {
+    backgroundColor: "#182235",
+    color: "#dbeafe",
+    borderBottom: "1px solid #334155",
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+};
+
+const bodyCellStyle = {
+    color: "#e5e7eb",
+    borderBottom: "1px solid #24324a",
+    whiteSpace: "nowrap",
 };
 
 const ChartDetailsModal = ({
@@ -25,53 +49,109 @@ const ChartDetailsModal = ({
     chartDetailsLoading,
     onClose,
 }) => {
-
     return (
-
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
-                <div>
-                    <h2>
-                        {selectedChart?.category}: {selectedChart?.label}
-                    </h2>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: "16px",
+                        marginBottom: "18px",
+                    }}
+                >
+                    <div>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "22px",
+                                fontWeight: 700,
+                            }}
+                        >
+                            {selectedChart?.category}: {selectedChart?.label}
+                        </h2>
 
-                    <Button variant="contained" onClick={onClose}>
+                        <p
+                            style={{
+                                margin: "6px 0 0",
+                                color: "#94a3b8",
+                                fontSize: "14px",
+                            }}
+                        >
+                            {chartDetailsLoading
+                                ? "Loading alarms..."
+                                : `${chartDetails.length} alarms found`}
+                        </p>
+                    </div>
+
+                    <Button
+                        variant="outlined"
+                        onClick={onClose}
+                        sx={{
+                            color: "#e5e7eb",
+                            borderColor: "#334155",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            "&:hover": {
+                                borderColor: "#60a5fa",
+                                backgroundColor: "#172033",
+                            },
+                        }}
+                    >
                         Close
                     </Button>
                 </div>
 
                 {chartDetailsLoading ? (
-                    <p>Loading alarms...</p>
+                    <p style={{ color: "#cbd5e1" }}>Loading alarms...</p>
                 ) : (
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Alarm Number</th>
-                                <th>Status</th>
-                                <th>Severity ID</th>
-                                <th>Server</th>
-                                <th>Summary</th>
-                                <th>Type</th>
-                                <th>Alert Group</th>
-                                <th>Project</th>
-                            </tr>
-                        </thead>
+                    <TableContainer
+                        component={Paper}
+                        sx={{
+                            maxHeight: "60vh",
+                            backgroundColor: "#111827",
+                            border: "1px solid #24324a",
+                            boxShadow: "none",
+                        }}
+                    >
+                        <Table stickyHeader size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={headerCellStyle}>Alarm Number</TableCell>
+                                    <TableCell sx={headerCellStyle}>Status</TableCell>
+                                    <TableCell sx={headerCellStyle}>Severity ID</TableCell>
+                                    <TableCell sx={headerCellStyle}>Server</TableCell>
+                                    <TableCell sx={headerCellStyle}>Summary</TableCell>
+                                    <TableCell sx={headerCellStyle}>Type</TableCell>
+                                    <TableCell sx={headerCellStyle}>Alert Group</TableCell>
+                                    <TableCell sx={headerCellStyle}>Project</TableCell>
+                                </TableRow>
+                            </TableHead>
 
-                        <tbody>
-                            {chartDetails.map((alarm) => (
-                                <tr key={alarm.ALARM_NUMBER}>
-                                    <td>{alarm.ALARM_NUMBER}</td>
-                                    <td>{alarm.STATUS}</td>
-                                    <td>{alarm.SEVERITY_ID}</td>
-                                    <td>{alarm.SERVER_NAME}</td>
-                                    <td>{alarm.SUMMARY}</td>
-                                    <td>{alarm.TYPE}</td>
-                                    <td>{alarm.ALERT_GROUP}</td>
-                                    <td>{alarm.PROJECT}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            <TableBody>
+                                {chartDetails.map((alarm) => (
+                                    <TableRow
+                                        key={alarm.ALARM_NUMBER}
+                                        sx={{
+                                            "&:hover": {
+                                                backgroundColor: "#162033",
+                                            },
+                                        }}
+                                    >
+                                        <TableCell sx={bodyCellStyle}>{alarm.ALARM_NUMBER}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.STATUS}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.SEVERITY_ID}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.SERVER_NAME}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.SUMMARY}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.TYPE}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.ALERT_GROUP}</TableCell>
+                                        <TableCell sx={bodyCellStyle}>{alarm.PROJECT}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 )}
             </Box>
         </Modal>
