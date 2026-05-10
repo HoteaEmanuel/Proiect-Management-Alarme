@@ -31,6 +31,36 @@ export const Statistics = () => {
 
     const [statistics, setStatistics] = useState(null);
 
+    // Logica apasare chart si descarcare
+
+    // ce e apasat, gen category: Status, label: Active
+    const [selectedChart, setSelectedChart] = useState(null);
+    // lista alarmelor primite de la back
+    const [chartDetails, setChartDetails] = useState([]);
+    // request ul se incarca sau nu
+    const [chartDetailsLoading, setChartDetailsLoading] = useState(false);
+
+    const handleChartClick = async (category, label) => {
+
+        setSelectedChart({ category, label });
+        setChartDetailsLoading(true);
+
+       try {
+
+            const data = await alarmsApi.getChartDetails({
+                category,
+                label,
+            });
+            setChartDetails(data);
+
+        } finally {
+
+            setChartDetailsLoading(false);
+        }
+    };
+    // Logica apasare chart si descarcare
+
+
     // Refresh la statistici la fiecare modificare a filtrelor
     useEffect(() => {
         async function fetchStatistics() {
@@ -200,13 +230,20 @@ export const Statistics = () => {
                             <h2 className="statistics-card-title">Severities</h2>
 
                             <div className="statistics-chart-body">
-                                <GraficBara data={severities} vertical={true} />
+                                <GraficBara 
+                                    data={severities} 
+                                    vertical={true} 
+                                    onBarClick={(label) => handleChartClick("Severity", label)}
+                                />
                             </div>
                         </div>
 
                         <div className="statistics-chart-card">
                             <h2 className="statistics-card-title">Status</h2>
-                            <GraficPie data={status} />
+                            <GraficPie 
+                                data={status} 
+                                onSliceClick={(label) => handleChartClick("Status", label)}
+                            />
                         </div>
                     </section>
 
@@ -220,21 +257,31 @@ export const Statistics = () => {
                                 <h2 className="statistics-card-title">
                                     Category 1
                                 </h2>
-                                <GraficPie data={categoriesTier1} />
+                                <GraficPie 
+                                    data={categoriesTier1} 
+                                    onSliceClick={(label) => handleChartClick("CategoryTier1", label)}
+                                />
                             </div>
 
                             <div className="statistics-chart-card">
                                 <h2 className="statistics-card-title">
                                     Category 2
                                 </h2>
-                                <GraficPie data={categoriesTier2} />
+                                <GraficPie 
+                                    data={categoriesTier2} 
+                                    onSliceClick={(label) => handleChartClick("CategoryTier2", label)}
+                                />
                             </div>
 
                             <div className="statistics-chart-card">
                                 <h2 className="statistics-card-title">
                                     Category 3
                                 </h2>
-                                <GraficPie data={categoriesTier3} legend={false} />
+                                <GraficPie 
+                                    data={categoriesTier3} 
+                                    legend={false} 
+                                    onSliceClick={(label) => handleChartClick("CategoryTier3", label)}
+                                />
                             </div>
                         </div>
                     </section>
@@ -251,6 +298,7 @@ export const Statistics = () => {
                                         data={companies}
                                         direction={"horizontal"}
                                         vertical={false}
+                                        onBarClick={(label) => handleChartClick("Company", label)}
                                     />
                                 </div>
                             </div>
@@ -291,6 +339,9 @@ export const Statistics = () => {
                                                 dataKey="value"
                                                 fill="#378ADD"
                                                 radius={[0, 4, 4, 0]}
+                                                onClick={(entry) => {
+                                                    handleChartClick("ServerName", entry.name);
+                                                }}
                                             />
                                         </BarChart>
                                     </ResponsiveContainer>
