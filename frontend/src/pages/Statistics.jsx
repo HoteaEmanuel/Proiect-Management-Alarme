@@ -15,6 +15,7 @@ import { RiLoader2Fill } from "react-icons/ri";
 import GraficBara from "@features/dashboard/components/statistics/GraficBara";
 import GraficPie from "@features/dashboard/components/statistics/GraficPie";
 import { useSearchParams } from "react-router-dom";
+import ChartDetailsModal from "@features/dashboard/components/statistics/ChartDetailsModal";
 
 export const Statistics = () => {
     const year = new Date().getFullYear();
@@ -51,12 +52,21 @@ export const Statistics = () => {
                 category,
                 label,
             });
+            console.log("Chart details data:", data);
+            console.log("First alarm:", data[0]);
+
             setChartDetails(data);
 
         } finally {
 
             setChartDetailsLoading(false);
         }
+    };
+
+    const handleCloseChartDetails = () => {
+
+        setSelectedChart(null);
+        setChartDetails([]);
     };
     // Logica apasare chart si descarcare
 
@@ -351,6 +361,13 @@ export const Statistics = () => {
                     </section>
                 </>
             )}
+            <ChartDetailsModal
+                open={selectedChart !== null}
+                selectedChart={selectedChart}
+                chartDetails={chartDetails}
+                chartDetailsLoading={chartDetailsLoading}
+                onClose={handleCloseChartDetails}
+            />
         </div>
     );
 };
