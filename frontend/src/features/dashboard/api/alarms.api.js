@@ -94,6 +94,7 @@ export const alarmsApi = {
     }
   },
 
+  // cere lista de alarme de la o o bucata din grafic, format json, pt popup
   getChartDetails: async ({ category, label }) => {
     const response = await api.get(
         `${VITE_URL_APP}/alarms/chart-details?category=${category}&&label=${label}`,
@@ -101,6 +102,7 @@ export const alarmsApi = {
 
     return response.data;
   },
+  // la fel dar Excel, pt descarcare
   exportChartDetails: async ({ category, label }) => {
       const response = await api.get(
           `${VITE_URL_APP}/alarms/chart-details?category=${category}&&label=${label}&&export=true`,
