@@ -93,4 +93,23 @@ export const alarmsApi = {
       throw new Error(e);
     }
   },
+
+  getChartDetails: async ({ category, label }) => {
+    const response = await api.get(
+        `${VITE_URL_APP}/alarms/chart-details?category=${category}&&label=${label}`,
+    );
+
+    return response.data;
+  },
+  exportChartDetails: async ({ category, label }) => {
+      const response = await api.get(
+          `${VITE_URL_APP}/alarms/chart-details?category=${category}&&label=${label}&&export=true`,
+          {
+              responseType: "arraybuffer",
+          },
+      );
+
+      return response.data;
+  },
+
 };
