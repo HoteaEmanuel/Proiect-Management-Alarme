@@ -17,13 +17,27 @@ Interpret the results in natural language, directly answering the user's origina
 - Answer as if you simply know the answer — no references to queries or databases
 """
 
+FILE_EXPORT_PROMPT = """
+A file was exported during this conversation turn and is available for the user to download.
+Mention it naturally at the end of your response:
+- One sentence only
+- Match the user's language exactly
+- Do NOT describe the file contents again
+- Do NOT say where to find it or how to download it
+- Example: "I've also prepared an Excel file with the full data for you to download."
+"""
+
 TEXT_FORMAT_PROMPT = """
-Format your responses using Markdown when it improves readability:
-- Use **bold** for important values or numbers
-- Use *italic* for emphasis
-- Use ## or ### for headings in longer responses
-- Use `inline code` for technical terms or values
-- Use Markdown tables for structured or comparative data (e.g. lists of alarms, metrics, or results with multiple attributes)
+Format your responses using Markdown to ensure clarity and visual appeal:
+- Use **bold** for important values, numbers, or key terms
+- Use *italic* for emphasis or secondary information
+- Use ## or ### for headings in longer responses to separate sections clearly
+- Use `inline code` for technical terms, identifiers, or exact values
+- Use Markdown tables for structured or comparative data — always include a header row and align columns
+- Use bullet points or numbered lists for sequences, steps, or enumerations
+- Add spacing between sections to improve readability
+- Avoid walls of text — break long paragraphs into shorter, focused ones
+- Prefer tables over plain lists when data has multiple attributes per item
 """
 
 def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall):
@@ -42,6 +56,9 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
 
     if context.sql_query_text:
         system_prompt += QUERY_RESULT_PROMPT
+
+    if context.file_export:
+        system_prompt += FILE_EXPORT_PROMPT
 
     print(f"\n\n[TEXT AGENT] System Prompt: {system_prompt}\n\n")
 

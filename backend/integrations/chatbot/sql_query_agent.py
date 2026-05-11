@@ -22,5 +22,7 @@ def get_sql_agent_response(db: Session, context: AgentContext, call: AgentCall):
         if is_query_safe(query):
             context.sql_query_text = query
             context.sql_result = run_llm_query(db, query)
+    
+    print(f"[SQL] {context.sql_result}")
 
     return context

@@ -8,6 +8,7 @@ from crud import get_conversation_title, set_conversation_title, parse_file
 from .sql_query_agent import get_sql_agent_response
 from .text_agent import get_text_agent_response
 from .graphics_agent import get_graphics_agent_response
+from .excel_agent import get_excel_agent_response
 
 ORCHESTRATOR_PROMPT = """
 You are an orchestrator that analyzes the user's message and decides which agents are needed and in what order.
@@ -44,6 +45,15 @@ CRITICAL — Agent selection:
 - If data comes from both: sql → chart
 - text and chart can be used together: text explains, chart visualizes
 - Never use chart agent for tabular data or simple summaries — use text instead
+- Never send an empty messaje, even if the user asks just for a file, use the text agent to describe it
+
+CRITICAL — Excel agent rules:
+- After excel agent, always add text agent to describe what was exported
+- Never instruct the excel agent about which rows, columns, or filters to apply — it reads the data directly from context
+- Never mention "all results", "all rows", or any data scope in the excel agent instruction
+- Excel instruction must be ONE sentence: just say what the file represents, nothing else
+- Example of correct excel instruction: "Export the active alarms data to Excel"
+- Example of incorrect excel instruction: "Export all 150 rows of active alarms including severity and timestamp columns"
 
 CRITICAL — Context awareness:
 - Always read the conversation history before writing instructions
@@ -73,6 +83,10 @@ AVAILABLE_AGENTS = {
     "chart": {
         "run": get_graphics_agent_response,
         "description": "Generates a chart configuration based on available data — use only when the user explicitly asks for a chart, graph, or visualization"
+    },
+    "excel": {
+        "run": get_excel_agent_response,
+        "description": "Generates and exports an Excel file based on available data — use only when the user explicitly asks for an Excel file, spreadsheet, or data export. Always followed by text agent."
     },
     "text": {
         "run": get_text_agent_response,
@@ -139,7 +153,7 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
     if request.files:
         for file in request.files:
             try:
-                content = parse_file(file.filename, file.content)  # bytes direct, nu mai descarci
+                content = parse_file(file.filename, file.content)
                 parsed.append(f"[{file.filename}]:\n{content}")
             except Exception as e:
                 print(f"[FILES] EROARE la {file.filename}: {str(e)}")

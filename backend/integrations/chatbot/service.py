@@ -48,12 +48,14 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
         has_sql_query=True if agent_context.sql_query_text is not None else False,
         sql_query=agent_context.sql_query_text
     )
-    bot_reply = save_message_to_db(db=db, message_data=bot_message_data)
+    bot_message_data = save_message_to_db(db=db, message_data=bot_message_data)
 
-    set_response_id(db, user_message_id, bot_reply.id)
+    set_response_id(db, user_message_id, bot_message_data.id)
+
+    return bot_message_data
 
 
-def upload_and_save_preserve_files(
+def upload_and_save_user_preserve_files(
     db: Session,
     message_id: int,
     files: list[RawFileAttachment]
@@ -78,14 +80,18 @@ def user_chat_request(db: Session, request: MessageRequest):
     try:
         request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
         
+        upload_and_save_user_preserve_files(db, user_message_id, request.files)
+        
         output_blocks, agent_context = get_orchestrator_response(db, request, context_history)
 
-        save_bot_response(db, request, output_blocks, agent_context, user_message_id)
-
-        upload_and_save_preserve_files(db, user_message_id, request.files)
+        bot_message_data = save_bot_response(db, request, output_blocks, agent_context, user_message_id)
+        
+        if agent_context.file_export:
+            save_conversation_files(db, bot_message_data.id, [agent_context.file_export])
 
         return AssistantMessage(conversation_id=request.conversation_id,
-                               blocks=output_blocks)
+                               blocks=output_blocks,
+                               file=agent_context.file_export)
     
     except AppError:
         raise

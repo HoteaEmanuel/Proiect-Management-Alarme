@@ -368,13 +368,3 @@ def save_conversation_files(
         db.refresh(f)
 
     return db_files
-    
-#functie care returneaza toate fisierele asociate conversatiei, daca exista
-def get_conversation_files(db: Session, conversation_id: str):
-    return db.execute(
-        select(ConversationFileModel)
-        .where(
-            ConversationFileModel.conversation_id == conversation_id
-        )
-        .order_by(ConversationFileModel.created_at.asc())
-    ).scalars().all()

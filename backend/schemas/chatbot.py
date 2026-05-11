@@ -17,7 +17,11 @@ class CloudinaryFileAttachment(BaseModel):
     file_format: str
     file_size: int
 
-
+class ExcelStructure(BaseModel):
+    filename: str
+    sheet_name: str
+    headers: list[str]
+    column_mapping: list[str]  # ordonata - fiecare element e cheia din sql_result corespunzatoare headerului
 
 class UpdateTitleRequest(BaseModel):
     new_title: str
@@ -58,6 +62,7 @@ class AssistantMessage(BaseModel):
     conversation_id: str | None = None
     role: Literal["assistant"] = "assistant"
     blocks: list[OutputBlock]
+    file: CloudinaryFileAttachment | None = None
 
 ChatMessage = Annotated[
     Union[UserMessage, AssistantMessage],
@@ -99,3 +104,4 @@ class AgentContext(BaseModel):
     sql_result: list[dict] | None = None
     text_response: str | None = None
     chart_config: dict | None = None
+    file_export: CloudinaryFileAttachment | None = None
