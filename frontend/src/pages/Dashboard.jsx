@@ -19,6 +19,7 @@ import {
 } from "@constants/alarms.js";
 import Button from "@components/Button";
 import Tooltip from "@components/ToolTip";
+import AlarmDetailsModal from "@features/dashboard/components/AlarmDetailsModal";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams({ replace: false });
@@ -41,6 +42,8 @@ const Dashboard = () => {
   };
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
+  // Alarma selectata pentru pop up
+  const [selectedAlarm, setSelectedAlarm] = useState(null);
 
   // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
   useEffect(() => {
@@ -230,6 +233,7 @@ const Dashboard = () => {
       <AlarmsTable
         data={filteredAlarms?.alarms || []}
         totalCount={filteredAlarms?.total_alarms}
+        onRowClick={(alarm) => setSelectedAlarm(alarm)}
         pagination={{
           pageIndex: filters.pageIndex,
           pageSize: filters.pageSize,
@@ -266,6 +270,12 @@ const Dashboard = () => {
           });
         }}
       />
+      <AlarmDetailsModal
+        open={selectedAlarm !== null}
+        alarm={selectedAlarm}
+        onClose={() => setSelectedAlarm(null)}
+      />
+
 
       <div className="dashboard-pagination-info">
         <h2 className="dashboard-pagination-text">

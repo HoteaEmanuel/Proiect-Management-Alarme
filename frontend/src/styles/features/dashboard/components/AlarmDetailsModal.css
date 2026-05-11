@@ -1,0 +1,276 @@
+.alarm-details-modal {
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(78rem, 78vw);
+    max-height: 82vh;
+    overflow: hidden;
+    background-color: #0f172a;
+    border: 1px solid #24324a;
+    border-radius: 8px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    padding: 24px;
+    color: #ffffff;
+}
+
+.alarm-details-header {
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.alarm-details-title-group {
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.alarm-details-icon-wrapper {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 8px;
+    background-color: rgba(245, 158, 11, 0.12);
+}
+
+.alarm-details-icon {
+
+    width: 24px;
+    height: 24px;
+    color: #f59e0b;
+}
+
+.alarm-details-title {
+
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.alarm-details-subtitle {
+
+    margin: 6px 0 0;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.alarm-details-close-button {
+
+    border: 1px solid #334155;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #e5e7eb;
+    padding: 8px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.alarm-details-close-button:hover {
+
+    border-color: #60a5fa;
+    background-color: #172033;
+    color: #60a5fa;
+}
+
+.alarm-details-badges {
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.alarm-details-badge {
+
+    border: 1px solid #334155;
+    border-radius: 999px;
+    background-color: #111827;
+    color: #dbeafe;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.alarm-details-badge-status-active {
+
+    border-color: rgba(16, 185, 129, 0.45);
+    background-color: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+}
+
+.alarm-details-badge-status-closed {
+
+    border-color: rgba(239, 68, 68, 0.45);
+    background-color: rgba(239, 68, 68, 0.14);
+    color: #f87171;
+}
+
+.alarm-details-badge-status-cleared {
+
+    border-color: rgba(45, 212, 191, 0.45);
+    background-color: rgba(45, 212, 191, 0.12);
+    color: #5eead4;
+}
+
+.alarm-details-badge-status-acknowledged {
+
+    border-color: rgba(245, 158, 11, 0.5);
+    background-color: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+}
+
+.alarm-details-badge-severity-critical {
+
+    border-color: rgba(239, 68, 68, 0.55);
+    background-color: rgba(239, 68, 68, 0.18);
+    color: #fca5a5;
+}
+
+.alarm-details-badge-severity-major {
+
+    border-color: rgba(249, 115, 22, 0.5);
+    background-color: rgba(249, 115, 22, 0.15);
+    color: #fdba74;
+}
+
+.alarm-details-badge-severity-warning {
+
+    border-color: rgba(234, 179, 8, 0.5);
+    background-color: rgba(234, 179, 8, 0.14);
+    color: #fde047;
+}
+
+.alarm-details-badge-severity-minor {
+
+    border-color: rgba(56, 189, 248, 0.45);
+    background-color: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+}
+
+.alarm-details-badge-severity-info {
+
+    border-color: rgba(148, 163, 184, 0.45);
+    background-color: rgba(148, 163, 184, 0.13);
+    color: #cbd5e1;
+}
+
+.alarm-details-badge-type-system {
+
+    border-color: rgba(168, 85, 247, 0.45);
+    background-color: rgba(168, 85, 247, 0.13);
+    color: #c084fc;
+}
+
+.alarm-details-badge-type-application {
+
+    border-color: rgba(59, 130, 246, 0.45);
+    background-color: rgba(59, 130, 246, 0.13);
+    color: #93c5fd;
+}
+
+.alarm-details-badge-type-network {
+
+    border-color: rgba(20, 184, 166, 0.45);
+    background-color: rgba(20, 184, 166, 0.13);
+    color: #5eead4;
+}
+
+.alarm-details-grid {
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    max-height: 58vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #475569 #0f172a;
+}
+
+.alarm-details-grid::-webkit-scrollbar {
+
+    width: 8px;
+}
+
+.alarm-details-grid::-webkit-scrollbar-track {
+
+    background-color: #0f172a;
+    border-radius: 999px;
+}
+
+.alarm-details-grid::-webkit-scrollbar-thumb {
+
+    background-color: #475569;
+    border-radius: 999px;
+}
+
+.alarm-details-grid::-webkit-scrollbar-thumb:hover {
+
+    background-color: #64748b;
+}
+
+.alarm-details-field {
+
+    min-width: 0;
+    border: 1px solid #24324a;
+    border-radius: 8px;
+    background-color: #111827;
+    padding: 12px;
+}
+
+.alarm-details-field-wide {
+
+    grid-column: 1 / -1;
+}
+
+.alarm-details-label {
+
+    display: block;
+    margin-bottom: 6px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.alarm-details-value {
+
+    display: block;
+    color: #e5e7eb;
+    font-size: 15px;
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+
+    .alarm-details-modal {
+
+        width: 92vw;
+        padding: 18px;
+    }
+
+    .alarm-details-header {
+
+        flex-direction: column;
+    }
+
+    .alarm-details-title-group {
+
+        align-items: flex-start;
+    }
+
+    .alarm-details-grid {
+
+        grid-template-columns: 1fr;
+        max-height: 56vh;
+    }
+}

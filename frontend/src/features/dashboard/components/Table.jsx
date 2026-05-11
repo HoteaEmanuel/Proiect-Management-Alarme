@@ -75,6 +75,7 @@ export const AlarmsTable = ({
   onPaginationChange,
   sorting,
   onSortingChange,
+  onRowClick,
 }) => {
   console.log(data);
   console.log(pagination);
@@ -150,7 +151,11 @@ export const AlarmsTable = ({
 
         <tbody className="alarm-table-body">
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="alarm-table-row">
+            <tr 
+              key={row.id} 
+              className="alarm-table-row"
+              onClick={() => onRowClick?.(row.original)}
+            >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="alarm-table-cell">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
