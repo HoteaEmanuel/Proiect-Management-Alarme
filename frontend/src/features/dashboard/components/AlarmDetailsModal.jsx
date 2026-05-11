@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Modal } from "@mui/material";
+import { FiAlertTriangle } from "react-icons/fi";
 import "@styles/features/dashboard/components/AlarmDetailsModal.css";
 
 const AlarmDetailsModal = ({ open, alarm, onClose }) => {
@@ -8,6 +9,7 @@ const AlarmDetailsModal = ({ open, alarm, onClose }) => {
         return null;
 
     const alarmFields = [
+
         { label: "Alarm number", value: alarm.alarm_number },
         { label: "Status", value: alarm.status },
         { label: "Severity", value: alarm.severity },
@@ -33,9 +35,15 @@ const AlarmDetailsModal = ({ open, alarm, onClose }) => {
         <Modal open={open} onClose={onClose}>
             <Box className="alarm-details-modal">
                 <div className="alarm-details-header">
-                    <div>
-                        <h2 className="alarm-details-title">{alarm.alarm_number}</h2>
-                        <p className="alarm-details-subtitle">{alarm.summary}</p>
+                    <div className="alarm-details-title-group">
+                        <div className="alarm-details-icon-wrapper">
+                            <FiAlertTriangle className="alarm-details-icon" />
+                        </div>
+
+                        <div>
+                            <h2 className="alarm-details-title">{alarm.alarm_number}</h2>
+                            <p className="alarm-details-subtitle">{alarm.summary}</p>
+                        </div>
                     </div>
 
                     <button

@@ -24,6 +24,33 @@
     margin-bottom: 14px;
 }
 
+.alarm-details-title-group {
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.alarm-details-icon-wrapper {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 8px;
+    background-color: rgba(245, 158, 11, 0.12);
+}
+
+.alarm-details-icon {
+
+    width: 24px;
+    height: 24px;
+    color: #f59e0b;
+}
+
 .alarm-details-title {
 
     margin: 0;
@@ -150,6 +177,11 @@
     .alarm-details-header {
 
         flex-direction: column;
+    }
+
+    .alarm-details-title-group {
+
+        align-items: flex-start;
     }
 
     .alarm-details-grid {
