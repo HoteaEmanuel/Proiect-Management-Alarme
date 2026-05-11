@@ -27,7 +27,6 @@ const ChatInput1 = ({ placeholder }) => {
   const {
     message,
     setMessage,
-    setMessages,
     isAwaitingResponse,
     setIsAwaiting,
     conversationId,
@@ -39,12 +38,12 @@ const ChatInput1 = ({ placeholder }) => {
   const { recording, start, stop, clear, transcript, isSpeaking } =
     useVoiceToText();
 
+  // De fiecare data cand se inregistreaza ceva actualizez mesajul din input
   useEffect(() => {
-    if (transcript) {
-      setMessage(transcript); // populezi inputul
-      clear();
+    if (recording && transcript) {
+      setMessage(transcript);
     }
-  }, [recording, clear, transcript, setMessage]);
+  }, [transcript]);
 
   const handleSubmit = async () => {
     if (isAwaitingResponse) return;

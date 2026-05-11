@@ -17,7 +17,7 @@ const useVoiceToText = () => {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
+    recognition.lang = "ro-RO";
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.onresult = (e) => {
