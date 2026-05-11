@@ -192,7 +192,14 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
                 blocks = json.loads(msg.content)
             except:
                 blocks = msg.content
-            result.append({"role": msg.role, "blocks": blocks})
+            
+            entry = {"role": msg.role, "blocks": blocks}
+            
+            files = get_message_files(db, msg.id)
+            if files:
+                entry["file"] = files[0]  # sau files daca vrei lista
+            
+            result.append(entry)
         else:
             files = get_message_files(db, msg.id)
             entry = {"role": msg.role, "content": msg.content}
