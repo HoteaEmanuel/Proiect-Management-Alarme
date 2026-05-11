@@ -7,7 +7,7 @@ import { FaEye } from "react-icons/fa";
 
 import { FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../../store/authStore";
+import useAuthStore from "@store/authStore";
 import { authApi } from "../api/auth.api";
 
 import "../../../styles/features/auth/components/LoginForm.css";

@@ -20,7 +20,6 @@ import {
 import remarkGfm from "remark-gfm";
 import ToolTip from "@components/ToolTip";
 import Button from "@components/Button";
-import { BiDownload } from "react-icons/bi";
 import { GoDownload } from "react-icons/go";
 import { toPng } from "html-to-image";
 const COLORS = [
@@ -51,35 +50,6 @@ const Chart = ({ content }) => {
     a.download = `${title || "chart"}.png`;
     a.href = dataUrl;
     a.click();
-  };
-
-  const downloadSVG = () => {
-    const svg = chartRef.current?.querySelector("svg");
-    if (!svg) return;
-
-    const serializer = new XMLSerializer();
-    let source = serializer.serializeToString(svg);
-
-    // add namespaces if missing
-    if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
-      source = source.replace(
-        /^<svg/,
-        '<svg xmlns="http://www.w3.org/2000/svg"',
-      );
-    }
-
-    const blob = new Blob([source], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "chart.svg";
-    a.click();
-
-    URL.revokeObjectURL(url);
   };
 
   let config;
@@ -131,70 +101,77 @@ const Chart = ({ content }) => {
         width: "800px",
         height: "500px",
       }}
-      ref={chartRef}
     >
       {title && (
         <p className="text-sm font-medium text-gray-300 mb-2">{title}</p>
       )}
-
-      <ResponsiveContainer
-        width={"100%"}
-        height={"100%"}
-        className={"space-y-4"}
+      <div
+        ref={chartRef}
+        style={{
+          width: "800px",
+          height: "500px",
+        }}
       >
-        {chart_type === "pie" ? (
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey={y_keys[0]}
-              nameKey={x_key}
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label
-            >
-              {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        ) : chart_type === "bar" ? (
-          <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
-            <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
-            />
-            <Legend />
-            {renderLines()}
-          </BarChart>
-        ) : chart_type === "line" ? (
-          <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
-            <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
-            />
-            <Legend />
-            {renderLines()}
-          </LineChart>
-        ) : (
-          <AreaChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
-            <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
-            />
-            <Legend />
-            {renderLines()}
-          </AreaChart>
-        )}
-      </ResponsiveContainer>
+        <ResponsiveContainer
+          width={"100%"}
+          height={"100%"}
+          className={"space-y-4"}
+        >
+          {chart_type === "pie" ? (
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey={y_keys[0]}
+                nameKey={x_key}
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {data.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          ) : chart_type === "bar" ? (
+            <BarChart {...commonProps}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
+              />
+              <Legend />
+              {renderLines()}
+            </BarChart>
+          ) : chart_type === "line" ? (
+            <LineChart {...commonProps}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
+              />
+              <Legend />
+              {renderLines()}
+            </LineChart>
+          ) : (
+            <AreaChart {...commonProps}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
+              />
+              <Legend />
+              {renderLines()}
+            </AreaChart>
+          )}
+        </ResponsiveContainer>
+      </div>
+
       <div className="relative bg-red-500 w-full">
         <div className="absolute bottom-0 right-0">
           <ToolTip text={".Png"}>

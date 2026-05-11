@@ -2,47 +2,33 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
 import { useParams } from "react-router-dom";
 import ChatInput from "@features/ai/components/ChatInput.jsx";
-import {
-  FaArrowAltCircleDown,
-  FaArrowCircleDown,
-  FaArrowDown,
-  FaCheck,
-} from "react-icons/fa";
+import { FaArrowDown, FaCheck } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
 
 import Loading from "../../features/ai/components/Loading.jsx";
-import { api } from "../../lib/axios.js";
-import Loading1 from "../../features/ai/components/Loading1.jsx";
 import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
 import { RiLoader2Fill } from "react-icons/ri";
 import UserMessage from "@features/ai/components/UserMessage.jsx";
 import FilePreview from "@features/ai/components/FilePreview.jsx";
 import Button from "@components/Button.jsx";
-import { toast } from "sonner";
-import useVoiceToText from "@features/ai/hooks/useVoiceToText.jsx";
-import useAuthStore from "@store/authStore.js";
+import useChatStore from "@store/chatStore.js";
+import ChatInput1 from "@features/ai/components/ChatInput1.jsx";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
-const ChatWindow = () => {
+const ChatWindow1 = () => {
   const { id } = useParams();
-  const { user } = useAuthStore();
-  console.log(id);
   const { data, isPending, isFetching } = useGetConversation(id);
   const [copied, setCopied] = useState(false);
-  const [messages, setMessages] = useState([]);
 
   const [previewFile, setPreviewFile] = useState(null);
-  const [files, setFiles] = useState([]);
+
   const isInitialLoad = useRef(true);
   const [showCopy, setShowCopy] = useState(null);
+  const { messages, setMessages, setConversationId, isAwaitingResponse } =
+    useChatStore();
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
-  const [isTyping, setIsTyping] = useState(false);
-  // const message = useRef();
-  const [message, setMessage] = useState("");
-  const { recording, start, stop, clear, transcript, isSpeaking } = useVoiceToText();
-  // const [hasContent, setHasContent] = useState(false);
-  // const conversationRef = useRef(null);
 
   const conversationRef = useCallback((el) => {
     if (!el) return;
@@ -57,17 +43,15 @@ const ChatWindow = () => {
     return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
   }, []);
   const chatEnd = useRef(null);
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   const handleScrollDown = () => {
     chatEnd?.current.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
-    if (transcript) {
-      setMessage(transcript); // populezi inputul
-      clear();
-    }
-  }, [recording, clear, transcript]);
+    setConversationId(id);
+  }, []);
+
   useEffect(() => {
     isInitialLoad.current = true;
   }, [id]); // Resetare ref la fiecare intrarea pe un chat
@@ -130,78 +114,15 @@ const ChatWindow = () => {
   if (isPending)
     return (
       <>
-        <RiLoader2Fill className="size-4 mx-auto animate-spin" />
+        <RiLoader2Fill className="size-6 mx-auto animate-spin" />
       </>
     );
-
-  const handleSubmit = async () => {
-    if (isTyping) return;
-    setIsTyping(true);
-    try {
-      setMessages((prev) => [
-        ...prev,
-        {
-          conversation_id: id,
-          user_id: user._id,
-          role: "user",
-          has_sql_query: false,
-          content: message,
-          files: files,
-        },
-      ]);
-      const filesToSend = files.map((item) => item.file);
-      const filesPreserveStatus = files.map((item) => item.persist);
-      const mesaj = {
-        user_id: user.user_id,
-        conversation_id: id,
-        message: message,
-        files: filesToSend,
-        file_preserve_flags: filesPreserveStatus,
-      };
-
-      const formData = new FormData();
-      formData.append("message", mesaj.message);
-      formData.append("new_chat", String(mesaj.new_chat ?? false));
-      console.log("PLM");
-      console.log(id);
-      formData.append("conversation_id", id);
-
-      mesaj.files.forEach((file) => {
-        formData.append("files", file);
-      });
-
-      mesaj.file_preserve_flags.forEach((persist) => {
-        formData.append("file_preserve_flags", String(persist === true));
-      });
-
-      setMessage("");
-
-      setFiles([]);
-      handleScrollDown();
-      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
-        headers: {
-          "Content-Type": "multipart/formdata",
-        },
-      });
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", blocks: response.data.blocks },
-      ]);
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  console.log(messages);
   return (
     <div
       className="w-full h-full overflow-y-auto overflow-x-hidden"
       ref={conversationRef}
     >
-      <section className="w-full px-5 pb-30 flex justify-center">
+      <section className="w-full px-7 pb-30 flex justify-center">
         <ol className="flex flex-col gap-4 w-2/3 p-2">
           {messages?.length > 0 &&
             messages.map((message, index) => (
@@ -258,7 +179,7 @@ const ChatWindow = () => {
       </section>
 
       <div className="absolute flex flex-col bottom-0 right-5 w-4/5  z-10 items-center justify-center gap-4">
-        {isTyping && (
+        {isAwaitingResponse && (
           <div className="w-full flex justify-center mb-5 h-full ">
             <Button
               className="w-14 z-100 rounded-2xl p-2 cursor-pointer culor-inherit  glassy-container glassy-container-darker"
@@ -268,7 +189,7 @@ const ChatWindow = () => {
             </Button>
           </div>
         )}
-        {showScrollBtn && !isTyping && (
+        {showScrollBtn && !isAwaitingResponse && (
           <Button
             onClick={handleScrollDown}
             className="scroll-btn glassy-container"
@@ -277,23 +198,11 @@ const ChatWindow = () => {
           </Button>
         )}
         <div className="w-2/3 flex justify-center bg-[#0b1220] p-4 pt-0">
-          <ChatInput
-            onSubmit={handleSubmit}
-            message={message}
-            files={files}
-            setFiles={setFiles}
-            loading={isTyping}
-            placeholder={"Ask anything"}
-            setMessage={setMessage}
-            startRecording={start}
-            stopRecording={stop}
-            recording={recording}
-            isSpeaking={isSpeaking}
-          />
+          <ChatInput1 placeholder={"Ask anything"} />
         </div>
       </div>
     </div>
   );
 };
 
-export default ChatWindow;
+export default ChatWindow1;

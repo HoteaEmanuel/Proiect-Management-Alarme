@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuthStore } from "../store/authStore";
+import useAuthStore from "@store/authStore.js";
 import { Navigate, Outlet } from "react-router-dom";
 
 const UnauthRoute = () => {

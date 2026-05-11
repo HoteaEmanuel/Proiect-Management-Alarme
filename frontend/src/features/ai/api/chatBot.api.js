@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@lib/axios.js";
-import { useAuthStore } from "../../../store/authStore.js";
+import useAuthStore from "@store/authStore.js";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
@@ -26,15 +26,11 @@ export const useCreateConversation = () => {
 
       console.log("FORM DATA NEW");
       console.log(...formData.entries());
-      const response = await api.post(
-        `${VITE_URL_APP}/api/chatbot`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/formdata",
-          },
+      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
+        headers: {
+          "Content-Type": "multipart/formdata",
         },
-      );
+      });
       return response.data;
     },
     mutationKey: ["conversations"],
