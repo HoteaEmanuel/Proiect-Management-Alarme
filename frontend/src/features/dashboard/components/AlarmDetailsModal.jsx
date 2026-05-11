@@ -31,6 +31,14 @@ const AlarmDetailsModal = ({ open, alarm, onClose }) => {
         { label: "Category tier 3", value: alarm.category_tier_3 },
     ];
 
+    const getBadgeClassName = (type, value) => {
+
+        const normalizedValue = value?.toLowerCase();
+
+        return `alarm-details-badge alarm-details-badge-${type}-${normalizedValue}`;
+    };
+
+
     return (
         <Modal open={open} onClose={onClose}>
             <Box className="alarm-details-modal">
@@ -56,9 +64,17 @@ const AlarmDetailsModal = ({ open, alarm, onClose }) => {
                 </div>
 
                 <div className="alarm-details-badges">
-                    <span className="alarm-details-badge">{alarm.status}</span>
-                    <span className="alarm-details-badge">{alarm.severity}</span>
-                    <span className="alarm-details-badge">{alarm.type}</span>
+                    <span className={getBadgeClassName("status", alarm.status)}>
+                        {alarm.status}
+                    </span>
+
+                    <span className={getBadgeClassName("severity", alarm.severity)}>
+                        {alarm.severity}
+                    </span>
+
+                    <span className={getBadgeClassName("type", alarm.type)}>
+                        {alarm.type}
+                    </span>
                 </div>
 
                 <div className="alarm-details-grid">

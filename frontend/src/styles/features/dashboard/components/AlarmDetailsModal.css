@@ -102,6 +102,90 @@
     font-weight: 700;
 }
 
+.alarm-details-badge-status-active {
+
+    border-color: rgba(16, 185, 129, 0.45);
+    background-color: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+}
+
+.alarm-details-badge-status-closed {
+
+    border-color: rgba(239, 68, 68, 0.45);
+    background-color: rgba(239, 68, 68, 0.14);
+    color: #f87171;
+}
+
+.alarm-details-badge-status-cleared {
+
+    border-color: rgba(45, 212, 191, 0.45);
+    background-color: rgba(45, 212, 191, 0.12);
+    color: #5eead4;
+}
+
+.alarm-details-badge-status-acknowledged {
+
+    border-color: rgba(245, 158, 11, 0.5);
+    background-color: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+}
+
+.alarm-details-badge-severity-critical {
+
+    border-color: rgba(239, 68, 68, 0.55);
+    background-color: rgba(239, 68, 68, 0.18);
+    color: #fca5a5;
+}
+
+.alarm-details-badge-severity-major {
+
+    border-color: rgba(249, 115, 22, 0.5);
+    background-color: rgba(249, 115, 22, 0.15);
+    color: #fdba74;
+}
+
+.alarm-details-badge-severity-warning {
+
+    border-color: rgba(234, 179, 8, 0.5);
+    background-color: rgba(234, 179, 8, 0.14);
+    color: #fde047;
+}
+
+.alarm-details-badge-severity-minor {
+
+    border-color: rgba(56, 189, 248, 0.45);
+    background-color: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+}
+
+.alarm-details-badge-severity-info {
+
+    border-color: rgba(148, 163, 184, 0.45);
+    background-color: rgba(148, 163, 184, 0.13);
+    color: #cbd5e1;
+}
+
+.alarm-details-badge-type-system {
+
+    border-color: rgba(168, 85, 247, 0.45);
+    background-color: rgba(168, 85, 247, 0.13);
+    color: #c084fc;
+}
+
+.alarm-details-badge-type-application {
+
+    border-color: rgba(59, 130, 246, 0.45);
+    background-color: rgba(59, 130, 246, 0.13);
+    color: #93c5fd;
+}
+
+.alarm-details-badge-type-network {
+
+    border-color: rgba(20, 184, 166, 0.45);
+    background-color: rgba(20, 184, 166, 0.13);
+    color: #5eead4;
+}
+
 .alarm-details-grid {
 
     display: grid;
