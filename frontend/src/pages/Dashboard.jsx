@@ -41,6 +41,8 @@ const Dashboard = () => {
   };
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
+  // Alarma selectata pentru pop up
+  const [selectedAlarm, setSelectedAlarm] = useState(null);
 
   // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
   useEffect(() => {
@@ -230,6 +232,7 @@ const Dashboard = () => {
       <AlarmsTable
         data={filteredAlarms?.alarms || []}
         totalCount={filteredAlarms?.total_alarms}
+        onRowClick={(alarm) => setSelectedAlarm(alarm)}
         pagination={{
           pageIndex: filters.pageIndex,
           pageSize: filters.pageSize,
