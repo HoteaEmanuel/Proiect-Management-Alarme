@@ -10,7 +10,7 @@ import FilePreview from "./FilePreview";
 import FileList from "./FileList";
 import Button from "@components/Button";
 import useChatStore from "@store/chatStore.js";
-import useVoiceToText from "../hooks/useVoiceToText";
+import useVoiceToText from "../hooks/useVoiceToText.js";
 import useAuthStore from "@store/authStore.js";
 import { api } from "@lib/axios";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
@@ -85,6 +85,7 @@ const ChatInput1 = ({ placeholder }) => {
       setMessage("");
 
       setFiles([]);
+      clear();
       //   handleScrollDown();
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
         headers: {
@@ -249,17 +250,6 @@ const ChatInput1 = ({ placeholder }) => {
         onChangeCapture={handleInput}
         className="w-full resize-none overflow-y-auto bg-transparent outline-none max-h-32"
       />
-      {/* {audioBlob && (
-        <div
-          className="flex justify-center"
-        >
-          <audio
-            controls
-            src={URL.createObjectURL(audioBlob)}
-            className="h-8"
-          />
-        </div>
-      )} */}
       <div className="flex items-center justify-between">
         <input
           type="file"

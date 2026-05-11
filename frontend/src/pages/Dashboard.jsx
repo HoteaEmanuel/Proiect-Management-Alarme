@@ -63,7 +63,10 @@ const Dashboard = () => {
       return next;
     });
   };
-  if (isPendingAlarms) return <p>Loading...</p>;
+  if (isPendingAlarms)
+    return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
+  console.log("ALARMS ");
+  console.log(alarms);
 
   const handleExport = async () => {
     try {
@@ -85,7 +88,7 @@ const Dashboard = () => {
         console.log(url);
       });
     } catch (e) {
-      toast.error("Export failed");
+      toast.error(e?.message  || "Export failed");
     }
   };
 
@@ -110,7 +113,6 @@ const Dashboard = () => {
                 <CiExport className="dashboard-export-icon" />
               </>
             )}
-
           </Button>
         </Tooltip>
       </div>
@@ -269,7 +271,7 @@ const Dashboard = () => {
         <h2 className="dashboard-pagination-text">
           Total alarms:{" "}
           <span className="dashboard-pagination-value">
-            {alarms?.length}
+            {alarms.total_alarms}
           </span>{" "}
         </h2>
         {filteredAlarms?.total_alarms !== alarms.total_alarms && (

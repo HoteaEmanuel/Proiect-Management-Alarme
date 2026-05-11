@@ -2,8 +2,8 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
 import { useParams } from "react-router-dom";
 import ChatInput from "@features/ai/components/ChatInput.jsx";
-import { FaArrowDown, FaCheck } from "react-icons/fa";
-import { MdContentCopy } from "react-icons/md";
+import { FaArrowDown } from "react-icons/fa";
+
 
 import Loading from "../../features/ai/components/Loading.jsx";
 import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
@@ -14,12 +14,12 @@ import Button from "@components/Button.jsx";
 import useChatStore from "@store/chatStore.js";
 import ChatInput1 from "@features/ai/components/ChatInput1.jsx";
 
+
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
 const ChatWindow1 = () => {
   const { id } = useParams();
   const { data, isPending, isFetching } = useGetConversation(id);
-  const [copied, setCopied] = useState(false);
 
   const [previewFile, setPreviewFile] = useState(null);
 
@@ -28,7 +28,6 @@ const ChatWindow1 = () => {
   const { messages, setMessages, setConversationId, isAwaitingResponse } =
     useChatStore();
   const [showScrollBtn, setShowScrollBtn] = useState(false);
-
 
   const conversationRef = useCallback((el) => {
     if (!el) return;
@@ -88,27 +87,6 @@ const ChatWindow1 = () => {
     return () => el.removeEventListener("scroll", handleScroll);
   }, [conversationRef]);
 
-  // Functie care copiaza contentul unui mesaj in clipboard
-  const handleCopy = async (message) => {
-    try {
-      let content = "";
-      if (message?.content) content = message?.content;
-      else {
-        message?.blocks.forEach((block) => {
-          if (block.type === "text") content += block.content;
-        });
-      }
-      await navigator.clipboard.writeText(content);
-      setCopied(true);
-      // Feedback copiere
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-
   // const { mutateAsync: sendMessage, isPending: isPendingAIResponse } =
   //   useSendMessage({ id });
   if (isPending)
@@ -134,8 +112,8 @@ const ChatWindow1 = () => {
                 <div
                   className={`${
                     message.role === "assistant"
-                      ? "text-left p-2 rounded-2xl min-w-0 overflow-hidden"
-                      : "max-w-[75%]"
+                      ? "text-left p-2 rounded-2xl max-w-full w-fit wrap-break-word"
+                      : "max-w-[75%] w-fit wrap-break-word"
                   }`}
                   onMouseEnter={() => setShowCopy(index)}
                 >
@@ -144,26 +122,14 @@ const ChatWindow1 = () => {
                       message={message}
                       onFileClick={setPreviewFile}
                       previewFile={previewFile}
+                      showOptions={showCopy === index}
                     />
                   ) : (
-                    <ChatResponse blocks={message?.blocks} />
+                    <ChatResponse
+                      blocks={message?.blocks}
+                      showOptions={showCopy === index}
+                    />
                   )}
-                </div>
-                <div className="relative">
-                  <div className="absolute w-full bottom-0 left-1">
-                    {showCopy === index && !copied && (
-                      <button
-                        className="cursor-pointer hover:scale-125"
-                        onClick={() => handleCopy(message)}
-                      >
-                        <MdContentCopy className="size-3 text-gray-500" />
-                      </button>
-                    )}
-
-                    {showCopy === index && copied && (
-                      <FaCheck className="size-3" />
-                    )}
-                  </div>
                 </div>
               </li>
             ))}

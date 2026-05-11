@@ -19,7 +19,7 @@ import UserMessage from "@features/ai/components/UserMessage.jsx";
 import FilePreview from "@features/ai/components/FilePreview.jsx";
 import Button from "@components/Button.jsx";
 import { toast } from "sonner";
-import useVoiceToText from "@features/ai/hooks/useVoiceToText.jsx";
+import useVoiceToText from "@features/ai/hooks/useVoiceToText.js";
 import useAuthStore from "@store/authStore.js";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;

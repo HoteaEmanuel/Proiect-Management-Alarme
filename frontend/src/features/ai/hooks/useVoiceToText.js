@@ -26,7 +26,6 @@ const useVoiceToText = () => {
         .join("");
       setTranscript(text);
 
-      // reset speaking state on every new result
       setIsSpeaking(true);
       clearTimeout(silenceTimer.current);
       silenceTimer.current = setTimeout(() => setIsSpeaking(false), 1500);
