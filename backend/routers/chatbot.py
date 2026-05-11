@@ -4,10 +4,9 @@ from database import get_db
 from sqlalchemy.orm import Session
 from typing import List
 
-from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment, UpdateTitleRequest
+from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment, UpdateTitleRequest, CloudinaryFileAttachment
 from integrations.chatbot import user_chat_request
-from integrations.cloudinary import upload_file_to_cloudinary
-from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, get_file_history
 from auth_utils import get_current_user
 
 router = APIRouter(
@@ -24,7 +23,6 @@ async def send_message_to_chatbot(
     files: list[UploadFile] = File(default=[]),
     file_preserve_flags: list[str] = Form(default=[])
 ):
-    print()
     print(user_id,conversation_id,message,new_chat,files,file_preserve_flags)
     parsed_flags = [f.lower() == "true" for f in file_preserve_flags]
     while len(parsed_flags) < len(files):
@@ -74,10 +72,16 @@ def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_u
         conversation = get_full_conversation(db=db, user_id=user_id["id"], conversation_id=conversation_id)
         return ConversationHistory(messages=conversation)
     except Exception as e:
-        print(f"EROARE GET CONVERSATION: {str(e)}")
-        import traceback
-        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/conversations/{conversation_id}/files", response_model=list[CloudinaryFileAttachment])
+def get_conversation_files(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        files = get_file_history(db=db, user_id=user_id["id"], conversation_id=conversation_id)
+        return files
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
     
 @router.delete("/conversations/{conversation_id}", status_code=204)
 def delete_chat(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -94,49 +98,3 @@ def edit_conversation_title(conversation_id: str, body: UpdateTitleRequest , use
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.post("/conversations/{conversation_id}/upload-file", status_code=201, openapi_extra={
-    "requestBody": {
-        "content": {
-            "multipart/form-data": {
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "file": {
-                            "type": "array",
-                            "items": {"type": "string", "format": "binary"}
-                        }
-                    },
-                    "required": ["file"]
-                }
-            }
-        }
-    }
-})
-async def upload_conversation_file(
-    file: List[UploadFile] = File(...),
-):
-    try:
-        uploaded_files = []
-        for uploaded_file in file:
-            if not uploaded_file.filename:
-                raise HTTPException(status_code=400, detail="One of the files has no name")
-            
-
-            file_bytes = await uploaded_file.read()
-            cloudinary_file = upload_file_to_cloudinary(file_bytes, uploaded_file.filename)
-
-            uploaded_files.append({
-                "filename": uploaded_file.filename,
-                "url": cloudinary_file["url"],
-                "public_id": cloudinary_file["public_id"],
-                "resource_type": cloudinary_file["resource_type"],
-                "file_format": cloudinary_file["format"] or uploaded_file.filename.rsplit(".", 1)[-1].lower(),
-                "file_size": cloudinary_file["bytes"],
-            })
-
-        return {"files": uploaded_files}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

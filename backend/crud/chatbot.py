@@ -133,6 +133,32 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
 
     return result
 
+def get_file_history(db: Session, user_id: str, conversation_id: str) -> list[CloudinaryFileAttachment]:
+    files = (
+        db.query(ConversationFileModel)
+        .join(MessageModel, MessageModel.id == ConversationFileModel.message_id)
+        .filter(
+            MessageModel.conversation_id == conversation_id,
+            MessageModel.user_id == user_id,
+            ConversationFileModel.is_deleted == False
+        )
+        .order_by(ConversationFileModel.created_at.asc())
+        .all()
+    )
+
+    return [
+        CloudinaryFileAttachment(
+            filename=f.filename,
+            url=f.file_url,
+            public_id=f.public_id or "",
+            resource_type=f.resource_type or "",
+            file_format=f.file_format or "",
+            file_size=f.file_size or 0
+        )
+        for f in files
+    ]
+
+
 #functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
 def get_full_conversation(db: Session, user_id: str, conversation_id: str):
     try:
