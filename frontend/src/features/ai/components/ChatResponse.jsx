@@ -1,5 +1,5 @@
 import ReactMarkdown from "react-markdown";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -22,6 +22,14 @@ import ToolTip from "@components/ToolTip";
 import Button from "@components/Button";
 import { GoDownload } from "react-icons/go";
 import { toPng } from "html-to-image";
+import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
+import { FaPlay, FaStop } from "react-icons/fa";
+import { AiFillSound } from "react-icons/ai";
+import { MdContentCopy } from "react-icons/md";
+import { FaCheck } from "react-icons/fa";
+import { toast } from "sonner";
+import removeMarkdown from "remove-markdown";
+
 const COLORS = [
   "#6366f1",
   "#22d3ee",
@@ -30,7 +38,6 @@ const COLORS = [
   "#f43f5e",
   "#a78bfa",
 ];
-
 const Chart = ({ content }) => {
   console.log("CHART CONTENT ");
   console.log(content);
@@ -174,7 +181,7 @@ const Chart = ({ content }) => {
 
       <div className="relative bg-red-500 w-full">
         <div className="absolute bottom-0 right-0">
-          <ToolTip text={".Png"}>
+          <ToolTip text={"Download as .png"}>
             <Button
               onClick={downloadPNG}
               className="p-2 rounded-full hover:bg-gray-800 hover:scale-110 cursor-pointer"
@@ -188,22 +195,87 @@ const Chart = ({ content }) => {
   );
 };
 
-const ChatResponse = ({ blocks }) => {
+const ChatResponse = ({ blocks, showOptions }) => {
   console.log("BLOCKS");
   console.log(blocks);
+  const [copied, setCopied] = useState(false);
+  const { speaking, speak, stop } = useSpeechSynthesis();
+
+  console.log("SPEAKING");
+  console.log(speaking);
+
+  console.log("COPIED");
+  console.log(copied);
+
+  const handleCopy = async (message) => {
+    try {
+      const text = removeMarkdown(message); // Copiez mesajul eliminand markdown ul
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      // Feedback copiere
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (err) {
+      toast.error(err?.message || "Failed to copy");
+    }
+  };
   return (
     <div className="min-w-0 w-full">
       {blocks.map((block, index) => (
-        <div key={index} className="min-w-0 w-screen">
+        <div key={index} className="">
           {block.type === "chart" ? (
-            <div className="min-w-full">
+            <div className="w-screen">
               <Chart content={block.content} />
             </div>
           ) : (
-            <div className="prose prose-invert min-w-0">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {block.content}
-              </ReactMarkdown>
+            <div className="prose prose-invert min-w-0 pb-5">
+              <div className="mb-2">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {block.content}
+                </ReactMarkdown>
+              </div>
+              {showOptions && (
+                <div className="relative">
+                  <div className="absolute flex gap-2">
+                    <ToolTip text={speaking ? "Stop" : "Read loud"}>
+                      <Button
+                        onClick={() => {
+                          if (speaking) {
+                            stop();
+                          } else {
+                            speak(block.content);
+                          }
+                        }}
+                        className="cursor-pointer hover:scale-120 text-white/80"
+                      >
+                        {speaking ? (
+                          <FaStop className="size-4" />
+                        ) : (
+                          <AiFillSound className="size-4" />
+                        )}
+                      </Button>
+                    </ToolTip>
+
+                    {!copied && (
+                      <ToolTip text={"Copy"}>
+                        <Button
+                          className="cursor-pointer hover:scale-125 hover:bg-gray-800  p-1 rounded-full"
+                          onClick={() => handleCopy(block.content)}
+                        >
+                          <MdContentCopy className="size-4  " />
+                        </Button>
+                      </ToolTip>
+                    )}
+
+                    {copied && (
+                      <ToolTip text={"Copied succesfully"}>
+                        <FaCheck className="size-4" />
+                      </ToolTip>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
