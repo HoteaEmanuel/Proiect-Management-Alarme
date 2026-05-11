@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import { useAuthStore } from "../../store/authStore";
-import Input from "@components/Input";
-import MessageInput from "@features/ai/components/MessageInput.jsx";
 import { useCreateConversation } from "@features/ai/api/chatBot.api.js";
+import useAuthStore from "@store/authStore.js";
+import ChatInput from "@features/ai/components/ChatInput.jsx";
 
 const NewChat = () => {
   const { user } = useAuthStore();
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
-  console.log(user);
   const { mutateAsync: sendMessage, isPending } = useCreateConversation();
   const onSubmit = async () => {
     if (isPending) return;
@@ -53,7 +51,7 @@ const NewChat = () => {
         className="w-1/2 border border-gray-700 p-4 rounded-xl"
       /> */}
       <div className="w-1/2">
-        <MessageInput
+        <ChatInput
           placeholder={"How can i help you?"}
           className="w-full border border-gray-700 p-4 rounded-xl"
           onSubmit={onSubmit}

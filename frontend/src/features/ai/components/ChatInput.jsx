@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
+import { FaMicrophoneSlash } from "react-icons/fa";
 import LoadingCircle from "../../../components/LoadingCircle";
 import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
@@ -15,7 +16,7 @@ const MAX_HEIGHT = 200;
 const MAX_ALLOWED_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // FILE MAXIMUM SIZE
 
-const MessageInput = ({
+const ChatInput = ({
   onSubmit,
   message,
   files,
@@ -24,7 +25,13 @@ const MessageInput = ({
   placeholder,
   setMessage,
   setFiles,
+  startRecording,
+  stopRecording,
+  recording,
+  isSpeaking,
 }) => {
+  console.log("IS SPEAKING ");
+  console.log(isSpeaking);
   const input = useRef();
 
   const [previewFile, setPreviewFile] = useState(null);
@@ -39,7 +46,7 @@ const MessageInput = ({
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
 
-    // Daca elementul are heightul mai mare decat MAX_HEIGHT atunci ii adaugam scroll ( overflow y auto)
+    // Daca elementul are inaltimea mai mare decat MAX_HEIGHT atunci ii adaugam scroll ( overflow y auto)
     if (el.scrollHeight > MAX_HEIGHT) {
       el.style.height = MAX_HEIGHT + "px";
       el.classList.add("overflow-y-auto");
@@ -49,6 +56,24 @@ const MessageInput = ({
       el.classList.remove("overflow-y-auto");
     }
   };
+
+  // Schimba inaltimea inputului programatic, in cazul inregistrarii
+  useEffect(() => {
+    const el = input.current;
+    if (!el) return;
+
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+
+    if (el.scrollHeight > MAX_HEIGHT) {
+      el.style.height = MAX_HEIGHT + "px";
+      el.classList.add("overflow-y-auto");
+      el.classList.remove("overflow-hidden");
+    } else {
+      el.classList.add("overflow-hidden");
+      el.classList.remove("overflow-y-auto");
+    }
+  }, [message]);
 
   const handleKeyDown = (e) => {
     // Daca se apasa enter, fara shift atunci se da submit la message
@@ -155,9 +180,20 @@ const MessageInput = ({
         maxLength={MESSAGE_LIMIT}
         onKeyDown={handleKeyDown}
         onInput={handleInput}
+        onChangeCapture={handleInput}
         className="w-full resize-none overflow-y-auto bg-transparent outline-none max-h-32"
       />
-
+      {/* {audioBlob && (
+        <div
+          className="flex justify-center"
+        >
+          <audio
+            controls
+            src={URL.createObjectURL(audioBlob)}
+            className="h-8"
+          />
+        </div>
+      )} */}
       <div className="flex items-center justify-between">
         <input
           type="file"
@@ -174,9 +210,35 @@ const MessageInput = ({
         </Tooltip>
 
         <div className="flex items-center gap-2">
-          <Button className="cursor-pointer hover:scale-105">
-            <MdKeyboardVoice className="size-5" />
-          </Button>
+          {!recording && message === "" ? (
+            <Tooltip text={"Dictate"}>
+              <Button
+                className="cursor-pointer hover:scale-105"
+                onClick={startRecording}
+              >
+                <MdKeyboardVoice className="size-5" />
+              </Button>
+            </Tooltip>
+          ) : (
+            recording && (
+              <Tooltip text={"Stop recording"}>
+                <Button
+                  className={`cursor-pointer flex justify-center items-center rounded-full transition-all duration-300
+  ${
+    isSpeaking
+      ? "shadow-[0_0_10px_2px_rgba(59,130,246,0.5)] border-2 border-gray-900  scale-110"
+      : "hover:scale-105"
+  }`}
+                  onClick={stopRecording}
+                >
+                  {/* <span className="text-xs">Recording...</span> */}
+                  <MdKeyboardVoice
+                    className={`size-5 transition-transform duration-150 ${isSpeaking ? "scale-120" : "scale-100"}`}
+                  />
+                </Button>
+              </Tooltip>
+            )
+          )}
 
           {!loading && (
             <Button
@@ -194,4 +256,4 @@ const MessageInput = ({
   );
 };
 
-export default MessageInput;
+export default ChatInput;

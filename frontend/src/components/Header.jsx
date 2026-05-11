@@ -1,6 +1,6 @@
 import React from "react";
-import { useAuthStore } from "../store/authStore";
-import "../styles/components/Header.css";
+import useAuthStore from "@store/authStore.js";
+import "@styles/components/Header.css";
 
 const Header = () => {
   const { user } = useAuthStore();

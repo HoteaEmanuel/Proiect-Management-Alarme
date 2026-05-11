@@ -26,7 +26,7 @@ const File = ({ file, onClick }) => {
     >
       <span className="text-lg shrink-0">{icon}</span>
       <div className="overflow-hidden">
-        <p className="text-xs text-white truncate">{file.filename}</p>
+        <p className="text-xs text-white truncate">{fileName}</p>
       </div>
     </button>
   );
