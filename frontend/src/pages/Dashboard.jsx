@@ -19,6 +19,7 @@ import {
 } from "@constants/alarms.js";
 import Button from "@components/Button";
 import Tooltip from "@components/ToolTip";
+import AlarmDetailsModal from "@features/dashboard/components/AlarmDetailsModal";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams({ replace: false });
@@ -269,6 +270,12 @@ const Dashboard = () => {
           });
         }}
       />
+      <AlarmDetailsModal
+        open={selectedAlarm !== null}
+        alarm={selectedAlarm}
+        onClose={() => setSelectedAlarm(null)}
+      />
+
 
       <div className="dashboard-pagination-info">
         <h2 className="dashboard-pagination-text">

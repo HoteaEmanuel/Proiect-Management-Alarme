@@ -1,41 +1,72 @@
 import React from "react";
-import { Box, Button, Modal } from "@mui/material";
-
-const modalStyle = {
-
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "70%",
-    maxHeight: "80vh",
-    overflowY: "auto",
-    backgroundColor: "#0f172a",
-    border: "1px solid #24324a",
-    borderRadius: "8px",
-    boxShadow: 24,
-    padding: "24px",
-    color: "white",
-};
+import { Box, Modal } from "@mui/material";
+import "@styles/features/dashboard/components/AlarmDetailsModal.css";
 
 const AlarmDetailsModal = ({ open, alarm, onClose }) => {
 
-    if (!alarm) 
+    if (!alarm)
         return null;
 
-    return (
-        
-        <Modal open={open} onClose={onClose}>
-        <Box sx={modalStyle}>
-            <div>
-            <h2>{alarm.alarm_number}</h2>
-            <p>{alarm.summary}</p>
-            </div>
+    const alarmFields = [
+        { label: "Alarm number", value: alarm.alarm_number },
+        { label: "Status", value: alarm.status },
+        { label: "Severity", value: alarm.severity },
+        { label: "Company", value: alarm.company },
+        { label: "Project", value: alarm.project },
+        { label: "Server", value: alarm.server_name },
+        { label: "Alert description", value: alarm.alert_description },
+        { label: "Alert key", value: alarm.alert_key },
+        { label: "Node", value: alarm.node },
+        { label: "Summary", value: alarm.summary },
+        { label: "Type", value: alarm.type },
+        { label: "Alert group", value: alarm.alert_group },
+        { label: "First occurrence", value: alarm.first_occurence_datetime },
+        { label: "Last occurrence", value: alarm.last_occurence_datetime },
+        { label: "Clear occurrence", value: alarm.clear_occurence_datetime },
+        { label: "Deleted datetime", value: alarm.deleted_datetime },
+        { label: "Category tier 1", value: alarm.category_tier_1 },
+        { label: "Category tier 2", value: alarm.category_tier_2 },
+        { label: "Category tier 3", value: alarm.category_tier_3 },
+    ];
 
-            <Button variant="outlined" onClick={onClose}>
-            Close
-            </Button>
-        </Box>
+    return (
+        <Modal open={open} onClose={onClose}>
+            <Box className="alarm-details-modal">
+                <div className="alarm-details-header">
+                    <div>
+                        <h2 className="alarm-details-title">{alarm.alarm_number}</h2>
+                        <p className="alarm-details-subtitle">{alarm.summary}</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="alarm-details-close-button"
+                        onClick={onClose}
+                    >
+                        Close
+                    </button>
+                </div>
+
+                <div className="alarm-details-badges">
+                    <span className="alarm-details-badge">{alarm.status}</span>
+                    <span className="alarm-details-badge">{alarm.severity}</span>
+                    <span className="alarm-details-badge">{alarm.type}</span>
+                </div>
+
+                <div className="alarm-details-grid">
+                    {alarmFields.map((field) => (
+                        <div
+                            key={field.label}
+                            className={`alarm-details-field ${field.wide ? "alarm-details-field-wide" : ""}`}
+                        >
+                            <span className="alarm-details-label">{field.label}</span>
+                            <strong className="alarm-details-value">
+                                {field.value || "N/A"}
+                            </strong>
+                        </div>
+                    ))}
+                </div>
+            </Box>
         </Modal>
     );
 };
