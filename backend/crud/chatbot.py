@@ -5,6 +5,7 @@ import io
 import fitz
 import json
 import requests
+from docx import Document as DocxDocument
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import MessageCreate, CloudinaryFileAttachment
@@ -29,6 +30,26 @@ def parse_pdf(content: bytes) -> str:
     except Exception as e:
         raise AppError(status_code=400, detail=f"PDF parsing error: {str(e)}")
     
+#functie pentru parsare fisiere docx
+def parse_docx(content:bytes) -> str:
+    try:
+        doc=DocxDocument(io.BytesIO(content))
+        paragraphs=[p.text for p in doc.paragraphs if p.text.strip()]
+        
+        #parsez eventualele tabele din docx
+        for table in doc.tables:
+            for row in table.rows:
+                cells=[cell.text.strip() for cell in row.cells]
+                paragraphs.append(" | ".join(cells))
+        extracted = "\n".join(paragraphs).strip()
+        if not extracted:
+            raise AppError(status_code=400, detail="DOCX extraction failed")
+        return extracted
+    except AppError:
+        raise
+    except Exception as e:
+        raise AppError(status_code=400, detail=f"DOCX parsing error: {str(e)}")
+    
 def parse_file(filename: str, content: bytes) -> str:
     #extrag extensia fisierului
     if "." not in filename:
@@ -39,6 +60,8 @@ def parse_file(filename: str, content: bytes) -> str:
         #parsez in functie de extensie
         if ext=="pdf":
             return parse_pdf(content)
+        elif ext=="docx":
+            return parse_docx(content)
         elif ext == "csv":
             df=pd.read_csv(io.BytesIO(content), on_bad_lines="skip")
             return df.to_json(orient="records", force_ascii=False)
@@ -46,7 +69,7 @@ def parse_file(filename: str, content: bytes) -> str:
             df=pd.read_excel(io.BytesIO(content))
             return df.to_markdown(index=False)
         else:
-            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls, .pdf")
+            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls, .pdf, .docx")
 
     except AppError:
         raise
