@@ -15,6 +15,8 @@ const OptionsModal = ({
   );
   console.log("CONVERSATION TO BE");
   console.log(conversation);
+  console.log("POSITION");
+  console.log(position);
   const modalRef = useRef(null);
   // Adaug event de mouse down, cand se da click inafara containerului de optiuni
   useEffect(() => {
@@ -34,7 +36,7 @@ const OptionsModal = ({
       className="absolute left-50 background
                     w-44 rounded-xl overflow-hidden
                      border border-white/10
-                    shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+                    shadow-[0_8px_32px_rgba(0,0,0,0.6)] "
       onMouseLeave={() => {
         showOptions(false);
         clear(null);
@@ -44,7 +46,7 @@ const OptionsModal = ({
         showOptions(false);
         clear(null);
       }}
-      style={{ top: position.top }}
+      style={{ position:"fixed", top: position ? position.top : 10, right:0  }}
     >
       <ul className="flex flex-col">
         <li>

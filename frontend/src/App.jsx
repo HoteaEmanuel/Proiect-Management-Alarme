@@ -10,7 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import useCheckAuth from "./hooks/useCheckAuth.js";
 import { Statistics } from "./pages/Statistics.jsx";
 import Settings from "./pages/Settings.jsx";
-import ChatWindow from "./pages/ai-chatbot/ChatWindow.jsx";
+// import ChatWindow from "./pages/ai-chatbot/ChatWindow.jsx";
 import Chatlayout from "./layouts/Chatlayout.jsx";
 import NewChat from "./pages/ai-chatbot/NewChat.jsx";
 import Chats from "./pages/ai-chatbot/Chats.jsx";

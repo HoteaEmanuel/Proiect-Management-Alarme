@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import ChatInput from "@features/ai/components/ChatInput.jsx";
 import { FaArrowDown } from "react-icons/fa";
 
-
 import Loading from "../../features/ai/components/Loading.jsx";
 import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
 import { RiLoader2Fill } from "react-icons/ri";
@@ -13,7 +12,6 @@ import FilePreview from "@features/ai/components/FilePreview.jsx";
 import Button from "@components/Button.jsx";
 import useChatStore from "@store/chatStore.js";
 import ChatInput1 from "@features/ai/components/ChatInput1.jsx";
-
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -25,7 +23,7 @@ const ChatWindow1 = () => {
 
   const isInitialLoad = useRef(true);
   const [showCopy, setShowCopy] = useState(null);
-  const { messages, setMessages, setConversationId, isAwaitingResponse } =
+  const { messages, setMessages, isAwaitingResponse } =
     useChatStore();
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
@@ -47,9 +45,6 @@ const ChatWindow1 = () => {
     chatEnd?.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    setConversationId(id);
-  }, []);
 
   useEffect(() => {
     isInitialLoad.current = true;

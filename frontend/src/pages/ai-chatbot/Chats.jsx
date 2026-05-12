@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useGetUserConversations } from "../../features/ai/api/chatBot.api.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import Input from "../../components/Input.jsx";
 import LoadingCircle from "../../components/LoadingCircle.jsx";
 
@@ -20,8 +20,10 @@ const Chats = () => {
       ),
     [chats, search],
   );
+
   if (isPending) return <LoadingCircle />;
   console.log(search);
+
   return (
     <div className="w-full h-full flex flex-col items-center gap-10 p-10 ">
       {chats.conversations?.length === 0 ? (

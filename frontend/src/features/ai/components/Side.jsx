@@ -3,7 +3,13 @@ import { MdDashboard } from "react-icons/md";
 import { IoIosStats } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosChatboxes } from "react-icons/io";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { RiChatAiFill } from "react-icons/ri";
 import { IoMdArrowBack } from "react-icons/io";
 import { RiChatNewFill } from "react-icons/ri";
@@ -17,13 +23,19 @@ import {
 import OptionsModal from "./OptionsModal";
 import Input from "@components/Input";
 import { BsCloudFogFill } from "react-icons/bs";
+import useChatStore from "@store/chatStore";
 const Side = () => {
   const { pathname } = useLocation();
+  const { id } = useParams();
+  console.log("ID CONV");
+  console.log(id);
   const {
     data: conversations,
     isLoading,
     isPending,
   } = useGetUserConversations();
+
+  const { setConversation } = useChatStore();
 
   const { mutateAsync: renameConversation } = useRenameConversation();
 
@@ -34,14 +46,13 @@ const Side = () => {
   const [position, setPosition] = useState({ top: 0 }); // folosit pentru positionarea modalului de optiuni
   const navigate = useNavigate();
 
-  if (isLoading || isPending) return <p>Loading...</p>;
-  console.log("EDITING");
-  console.log(editValue);
-  console.log(editingId);
+  if (isLoading || isPending) return <p>Loading...</p>; //! Implement loading skeletons
   const handleRename = async (e) => {
     if (e.key === "Enter") {
-      // rename(conv.id, editValue);
-      await renameConversation({ conversationId: editingId, new_title: editValue });
+      await renameConversation({
+        conversationId: editingId,
+        new_title: editValue,
+      });
       setEditingId(null);
     }
     if (e.key === "Escape") {
@@ -50,13 +61,16 @@ const Side = () => {
   };
 
   const handleBlur = async () => {
-    // rename(conv.id, editValue); // salvezi
-    renameConversation(editingId, editValue);
-    console.log("HELLO");
+    await renameConversation(editingId, editValue);
     setEditingId(null);
-
   };
 
+  const handleNavigateToConversation = (conversation) => {
+    console.log("NAVIGATIN");
+    console.log(conversation);
+    // setConversation(conversation);
+    return navigate(`/chat/${conversation.conversation_id}`);
+  };
   return (
     <aside className="side">
       <NavLink
@@ -95,7 +109,10 @@ const Side = () => {
           <ul className="overflow-y-auto flex-1 flex flex-col gap-2 text-xs">
             {conversations.map((conv) =>
               editingId === conv.conversation_id ? (
-                <li key={conv.conversation_id}>
+                <li
+                  key={conv.conversation_id}
+                  className={`side-nav-item  mini-item ${id === conv.conversation_id && "active"}`}
+                >
                   <Input
                     autoFocus
                     handleChange={(e) => setEditValue(e.target.value)}
@@ -109,12 +126,14 @@ const Side = () => {
               ) : (
                 <li
                   key={conv.conversation_id}
-                  onClick={() => navigate(`/chat/${conv.conversation_id}`)}
+                  onClick={() => handleNavigateToConversation(conv)}
                   onMouseEnter={() => setSelectedConversation(conv)}
                   // onMouseLeave={() => setSelectedChat(null)}
-                  className={` cursor-pointer p-1 flex items-center justify-between gap-2`}
+                  className={`side-nav-item mini-item ${id === conv.conversation_id && "active"}`}
                 >
-                  <span className="truncate text-sm"> {conv.conversation_title}</span>
+                  <span className="truncate text-sm">
+                    {conv.conversation_title}
+                  </span>
                   {selectedConversation?.conversation_id ===
                     conv.conversation_id && (
                     <SlOptions

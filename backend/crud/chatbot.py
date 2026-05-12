@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, text
 import pandas as pd
 import io
@@ -157,7 +157,24 @@ def get_file_history(db: Session, user_id: str, conversation_id: str) -> list[Cl
         )
         for f in files
     ]
+    
+def get_conversation_data(db: Session, user_id: str, conversation_id: str):
+    try:
+        conversation = db.execute(
+            select(ConversationModel)
+            .where(
+                ConversationModel.conversation_id == conversation_id,
+                ConversationModel.user_id == user_id
+            )
+        ).scalar()
+    except Exception as e:
+        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
 
+    if conversation is None:
+        raise AppError(status_code=404, detail="Conversation not found")
+
+    return conversation
+        
 
 #functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
 def get_full_conversation(db: Session, user_id: str, conversation_id: str):
@@ -165,6 +182,7 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
         conversation = db.execute(
             select(ConversationModel)
             .where(ConversationModel.conversation_id == conversation_id)
+            # .options(joinedload(ConversationModel.messages))
         ).scalar()
     except Exception as e:
         raise AppError(status_code=500, detail=f"Database error: {str(e)}")

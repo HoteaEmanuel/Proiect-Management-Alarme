@@ -29,7 +29,7 @@ const ChatInput1 = ({ placeholder }) => {
     setMessage,
     isAwaitingResponse,
     setIsAwaiting,
-    conversationId,
+    conversation,
     addMessage,
   } = useChatStore();
   const [files, setFiles] = useState([]);
@@ -50,7 +50,7 @@ const ChatInput1 = ({ placeholder }) => {
     setIsAwaiting(true);
     try {
       addMessage({
-        conversation_id: conversationId,
+        conversation_id: conversation.conversation_id,
         user_id: user._id,
         role: "user",
         has_sql_query: false,
@@ -61,7 +61,7 @@ const ChatInput1 = ({ placeholder }) => {
       const filesPreserveStatus = files.map((item) => item.persist);
       const mesaj = {
         user_id: user.user_id,
-        conversation_id: conversationId,
+        conversation_id: conversation.conversation_id,
         message: message,
         files: filesToSend,
         file_preserve_flags: filesPreserveStatus,
@@ -71,8 +71,8 @@ const ChatInput1 = ({ placeholder }) => {
       formData.append("message", mesaj.message);
       formData.append("new_chat", String(mesaj.new_chat ?? false));
       console.log("PLM");
-      console.log(conversationId);
-      formData.append("conversation_id", conversationId);
+      console.log(conversation.conversation_id);
+      formData.append("conversation_id", conversation.conversation_id);
 
       mesaj.files.forEach((file) => {
         formData.append("files", file);

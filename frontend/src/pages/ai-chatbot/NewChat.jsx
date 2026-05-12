@@ -5,9 +5,11 @@ import ChatInput from "@features/ai/components/ChatInput.jsx";
 
 const NewChat = () => {
   const { user } = useAuthStore();
+
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
   const { mutateAsync: sendMessage, isPending } = useCreateConversation();
+
   const onSubmit = async () => {
     if (isPending) return;
 
@@ -27,7 +29,6 @@ const NewChat = () => {
     mesaj.files.forEach((file) => {
       formData.append("files", file);
     });
-    
 
     mesaj.file_preserve_flags.forEach((persist) => {
       formData.append("file_preserve_flags", String(persist === true));

@@ -4,9 +4,9 @@ from database import get_db
 from sqlalchemy.orm import Session
 from typing import List
 
-from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment, UpdateTitleRequest, CloudinaryFileAttachment
+from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment, UpdateTitleRequest, CloudinaryFileAttachment, ConversationResponse
 from integrations.chatbot import user_chat_request
-from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, get_file_history
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, get_file_history, get_conversation_data
 from auth_utils import get_current_user
 
 router = APIRouter(
@@ -65,7 +65,7 @@ def get_conversations_list(user_id: str = Depends(get_current_user), db: Session
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+ 
 @router.get("/conversations/{conversation_id}", response_model=ConversationHistory)
 def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
@@ -73,7 +73,17 @@ def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_u
         return ConversationHistory(messages=conversation)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+    
+  
+@router.get("/conversations/{conversation_id}/info",response_model=ConversationResponse)  
+def get_conversation_info(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)):  
+    try:
+        print("BUNA DE AICI", conversation_id)
+        conversation= get_conversation_data(db=db, user_id=user_id["id"], conversation_id=conversation_id)
+        return conversation
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=str(e))  
+   
 @router.get("/conversations/{conversation_id}/files", response_model=list[CloudinaryFileAttachment])
 def get_conversation_files(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
     try:

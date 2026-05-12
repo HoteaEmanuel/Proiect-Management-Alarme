@@ -71,7 +71,7 @@ ChatMessage = Annotated[
 
 class ConversationHistory(BaseModel):
     messages: list[ChatMessage]
-
+    
 class ConversationResponse(BaseModel):
     conversation_id: str
     conversation_title: str | None = None

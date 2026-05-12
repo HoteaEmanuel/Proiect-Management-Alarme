@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-
+// hook pentru voice to text
 const useVoiceToText = () => {
   const [transcript, setTranscript] = useState("");
   const [recording, setRecording] = useState(false);

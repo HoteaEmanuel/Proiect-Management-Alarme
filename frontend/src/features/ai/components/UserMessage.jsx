@@ -62,7 +62,7 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
     <div className="flex">
       <div className="flex flex-col items-end gap-2">
         {hasFiles && (
-          <div className="flex flex-wrap gap-2 justify-end">
+          <div className="flex flex-wrap gap-2 p-2 rounded-2xl justify-end">
             {message.files.map((file, i) => (
               <File key={i} file={file} onClick={handleFileClick} />
             ))}

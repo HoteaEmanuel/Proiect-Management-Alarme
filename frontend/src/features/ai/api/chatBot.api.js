@@ -86,6 +86,22 @@ export const useGetUserConversations = () => {
   });
 };
 
+export const useGetConversationBaseData = (chatId) => {
+  const { user } = useAuthStore();
+  return useQuery({
+    queryFn: async () => {
+      const response = await api.get(
+        `${VITE_URL_APP}/api/conversations/${chatId}/info`,
+      );
+      console.log("CADOUL PRIMIT");
+      console.log(response.data);
+      return response.data;
+    },
+    // enabled:!!chatId
+    queryKey: ["conversation", chatId],
+  });
+};
+
 export const useGetConversation = (chatId) => {
   const { user } = useAuthStore();
   return useQuery({
@@ -141,3 +157,21 @@ export const useDeleteConversation = (conversationId) => {
     },
   });
 };
+
+// export const useReadResponse=()=>{
+//   return useMutation({
+//     mutationFn:async()=>{
+//       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/VOICE_ID", {
+//   method: "POST",
+//   headers: {
+//     "xi-api-key": პროცეს.env.ELEVENLABS_API_KEY,
+//     "Content-Type": "application/json",
+//   },
+//   body: JSON.stringify({
+//     text: "Hello, this sounds very human.",
+//     model_id: "eleven_multilingual_v2",
+//   }),
+// });
+//     }
+//   })
+// }

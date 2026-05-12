@@ -6,6 +6,8 @@ const useChatStore = create((set) => ({
   isAwaitingResponse:false,
   conversationId: "",
 
+  conversation:null,
+
   setMessage: (message) => set({ message }),
 
   addMessage: (message) =>
@@ -17,6 +19,8 @@ const useChatStore = create((set) => ({
   setIsAwaiting:(state)=>set({isAwaitingResponse:state}),
   
   setConversationId: (conversationId) => set({ conversationId }),
+
+  setConversation:(conversation)=>set({conversation}),
 
   clearMessage: () => set({ message: "" }),
 }));

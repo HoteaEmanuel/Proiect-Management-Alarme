@@ -44,11 +44,21 @@
   text-align: left;
   cursor: pointer;
 }
+
+.mini-item{
+  font-weight:normal;
+  font-size: medium;
+  justify-content: space-between;
+}
+
 .side-nav-item.active {
   background-color: var(--color-surface-muted);
   color: var(--color-text);
   font-weight: var(--fw-semibold);
   opacity: 1;
+}
+.mini-item.active{
+  font-weight: 400;
 }
 .side-nav-item:hover {
   background-color: var(--color-surface-muted);

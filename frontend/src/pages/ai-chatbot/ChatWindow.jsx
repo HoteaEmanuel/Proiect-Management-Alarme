@@ -1,299 +1,299 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
-import { useParams } from "react-router-dom";
-import ChatInput from "@features/ai/components/ChatInput.jsx";
-import {
-  FaArrowAltCircleDown,
-  FaArrowCircleDown,
-  FaArrowDown,
-  FaCheck,
-} from "react-icons/fa";
-import { MdContentCopy } from "react-icons/md";
+// import React, { useRef, useEffect, useState, useCallback } from "react";
+// import { useGetConversation } from "../../features/ai/api/chatBot.api.js";
+// import { useParams } from "react-router-dom";
+// import ChatInput from "@features/ai/components/ChatInput.jsx";
+// import {
+//   FaArrowAltCircleDown,
+//   FaArrowCircleDown,
+//   FaArrowDown,
+//   FaCheck,
+// } from "react-icons/fa";
+// import { MdContentCopy } from "react-icons/md";
 
-import Loading from "../../features/ai/components/Loading.jsx";
-import { api } from "../../lib/axios.js";
-import Loading1 from "../../features/ai/components/Loading1.jsx";
-import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
-import { RiLoader2Fill } from "react-icons/ri";
-import UserMessage from "@features/ai/components/UserMessage.jsx";
-import FilePreview from "@features/ai/components/FilePreview.jsx";
-import Button from "@components/Button.jsx";
-import { toast } from "sonner";
-import useVoiceToText from "@features/ai/hooks/useVoiceToText.js";
-import useAuthStore from "@store/authStore.js";
+// import Loading from "../../features/ai/components/Loading.jsx";
+// import { api } from "../../lib/axios.js";
+// import Loading1 from "../../features/ai/components/Loading1.jsx";
+// import ChatResponse from "../../features/ai/components/ChatResponse.jsx";
+// import { RiLoader2Fill } from "react-icons/ri";
+// import UserMessage from "@features/ai/components/UserMessage.jsx";
+// import FilePreview from "@features/ai/components/FilePreview.jsx";
+// import Button from "@components/Button.jsx";
+// import { toast } from "sonner";
+// import useVoiceToText from "@features/ai/hooks/useVoiceToText.js";
+// import useAuthStore from "@store/authStore.js";
 
-const VITE_URL_APP = import.meta.env.VITE_API_URL;
+// const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
-const ChatWindow = () => {
-  const { id } = useParams();
-  const { user } = useAuthStore();
-  console.log(id);
-  const { data, isPending, isFetching } = useGetConversation(id);
-  const [copied, setCopied] = useState(false);
-  const [messages, setMessages] = useState([]);
+// const ChatWindow = () => {
+//   const { id } = useParams();
+//   const { user } = useAuthStore();
+//   console.log(id);
+//   const { data, isPending, isFetching } = useGetConversation(id);
+//   const [copied, setCopied] = useState(false);
+//   const [messages, setMessages] = useState([]);
 
-  const [previewFile, setPreviewFile] = useState(null);
-  const [files, setFiles] = useState([]);
-  const isInitialLoad = useRef(true);
-  const [showCopy, setShowCopy] = useState(null);
+//   const [previewFile, setPreviewFile] = useState(null);
+//   const [files, setFiles] = useState([]);
+//   const isInitialLoad = useRef(true);
+//   const [showCopy, setShowCopy] = useState(null);
 
-  const [isTyping, setIsTyping] = useState(false);
-  // const message = useRef();
-  const [message, setMessage] = useState("");
-  const { recording, start, stop, clear, transcript, isSpeaking } = useVoiceToText();
-  // const [hasContent, setHasContent] = useState(false);
-  // const conversationRef = useRef(null);
+//   const [isTyping, setIsTyping] = useState(false);
+//   // const message = useRef();
+//   const [message, setMessage] = useState("");
+//   const { recording, start, stop, clear, transcript, isSpeaking } = useVoiceToText();
+//   // const [hasContent, setHasContent] = useState(false);
+//   // const conversationRef = useRef(null);
 
-  const conversationRef = useCallback((el) => {
-    if (!el) return;
+//   const conversationRef = useCallback((el) => {
+//     if (!el) return;
 
-    const handleScroll = () => {
-      const distanceFromBottom =
-        el.scrollHeight - el.scrollTop - el.clientHeight;
-      setShowScrollBtn(distanceFromBottom > 500);
-    };
+//     const handleScroll = () => {
+//       const distanceFromBottom =
+//         el.scrollHeight - el.scrollTop - el.clientHeight;
+//       setShowScrollBtn(distanceFromBottom > 500);
+//     };
 
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
-  }, []);
-  const chatEnd = useRef(null);
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
+//     el.addEventListener("scroll", handleScroll);
+//     return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
+//   }, []);
+//   const chatEnd = useRef(null);
+//   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
-  const handleScrollDown = () => {
-    chatEnd?.current.scrollIntoView({ behavior: "smooth" });
-  };
-  useEffect(() => {
-    if (transcript) {
-      setMessage(transcript); // populezi inputul
-      clear();
-    }
-  }, [recording, clear, transcript]);
-  useEffect(() => {
-    isInitialLoad.current = true;
-  }, [id]); // Resetare ref la fiecare intrarea pe un chat
+//   const handleScrollDown = () => {
+//     chatEnd?.current.scrollIntoView({ behavior: "smooth" });
+//   };
+//   useEffect(() => {
+//     if (transcript) {
+//       setMessage(transcript); // populezi inputul
+//       clear();
+//     }
+//   }, [recording, clear, transcript]);
+//   useEffect(() => {
+//     isInitialLoad.current = true;
+//   }, [id]); // Resetare ref la fiecare intrarea pe un chat
 
-  // La deschiderea chat ului va da automat scroll la finalul conversatiei
-  useEffect(() => {
-    if (isFetching) return;
-    if (!messages?.length) return;
-    if (isFetching) return;
-    if (!isInitialLoad.current) return;
+//   // La deschiderea chat ului va da automat scroll la finalul conversatiei
+//   useEffect(() => {
+//     if (isFetching) return;
+//     if (!messages?.length) return;
+//     if (isFetching) return;
+//     if (!isInitialLoad.current) return;
 
-    chatEnd.current?.scrollIntoView({ behavior: "smooth" });
-    isInitialLoad.current = false;
-  }, [messages, isFetching]);
+//     chatEnd.current?.scrollIntoView({ behavior: "smooth" });
+//     isInitialLoad.current = false;
+//   }, [messages, isFetching]);
 
-  useEffect(() => {
-    setMessages(data?.messages);
-  }, [setMessages, data]);
+//   useEffect(() => {
+//     setMessages(data?.messages);
+//   }, [setMessages, data]);
 
-  // Functie care adauga adauga event de scroll astfel incat sa apara posibilitatea de scroll
-  // to chat end daca se merge in istoricul conversatiei
-  useEffect(() => {
-    const el = conversationRef.current;
-    if (!el) return;
-    console.log(el);
-    const handleScroll = () => {
-      const distanceFromBottom =
-        el.scrollHeight - el.scrollTop - el.clientHeight;
-      console.log("DISTANCE", distanceFromBottom);
-      setShowScrollBtn(distanceFromBottom > 500);
-    };
+//   // Functie care adauga adauga event de scroll astfel incat sa apara posibilitatea de scroll
+//   // to chat end daca se merge in istoricul conversatiei
+//   useEffect(() => {
+//     const el = conversationRef.current;
+//     if (!el) return;
+//     console.log(el);
+//     const handleScroll = () => {
+//       const distanceFromBottom =
+//         el.scrollHeight - el.scrollTop - el.clientHeight;
+//       console.log("DISTANCE", distanceFromBottom);
+//       setShowScrollBtn(distanceFromBottom > 500);
+//     };
 
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [conversationRef]);
+//     el.addEventListener("scroll", handleScroll);
+//     return () => el.removeEventListener("scroll", handleScroll);
+//   }, [conversationRef]);
 
-  // Functie care copiaza contentul unui mesaj in clipboard
-  const handleCopy = async (message) => {
-    try {
-      let content = "";
-      if (message?.content) content = message?.content;
-      else {
-        message?.blocks.forEach((block) => {
-          if (block.type === "text") content += block.content;
-        });
-      }
-      await navigator.clipboard.writeText(content);
-      setCopied(true);
-      // Feedback copiere
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
+//   // Functie care copiaza contentul unui mesaj in clipboard
+//   const handleCopy = async (message) => {
+//     try {
+//       let content = "";
+//       if (message?.content) content = message?.content;
+//       else {
+//         message?.blocks.forEach((block) => {
+//           if (block.type === "text") content += block.content;
+//         });
+//       }
+//       await navigator.clipboard.writeText(content);
+//       setCopied(true);
+//       // Feedback copiere
+//       setTimeout(() => {
+//         setCopied(false);
+//       }, 2000);
+//     } catch (err) {
+//       console.error("Failed to copy:", err);
+//     }
+//   };
 
-  // const { mutateAsync: sendMessage, isPending: isPendingAIResponse } =
-  //   useSendMessage({ id });
-  if (isPending)
-    return (
-      <>
-        <RiLoader2Fill className="size-4 mx-auto animate-spin" />
-      </>
-    );
+//   // const { mutateAsync: sendMessage, isPending: isPendingAIResponse } =
+//   //   useSendMessage({ id });
+//   if (isPending)
+//     return (
+//       <>
+//         <RiLoader2Fill className="size-4 mx-auto animate-spin" />
+//       </>
+//     );
 
-  const handleSubmit = async () => {
-    if (isTyping) return;
-    setIsTyping(true);
-    try {
-      setMessages((prev) => [
-        ...prev,
-        {
-          conversation_id: id,
-          user_id: user._id,
-          role: "user",
-          has_sql_query: false,
-          content: message,
-          files: files,
-        },
-      ]);
-      const filesToSend = files.map((item) => item.file);
-      const filesPreserveStatus = files.map((item) => item.persist);
-      const mesaj = {
-        user_id: user.user_id,
-        conversation_id: id,
-        message: message,
-        files: filesToSend,
-        file_preserve_flags: filesPreserveStatus,
-      };
+//   const handleSubmit = async () => {
+//     if (isTyping) return;
+//     setIsTyping(true);
+//     try {
+//       setMessages((prev) => [
+//         ...prev,
+//         {
+//           conversation_id: id,
+//           user_id: user._id,
+//           role: "user",
+//           has_sql_query: false,
+//           content: message,
+//           files: files,
+//         },
+//       ]);
+//       const filesToSend = files.map((item) => item.file);
+//       const filesPreserveStatus = files.map((item) => item.persist);
+//       const mesaj = {
+//         user_id: user.user_id,
+//         conversation_id: id,
+//         message: message,
+//         files: filesToSend,
+//         file_preserve_flags: filesPreserveStatus,
+//       };
 
-      const formData = new FormData();
-      formData.append("message", mesaj.message);
-      formData.append("new_chat", String(mesaj.new_chat ?? false));
-      console.log("PLM");
-      console.log(id);
-      formData.append("conversation_id", id);
+//       const formData = new FormData();
+//       formData.append("message", mesaj.message);
+//       formData.append("new_chat", String(mesaj.new_chat ?? false));
+//       console.log("PLM");
+//       console.log(id);
+//       formData.append("conversation_id", id);
 
-      mesaj.files.forEach((file) => {
-        formData.append("files", file);
-      });
+//       mesaj.files.forEach((file) => {
+//         formData.append("files", file);
+//       });
 
-      mesaj.file_preserve_flags.forEach((persist) => {
-        formData.append("file_preserve_flags", String(persist === true));
-      });
+//       mesaj.file_preserve_flags.forEach((persist) => {
+//         formData.append("file_preserve_flags", String(persist === true));
+//       });
 
-      setMessage("");
+//       setMessage("");
 
-      setFiles([]);
-      handleScrollDown();
-      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
-        headers: {
-          "Content-Type": "multipart/formdata",
-        },
-      });
+//       setFiles([]);
+//       handleScrollDown();
+//       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
+//         headers: {
+//           "Content-Type": "multipart/formdata",
+//         },
+//       });
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", blocks: response.data.blocks },
-      ]);
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setIsTyping(false);
-    }
-  };
+//       setMessages((prev) => [
+//         ...prev,
+//         { role: "assistant", blocks: response.data.blocks },
+//       ]);
+//     } catch (e) {
+//       toast.error(e.message);
+//     } finally {
+//       setIsTyping(false);
+//     }
+//   };
 
-  console.log(messages);
-  return (
-    <div
-      className="w-full h-full overflow-y-auto overflow-x-hidden"
-      ref={conversationRef}
-    >
-      <section className="w-full px-5 pb-30 flex justify-center">
-        <ol className="flex flex-col gap-4 w-2/3 p-2">
-          {messages?.length > 0 &&
-            messages.map((message, index) => (
-              <li
-                key={index}
-                className={` w-full flex  ${message.role === "assistant" ? "justify-start" : "justify-end"} p-2`}
-                onMouseLeave={() => setShowCopy(undefined)}
-              >
-                <div
-                  className={`${
-                    message.role === "assistant"
-                      ? "text-left p-2 rounded-2xl min-w-0 overflow-hidden"
-                      : "max-w-[75%]"
-                  }`}
-                  onMouseEnter={() => setShowCopy(index)}
-                >
-                  {message.role === "user" ? (
-                    <UserMessage
-                      message={message}
-                      onFileClick={setPreviewFile}
-                      previewFile={previewFile}
-                    />
-                  ) : (
-                    <ChatResponse blocks={message?.blocks} />
-                  )}
-                </div>
-                <div className="relative">
-                  <div className="absolute w-full bottom-0 left-1">
-                    {showCopy === index && !copied && (
-                      <button
-                        className="cursor-pointer hover:scale-125"
-                        onClick={() => handleCopy(message)}
-                      >
-                        <MdContentCopy className="size-3 text-gray-500" />
-                      </button>
-                    )}
+//   console.log(messages);
+//   return (
+//     <div
+//       className="w-full h-full overflow-y-auto overflow-x-hidden"
+//       ref={conversationRef}
+//     >
+//       <section className="w-full px-5 pb-30 flex justify-center">
+//         <ol className="flex flex-col gap-4 w-2/3 p-2">
+//           {messages?.length > 0 &&
+//             messages.map((message, index) => (
+//               <li
+//                 key={index}
+//                 className={` w-full flex  ${message.role === "assistant" ? "justify-start" : "justify-end"} p-2`}
+//                 onMouseLeave={() => setShowCopy(undefined)}
+//               >
+//                 <div
+//                   className={`${
+//                     message.role === "assistant"
+//                       ? "text-left p-2 rounded-2xl min-w-0 overflow-hidden"
+//                       : "max-w-[75%]"
+//                   }`}
+//                   onMouseEnter={() => setShowCopy(index)}
+//                 >
+//                   {message.role === "user" ? (
+//                     <UserMessage
+//                       message={message}
+//                       onFileClick={setPreviewFile}
+//                       previewFile={previewFile}
+//                     />
+//                   ) : (
+//                     <ChatResponse blocks={message?.blocks} />
+//                   )}
+//                 </div>
+//                 <div className="relative">
+//                   <div className="absolute w-full bottom-0 left-1">
+//                     {showCopy === index && !copied && (
+//                       <button
+//                         className="cursor-pointer hover:scale-125"
+//                         onClick={() => handleCopy(message)}
+//                       >
+//                         <MdContentCopy className="size-3 text-gray-500" />
+//                       </button>
+//                     )}
 
-                    {showCopy === index && copied && (
-                      <FaCheck className="size-3" />
-                    )}
-                  </div>
-                </div>
-              </li>
-            ))}
-          <div ref={chatEnd} />
-        </ol>
+//                     {showCopy === index && copied && (
+//                       <FaCheck className="size-3" />
+//                     )}
+//                   </div>
+//                 </div>
+//               </li>
+//             ))}
+//           <div ref={chatEnd} />
+//         </ol>
 
-        {previewFile && (
-          <FilePreview
-            file={previewFile}
-            onClose={() => setPreviewFile(null)}
-          />
-        )}
-      </section>
+//         {previewFile && (
+//           <FilePreview
+//             file={previewFile}
+//             onClose={() => setPreviewFile(null)}
+//           />
+//         )}
+//       </section>
 
-      <div className="absolute flex flex-col bottom-0 right-5 w-4/5  z-10 items-center justify-center gap-4">
-        {isTyping && (
-          <div className="w-full flex justify-center mb-5 h-full ">
-            <Button
-              className="w-14 z-100 rounded-2xl p-2 cursor-pointer culor-inherit  glassy-container glassy-container-darker"
-              onClick={handleScrollDown}
-            >
-              <Loading />
-            </Button>
-          </div>
-        )}
-        {showScrollBtn && !isTyping && (
-          <Button
-            onClick={handleScrollDown}
-            className="scroll-btn glassy-container"
-          >
-            <FaArrowDown className="size-3" />{" "}
-          </Button>
-        )}
-        <div className="w-2/3 flex justify-center bg-[#0b1220] p-4 pt-0">
-          <ChatInput
-            onSubmit={handleSubmit}
-            message={message}
-            files={files}
-            setFiles={setFiles}
-            loading={isTyping}
-            placeholder={"Ask anything"}
-            setMessage={setMessage}
-            startRecording={start}
-            stopRecording={stop}
-            recording={recording}
-            isSpeaking={isSpeaking}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
+//       <div className="absolute flex flex-col bottom-0 right-5 w-4/5  z-10 items-center justify-center gap-4">
+//         {isTyping && (
+//           <div className="w-full flex justify-center mb-5 h-full ">
+//             <Button
+//               className="w-14 z-100 rounded-2xl p-2 cursor-pointer culor-inherit  glassy-container glassy-container-darker"
+//               onClick={handleScrollDown}
+//             >
+//               <Loading />
+//             </Button>
+//           </div>
+//         )}
+//         {showScrollBtn && !isTyping && (
+//           <Button
+//             onClick={handleScrollDown}
+//             className="scroll-btn glassy-container"
+//           >
+//             <FaArrowDown className="size-3" />{" "}
+//           </Button>
+//         )}
+//         <div className="w-2/3 flex justify-center bg-[#0b1220] p-4 pt-0">
+//           <ChatInput
+//             onSubmit={handleSubmit}
+//             message={message}
+//             files={files}
+//             setFiles={setFiles}
+//             loading={isTyping}
+//             placeholder={"Ask anything"}
+//             setMessage={setMessage}
+//             startRecording={start}
+//             stopRecording={stop}
+//             recording={recording}
+//             isSpeaking={isSpeaking}
+//           />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
-export default ChatWindow;
+// export default ChatWindow;

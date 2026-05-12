@@ -1,0 +1,15 @@
+.chat-header {
+  width: 100%;
+  min-height: 3.25rem;
+  border:none;
+  /* border-bottom: 1px solid var(--color-border); */
+  background-color: var(--color-bg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.45rem 1.25rem;
+  margin-left: auto;
+}
