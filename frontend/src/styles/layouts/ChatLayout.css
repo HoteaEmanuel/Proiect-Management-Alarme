@@ -1,35 +1,29 @@
 .chat-layout {
+  width: 100vw;
+  height: 100vh;
 
-    width: 100vw;
-    height: 100vh;
+  display: flex;
 
-    display: flex;
-
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    overflow: hidden;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 .chat-layout-body {
-
-    width: 100%;
-    flex: 1;
-    display: flex;
-    min-height: 0;
-    justify-content: center;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  justify-content: center;
 }
 
 .chat-layout-content {
-
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    align-items: center;
-
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-        
-        display: none;
-    }
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  align-items: center;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

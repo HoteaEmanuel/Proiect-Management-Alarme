@@ -97,7 +97,7 @@ export const useGetConversationBaseData = (chatId) => {
       console.log(response.data);
       return response.data;
     },
-    // enabled:!!chatId
+    enabled: !!chatId,
     queryKey: ["conversation", chatId],
   });
 };
@@ -155,6 +155,22 @@ export const useDeleteConversation = (conversationId) => {
       toast.success("Conversation was deleted");
       navigate("/chat/new");
     },
+  });
+};
+
+export const useGetConversationFiles = (conversationId) => {
+  return useQuery({
+    queryFn: async () => {
+      try {
+        const response = await api.get(
+          `${VITE_URL_APP}/api/conversations/${conversationId}/files`,
+        );
+        return response.data;
+      } catch (error) {
+        toast.error(error?.message || "Could not get the attached files");
+      }
+    },
+    queryKey: ["conversationFiles", conversationId],
   });
 };
 

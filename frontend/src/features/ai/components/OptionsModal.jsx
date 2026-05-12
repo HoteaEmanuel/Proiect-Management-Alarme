@@ -2,6 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { MdEdit } from "react-icons/md";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { useDeleteConversation } from "../api/chatBot.api";
+import { GiFiles } from "react-icons/gi";
+import Button from "@components/Button";
+
+const VITE_URL_APP = import.meta.env.VITE_API_URL;
 const OptionsModal = ({
   clear,
   showOptions,
@@ -9,6 +13,8 @@ const OptionsModal = ({
   position,
   setEditingId,
   setEditingValue,
+  fullOptions = false,
+  setShowFilesModal
 }) => {
   const { mutateAsync: deleteConversation } = useDeleteConversation(
     conversation.conversation_id,
@@ -17,7 +23,9 @@ const OptionsModal = ({
   console.log(conversation);
   console.log("POSITION");
   console.log(position);
+
   const modalRef = useRef(null);
+   
   // Adaug event de mouse down, cand se da click inafara containerului de optiuni
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -30,6 +38,7 @@ const OptionsModal = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [clear, showOptions]);
+
   return (
     <div
       ref={modalRef}
@@ -46,11 +55,11 @@ const OptionsModal = ({
         showOptions(false);
         clear(null);
       }}
-      style={{ position:"fixed", top: position ? position.top : 10, right:0  }}
+      style={{ position: "fixed", top: position?.top || 10, right: 0 }}
     >
       <ul className="flex flex-col">
-        <li>
-          <button
+        <li key={crypto.randomUUID()}>
+          <Button
             className="w-full flex items-center gap-3 p-2
                              text-sm hover:bg-white/10 cursor-pointer
                             "
@@ -62,11 +71,11 @@ const OptionsModal = ({
           >
             <MdEdit className="size-4" />
             Rename
-          </button>
+          </Button>
         </li>
 
-        <li className="border-t border-white/5">
-          <button
+        <li className="border-t border-white/5" key={crypto.randomUUID()}>
+          <Button
             className="w-full flex items-center gap-3 p-2
                              text-sm text-red-400
                              hover:bg-red-500/10
@@ -75,9 +84,25 @@ const OptionsModal = ({
           >
             <RiDeleteBin5Fill />
             Delete
-          </button>
+          </Button>
         </li>
+
+        {fullOptions && (
+          <li key={crypto.randomUUID()}>
+            <Button
+              className="w-full flex items-center gap-3 p-2
+                             text-sm hover:bg-white/10 cursor-pointer"
+
+                             onClick={()=>setShowFilesModal(true)}
+            >
+              <GiFiles className="size-5" />
+              Files attached
+            </Button>
+          </li>
+        )}
       </ul>
+
+     
     </div>
   );
 };

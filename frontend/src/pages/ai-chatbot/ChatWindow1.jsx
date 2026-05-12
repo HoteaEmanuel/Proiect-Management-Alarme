@@ -12,6 +12,7 @@ import FilePreview from "@features/ai/components/FilePreview.jsx";
 import Button from "@components/Button.jsx";
 import useChatStore from "@store/chatStore.js";
 import ChatInput1 from "@features/ai/components/ChatInput1.jsx";
+import ChatHeader from "@features/ai/components/ChatHeader.jsx";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -90,12 +91,17 @@ const ChatWindow1 = () => {
         <RiLoader2Fill className="size-6 mx-auto animate-spin" />
       </>
     );
+
+    console.log("MESSAGES");
+    console.log(messages);
   return (
     <div
       className="w-full h-full overflow-y-auto overflow-x-hidden"
       ref={conversationRef}
     >
-      <section className="w-full px-7 pb-30 flex justify-center">
+
+      <ChatHeader />
+      <section className="w-full px-7 pb-30 flex justify-center mt-20">
         <ol className="flex flex-col gap-4 w-2/3 p-2">
           {messages?.length > 0 &&
             messages.map((message, index) => (
@@ -122,6 +128,9 @@ const ChatWindow1 = () => {
                   ) : (
                     <ChatResponse
                       blocks={message?.blocks}
+                      file={message?.file}
+                      previewFile={previewFile}
+                      onFileClick={setPreviewFile}
                       showOptions={showCopy === index}
                     />
                   )}
@@ -158,7 +167,7 @@ const ChatWindow1 = () => {
             <FaArrowDown className="size-3" />{" "}
           </Button>
         )}
-        <div className="w-2/3 flex justify-center bg-[#0b1220] p-4 pt-0">
+        <div className="w-2/3 flex justify-center bg-[#0b1220] pb-4">
           <ChatInput1 placeholder={"Ask anything"} />
         </div>
       </div>

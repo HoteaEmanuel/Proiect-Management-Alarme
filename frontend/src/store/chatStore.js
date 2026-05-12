@@ -5,7 +5,7 @@ const useChatStore = create((set) => ({
   messages: [],
   isAwaitingResponse:false,
   conversationId: "",
-
+  showFiles:false,
   conversation:null,
 
   setMessage: (message) => set({ message }),
@@ -23,6 +23,9 @@ const useChatStore = create((set) => ({
   setConversation:(conversation)=>set({conversation}),
 
   clearMessage: () => set({ message: "" }),
+
+
+  setShowFiles:(state)=>set({showFiles:state})
 }));
 
 export default useChatStore;

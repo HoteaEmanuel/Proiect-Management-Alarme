@@ -11,7 +11,7 @@ const Chatlayout = () => {
       <div className="chat-layout-body">
         <Side />
         <section className="chat-layout-content">
-          <ChatHeader />
+          {/* <ChatHeader /> */}
           <Outlet />
         </section>
       </div>

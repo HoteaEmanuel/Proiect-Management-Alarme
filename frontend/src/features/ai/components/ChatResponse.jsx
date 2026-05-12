@@ -29,6 +29,7 @@ import { MdContentCopy } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
 import { toast } from "sonner";
 import removeMarkdown from "remove-markdown";
+import File from "./File";
 
 const COLORS = [
   "#6366f1",
@@ -195,9 +196,17 @@ const Chart = ({ content }) => {
   );
 };
 
-const ChatResponse = ({ blocks, showOptions }) => {
+const ChatResponse = ({
+  blocks,
+  showOptions,
+  onFileClick,
+  previewFile,
+  file = null,
+}) => {
   console.log("BLOCKS");
   console.log(blocks);
+  console.log("FILE HE");
+  console.log(file);
   const [copied, setCopied] = useState(false);
   const { speaking, speak, stop } = useSpeechSynthesis();
 
@@ -206,6 +215,11 @@ const ChatResponse = ({ blocks, showOptions }) => {
 
   console.log("COPIED");
   console.log(copied);
+
+  const handleFileClick = (file) => {
+    if (previewFile) onFileClick(null);
+    else onFileClick(file);
+  };
 
   const handleCopy = async (message) => {
     try {
@@ -222,6 +236,7 @@ const ChatResponse = ({ blocks, showOptions }) => {
   };
   return (
     <div className="min-w-0 w-full">
+      {file && <File file={file} onClick={handleFileClick} />}
       {blocks.map((block, index) => (
         <div key={index} className="">
           {block.type === "chart" ? (

@@ -226,7 +226,7 @@ const ChatInput1 = ({ placeholder }) => {
   };
 
   return (
-    <div className="w-full flex flex-col rounded-md border border-gray-800 bg-background gap-2 px-3 pt-3 pb-2">
+    <div className="w-full flex flex-col rounded-md border border-gray-800 bg-background gap-2  px-3 pt-3 pb-2">
       {files?.length > 0 && (
         <FileList
           files={files}

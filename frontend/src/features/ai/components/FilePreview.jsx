@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import XlsxPreview from "./XlsxPreview";
 
 const FilePreview = ({ file, onClose, ...props }) => {
@@ -6,16 +7,16 @@ const FilePreview = ({ file, onClose, ...props }) => {
   const fileItem = file?.file;
   console.log(file);
   const type = fileItem?.type || file.file_format;
+  console.log("FILE TYPE", type);
 
-
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
       onClick={onClose}
       {...props}
     >
       <div
-        className="max-w-6xl h-[90vh] w-full"
+        className="max-w-6xl h-[90vh] w-full overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {type.includes("image") && (
@@ -49,7 +50,8 @@ const FilePreview = ({ file, onClose, ...props }) => {
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
