@@ -1,0 +1,152 @@
+.chat-skeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+}
+
+.bubble-row {
+  display: flex;
+  width: 100%;
+}
+
+.bubble-row.left {
+  justify-content: flex-start;
+}
+
+.bubble-row.right {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  padding: 1rem 1.25rem;
+  width: min(var(--bubble-width), 80%);
+  min-width: 140px;
+}
+
+.user-bubble {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgb(17 24 39);
+}
+
+.message-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.skeleton-line {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shimmer {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 60%,
+    transparent 100%
+  );
+  animation: shimmer 2.2s infinite;
+}
+
+.typing-bubble {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgb(31 41 55);
+  border-radius: 1.25rem;
+  padding: 1rem 1.25rem;
+  width: fit-content;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  animation: blink 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .message-bubble {
+    width: min(var(--bubble-width), 88%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .chat-skeleton {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .message-bubble {
+    width: 90%;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+  }
+
+  .typing-bubble {
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+  }
+
+  .message-lines {
+    gap: 0.65rem;
+  }
+
+  .skeleton-line {
+    height: 8px;
+  }
+
+  .typing-dot {
+    width: 7px;
+    height: 7px;
+  }
+}

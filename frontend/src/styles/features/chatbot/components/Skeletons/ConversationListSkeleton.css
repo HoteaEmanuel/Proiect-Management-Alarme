@@ -1,0 +1,68 @@
+.conversation-skeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap:1rem;
+  padding: 16px;
+}
+
+.conversation-skeleton__inner {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+/* IMPORTANT FIX */
+.skel {
+  height: 10px;
+  border-radius: 999px;
+  background: rgb(31 41 55);
+  position: relative;
+
+  /* 🔥 CRITICAL SAFETY */
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* sizes */
+.skel.lg { height: 12px; }
+.skel.md { height: 10px; }
+.skel.sm { height: 8px; }
+
+/* width variants */
+.w-100 { width: 100%; }
+.w-85  { width: 85%; }
+.w-75  { width: 75%; }
+.w-60  { width: 60%; }
+.w-45  { width: 45%; }
+.w-30  { width: 30%; }
+
+/* shimmer */
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 55%,
+    transparent 100%
+  );
+  animation: shimmer 1.8s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

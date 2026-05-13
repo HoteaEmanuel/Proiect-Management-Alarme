@@ -14,8 +14,7 @@ import Settings from "./pages/Settings.jsx";
 import Chatlayout from "./layouts/Chatlayout.jsx";
 import NewChat from "./pages/ai-chatbot/NewChat.jsx";
 import Chats from "./pages/ai-chatbot/Chats.jsx";
-import { Toaster } from "sonner";
-import ChatWindow1 from "./pages/ai-chatbot/ChatWindow1";
+import ChatWindow from "./pages/ai-chatbot/ChatWindow";
 function App() {
   useCheckAuth();
   return (
@@ -33,7 +32,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route element={<Chatlayout />}>
-          <Route path="/chat/:id" element={<ChatWindow1 />}  />
+          <Route path="/chat/:id" element={<ChatWindow/>}  />
           <Route path="/chat/new" element={<NewChat />} />
           <Route path="/chats" element={<Chats />} />
         </Route>

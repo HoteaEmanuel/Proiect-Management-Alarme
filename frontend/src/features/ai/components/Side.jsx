@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Suspense, useState, useTransition } from "react";
 import { MdDashboard } from "react-icons/md";
 import { IoIosStats } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
@@ -24,18 +24,14 @@ import OptionsModal from "./OptionsModal";
 import Input from "@components/Input";
 import { BsCloudFogFill } from "react-icons/bs";
 import useChatStore from "@store/chatStore";
+import ChatSkeleton from "./Skeletons/ChatSkeleton";
+import ConversationSideList from "./ConversationSideList";
+import ConversationListSkeleton from "./Skeletons/ConversationListSkeleton";
 const Side = () => {
   const { pathname } = useLocation();
   const { id } = useParams();
   console.log("ID CONV");
   console.log(id);
-  const {
-    data: conversations,
-    isLoading,
-    isPending,
-  } = useGetUserConversations();
-
-  const { setConversation } = useChatStore();
 
   const { mutateAsync: renameConversation } = useRenameConversation();
 
@@ -45,8 +41,6 @@ const Side = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [position, setPosition] = useState({ top: 0 }); // folosit pentru positionarea modalului de optiuni
   const navigate = useNavigate();
-
-  if (isLoading || isPending) return <p>Loading...</p>; //! Implement loading skeletons
   const handleRename = async (e) => {
     if (e.key === "Enter") {
       await renameConversation({
@@ -68,9 +62,11 @@ const Side = () => {
   const handleNavigateToConversation = (conversation) => {
     console.log("NAVIGATIN");
     console.log(conversation);
-    // setConversation(conversation);
     return navigate(`/chat/${conversation.conversation_id}`);
   };
+
+  // if (isLoading || isPending) return <p>Loading...</p>; //! Implement loading skeletons
+
   return (
     <aside className="side">
       <NavLink
@@ -104,53 +100,9 @@ const Side = () => {
 
         <hr />
         <h1 className="text-sm opacity-50">Recents</h1>
-        {conversations?.length === 0 && <h1>No chats yet!</h1>}
-        {conversations?.length > 0 && (
-          <ul className="overflow-y-auto flex-1 flex flex-col gap-2 text-xs">
-            {conversations.map((conv) =>
-              editingId === conv.conversation_id ? (
-                <li
-                  key={conv.conversation_id}
-                  className={`side-nav-item  mini-item ${id === conv.conversation_id && "active"}`}
-                >
-                  <Input
-                    autoFocus
-                    handleChange={(e) => setEditValue(e.target.value)}
-                    handleKeyDown={(e) => handleRename(e)}
-                    handleBlur={() => handleBlur()}
-                    maxSize={50}
-                    defaultValue={editValue}
-                    style={{ padding: 2, fontSize: 12 }}
-                  />
-                </li>
-              ) : (
-                <li
-                  key={conv.conversation_id}
-                  onClick={() => handleNavigateToConversation(conv)}
-                  onMouseEnter={() => setSelectedConversation(conv)}
-                  // onMouseLeave={() => setSelectedChat(null)}
-                  className={`side-nav-item mini-item ${id === conv.conversation_id && "active"}`}
-                >
-                  <span className="truncate text-sm">
-                    {conv.conversation_title}
-                  </span>
-                  {selectedConversation?.conversation_id ===
-                    conv.conversation_id && (
-                    <SlOptions
-                      className="size-3 hover:bg-black/50 hover:scale-120 p-0.5 rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowOptions(true);
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setPosition({ top: rect.top });
-                      }}
-                    />
-                  )}
-                </li>
-              ),
-            )}
-          </ul>
-        )}
+        <Suspense fallback={<ConversationListSkeleton />}>
+          <ConversationSideList />
+        </Suspense>
 
         {showOptions && (
           <OptionsModal

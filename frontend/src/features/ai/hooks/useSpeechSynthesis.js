@@ -15,7 +15,7 @@ const useSpeechSynthesis = () => {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
-
+      
       const response = await fetch(
         "https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB",
         {

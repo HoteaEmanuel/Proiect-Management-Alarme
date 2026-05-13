@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { api } from "@lib/axios.js";
 import useAuthStore from "@store/authStore.js";
 import { toast } from "sonner";
@@ -75,11 +80,13 @@ export const useSendMessage = ({ id }) => {
 };
 export const useGetUserConversations = () => {
   const { user } = useAuthStore();
-  return useQuery({
+  return useSuspenseQuery({
     queryFn: async () => {
       const response = await api.get(`${VITE_URL_APP}/api/conversations`);
       console.log("API CHATS");
       console.log(response);
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(1000);
       return response.data.conversations;
     },
     queryKey: ["conversations", user.user_id],
@@ -109,27 +116,32 @@ export const useGetConversation = (chatId) => {
       const response = await api.get(
         `${VITE_URL_APP}/api/conversations/${chatId}`,
       );
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(1000);
       return response.data;
     },
     queryKey: ["conversation", user.user_id, chatId],
   });
 };
 
-export const useRenameConversation = () => {
+export const useRenameConversation = (conversationId) => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ conversationId, new_title }) => {
-      console.log("DATA HERE: ");
+      console.log("DATA HERE FOR RENAMING: ");
       console.log(conversationId, new_title);
       await api.patch(`${VITE_URL_APP}/api/conversations/${conversationId}`, {
         new_title: new_title,
       });
     },
-    mutationKey: ["conversations", user.user_id],
-    onSuccess: () => {
+    mutationKey: ["conversation", conversationId],
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["conversations", user.user_id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", variables.conversationId],
       });
     },
   });

@@ -6,6 +6,7 @@
 
   background-color: var(--color-bg);
   color: var(--color-text);
+  overflow:hidden;
 }
 
 .chat-layout-body {

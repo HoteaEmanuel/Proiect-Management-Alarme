@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useCreateConversation } from "@features/ai/api/chatBot.api.js";
 import useAuthStore from "@store/authStore.js";
-import ChatInput from "@features/ai/components/ChatInput.jsx";
+import ChatInputNewChat from "@features/ai/components/ChatInputNewChat";
 
 const NewChat = () => {
   const { user } = useAuthStore();
@@ -52,7 +52,7 @@ const NewChat = () => {
         className="w-1/2 border border-gray-700 p-4 rounded-xl"
       /> */}
       <div className="w-1/2">
-        <ChatInput
+        <ChatInputNewChat
           placeholder={"How can i help you?"}
           className="w-full border border-gray-700 p-4 rounded-xl"
           onSubmit={onSubmit}
