@@ -10,6 +10,7 @@ const Rootlayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggle = () => setIsSidebarOpen((prev) => !prev);
   const close = () => setIsSidebarOpen(false);
+  // Adaugare de eveniment care inchide meniul la escape
   useEffect(() => {
     const handler = (e) => e.key === "Escape" && close();
     document.addEventListener("keydown", handler);

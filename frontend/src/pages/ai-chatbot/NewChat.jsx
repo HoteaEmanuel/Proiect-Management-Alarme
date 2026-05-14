@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useCreateConversation } from "@features/ai/api/chatBot.api.js";
 import useAuthStore from "@store/authStore.js";
 import ChatInputNewChat from "@features/ai/components/ChatInputNewChat";
+import { greeting } from "@features/ai/lib/greetings";
 
 const NewChat = () => {
   const { user } = useAuthStore();
@@ -38,13 +39,19 @@ const NewChat = () => {
     setMessage("");
     await sendMessage(mesaj);
   };
+  const chatBotGreeting = greeting();
+  console.log("AI GREET");
+  console.log(chatBotGreeting);
   return (
     <div className="w-screen h-full  flex flex-col gap-10 justify-center items-center ">
-      <main className="flex flex-col gap-1">
-        <h1 className="font-bold text-5xl lg:text-4xl">
-          Hello, <span className="text-blue-500 italic">{user.username} </span>
+      <main className="flex flex-col gap-1 items-center justify-center">
+        <h1 className="font-bold text-4xl">
+          {chatBotGreeting.greeting + ', '}
+          <span className="text-blue-500 italic">{user.username} </span>
         </h1>
-        <p className="opacity-50 text-sm text-center">What's new?</p>
+        <p className="opacity-50 text-lg text-center">
+          {chatBotGreeting.subtitle}
+        </p>
       </main>
 
       {/* <Input
