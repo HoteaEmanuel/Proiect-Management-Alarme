@@ -1,5 +1,5 @@
 export const AlarmStatus = {
-  ALL: "",
+  ALL: "All",
   ACTIVE: "Active",
   CLOSED: "Closed",
   CLEARED: "Cleared",
@@ -7,7 +7,7 @@ export const AlarmStatus = {
 };
 
 export const AlarmSeverity={
-    ALL:"",
+    ALL:"All",
     CRITICAL:"Critical",
     MAJOR:"Major",
     MINOR:"Minor",
@@ -16,7 +16,7 @@ export const AlarmSeverity={
 }
 
 export const AlarmType={
-    ALL:"",
+    ALL:"All",
     SYSTEM:"System",
     APPLICATION:"Application",
     NETWORK:"Network"

@@ -68,8 +68,6 @@ const Dashboard = () => {
   };
   if (isPendingAlarms)
     return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
-  console.log("ALARMS ");
-  console.log(alarms);
 
   const handleExport = async () => {
     try {
