@@ -7,8 +7,10 @@ import OptionsModal from "./OptionsModal";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlOptions } from "react-icons/sl";
 import Input from "@components/Input";
-const ConversationSideList = () => {
+const ConversationSideList = ( { onNavigate }) => {
   const { id } = useParams();
+  console.log("NAVIGATE");
+  console.log(onNavigate);
   const { data: conversations } = useGetUserConversations();
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -38,6 +40,7 @@ const ConversationSideList = () => {
   const handleNavigateToConversation = (conversation) => {
     console.log("NAVIGATIN");
     console.log(conversation);
+    onNavigate();
 
     return navigate(`/chat/${conversation.conversation_id}`);
   };

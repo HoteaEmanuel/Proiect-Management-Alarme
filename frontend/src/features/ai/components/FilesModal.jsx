@@ -47,16 +47,7 @@ const FilesModal = ({ close }) => {
   return (
     <div
       ref={modalRef1}
-      className="fixed top-full right-0 z-50 w-1/6 h-screen rounded-xl overflow-hidden border border-white/10 "
-      //   onMouseLeave={() => {
-      //     showOptions(false);
-      //     clear(null);
-      //   }}
-      //   onBlur={() => {
-      //     console.log("BLURRRR");
-      //     showOptions(false);
-      //     clear(null);
-      //   }}
+      className="fixed top-full right-0 z-50 w-1/6 rounded-xl overflow-hidden border border-white/10 "
     >
       <Button
         className="absolute right-1 cursor-pointer hover:scale-110"
@@ -81,7 +72,7 @@ const FilesModal = ({ close }) => {
             <h2 className="font-bold text-lg text-center">Files attached</h2>
           </div>
 
-          <ul className="flex flex-col gap-2 overflow-y-auto  pt-5 px-4">
+          <ul className="flex flex-col gap-2 max-h-[80%] overflow-y-auto  py-5  px-4">
             {data.map((file) => (
               <li
                 key={file?.url}

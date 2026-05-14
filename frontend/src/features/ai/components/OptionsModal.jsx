@@ -4,6 +4,7 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import { useDeleteConversation } from "../api/chatBot.api";
 import { GiFiles } from "react-icons/gi";
 import Button from "@components/Button";
+import { toast } from "sonner";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 const OptionsModal = ({
@@ -14,7 +15,7 @@ const OptionsModal = ({
   setEditingId,
   setEditingValue,
   fullOptions = false,
-  setShowFilesModal
+  setShowFilesModal,
 }) => {
   const { mutateAsync: deleteConversation } = useDeleteConversation(
     conversation.conversation_id,
@@ -25,7 +26,7 @@ const OptionsModal = ({
   console.log(position);
 
   const modalRef = useRef(null);
-   
+
   // Adaug event de mouse down, cand se da click inafara containerului de optiuni
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -38,6 +39,16 @@ const OptionsModal = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [clear, showOptions]);
+
+  const handleDelete = async () => {
+    try {
+      await deleteConversation();
+
+      toast.info("Conversation deleted");
+    } catch (error) {
+      toast.error(error?.message || "Deletion failed");
+    }
+  };
 
   return (
     <div
@@ -80,7 +91,7 @@ const OptionsModal = ({
                              text-sm text-red-400
                              hover:bg-red-500/10
                              cursor-pointer text-left"
-            onClick={async () => await deleteConversation()}
+            onClick={handleDelete}
           >
             <RiDeleteBin5Fill />
             Delete
@@ -92,8 +103,7 @@ const OptionsModal = ({
             <Button
               className="w-full flex items-center gap-3 p-2
                              text-sm hover:bg-white/10 cursor-pointer"
-
-                             onClick={()=>setShowFilesModal(true)}
+              onClick={() => setShowFilesModal(true)}
             >
               <GiFiles className="size-5" />
               Files attached
@@ -101,8 +111,6 @@ const OptionsModal = ({
           </li>
         )}
       </ul>
-
-     
     </div>
   );
 };

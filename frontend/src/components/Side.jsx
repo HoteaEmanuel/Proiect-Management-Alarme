@@ -8,10 +8,11 @@ import { NavLink } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { RiChatAiFill } from "react-icons/ri";
 import "@styles/components/Side.css"
-const Side = () => {
+const Side = ({ isOpen, onNavigate}) => {
   const { pathname } = useLocation();
+  console.log("SIDE OPEN? ", isOpen);
   return (
-    <aside className="side">
+    <aside className={`side ${isOpen ? 'open':''}`}>
       <h1 className="side-title">Alarm Manager</h1>
 
       <nav className="side-nav">
@@ -19,7 +20,7 @@ const Side = () => {
           type="button"
           className={`side-nav-item  ${pathname === "/dashboard/" && "active"}`}
           to={"/dashboard"}
-          isA
+          onClick={onNavigate}
         >
           <MdDashboard className="side-nav-icon" />
           <span className="side-nav-text">Dashboard</span>
@@ -30,12 +31,13 @@ const Side = () => {
           className={`side-nav-item  ${pathname === "/statistics" && "active"}`}
           // onClick={() => navigate("/dashboard/statistics")}
           to={"/statistics"}
+          onClick={onNavigate}
         >
           <IoIosStats className="side-nav-icon" />
           <span className="side-nav-text">Statistics</span>
         </NavLink>
 
-        <NavLink type="button" className="side-nav-item" to={"/chat/new"}>
+        <NavLink type="button" className="side-nav-item" to={"/chat/new"} onClick={onNavigate}>
           <RiChatAiFill className="side-nav-icon" />
           <span className="side-nav-text">AI Assistant</span>
         </NavLink>
@@ -45,6 +47,7 @@ const Side = () => {
           className="side-nav-item"
           to={"/settings"}
           // onClick={() => navigate("/settings")}
+          onClick={onNavigate}
         >
           <IoMdSettings className="side-nav-icon" />
           <span className="side-nav-text">Settings</span>

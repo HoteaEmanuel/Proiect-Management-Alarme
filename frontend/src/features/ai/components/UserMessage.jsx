@@ -20,7 +20,6 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
   const [isClamped, setIsClamped] = useState(false);
   const contentRef = useRef(null);
   const [copied, setCopied] = useState(false);
-  
 
   useEffect(() => {
     const el = contentRef.current;
@@ -58,44 +57,45 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
 
         {hasText && (
           <div>
-            <div
-              ref={contentRef}
-              style={{
-                maxHeight: expanded ? "none" : `${MESSAGE_HEIGHT}px`,
-                overflow: "hidden",
-                transition: "max-height 0.3s ease",
-                // efect de bluring, shadow progresiv
-                maskImage:
-                  isClamped && !expanded
-                    ? "linear-gradient(to bottom, black 60%, transparent 100%)"
-                    : "none",
-                WebkitMaskImage:
-                  isClamped && !expanded
-                    ? "linear-gradient(to bottom, black 60%, transparent 100%)"
-                    : "none",
-              }}
-              className="whitespace-pre-wrap wrap-break-word bg-gray-800/50 rounded-2xl rounded-tr-sm px-4 py-2.5 pb-5 text-sm leading-relaxed"
-            >
-              {message.content}
-            </div>
-
-            {isClamped && (
-              <div className="relative">
-                <Button
-                  className="absolute flex gap-2 items-center hover:scale-105 cursor-pointer"
-                  onClick={() => setExpanded((prev) => !prev)}
-                >
-                  <span className="italic text-xs">
-                    {expanded ? "Show less" : "Show more"}
-                  </span>
-                  {expanded ? (
-                    <MdExpandLess className="size-4" />
-                  ) : (
-                    <MdExpandMore className="size-4" />
-                  )}
-                </Button>
+            <div className="relative">
+              <div
+                ref={contentRef}
+                style={{
+                  maxHeight: expanded ? "none" : `${MESSAGE_HEIGHT}px`,
+                  overflow: "hidden",
+                  transition: "max-height 0.3s ease",
+                  maskImage:
+                    isClamped && !expanded
+                      ? "linear-gradient(to bottom, black 60%, transparent 100%)"
+                      : "none",
+                  WebkitMaskImage:
+                    isClamped && !expanded
+                      ? "linear-gradient(to bottom, black 60%, transparent 100%)"
+                      : "none",
+                }}
+                className="whitespace-pre-wrap wrap-break-word bg-gray-800/50 rounded-2xl rounded-tr-sm px-4 py-2.5 pb-5 text-sm leading-relaxed"
+              >
+                {message.content}
               </div>
-            )}
+
+              {isClamped && (
+                <div className="absolute bottom-1 left-3 flex justify-center opacity-80">
+                  <Button
+                    className="flex gap-2 items-center hover:scale-105 cursor-pointer"
+                    onClick={() => setExpanded((prev) => !prev)}
+                  >
+                    <span className="italic text-xs">
+                      {expanded ? "Show less" : "Show more"}
+                    </span>
+                    {expanded ? (
+                      <MdExpandLess className="size-4" />
+                    ) : (
+                      <MdExpandMore className="size-4" />
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
 
             {showOptions && (
               <div className="relative">

@@ -310,19 +310,12 @@
     }
 }
 
-@media(max-width: 800px) {
+@media(max-width: 768px) {
 
     .statistics-page {
 
         padding: 20px 16px 28px;
         gap: 18px;
-    }
-
-    .statistics-kpi-grid,
-    .statistics-two-columns,
-    .statistics-three-columns {
-
-        grid-template-columns: 1fr;
     }
 
     .statistics-large-chart {

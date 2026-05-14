@@ -45,8 +45,8 @@
   cursor: pointer;
 }
 
-.mini-item{
-  font-weight:normal;
+.mini-item {
+  font-weight: normal;
   font-size: medium;
   justify-content: space-between;
 }
@@ -57,7 +57,7 @@
   font-weight: var(--fw-semibold);
   opacity: 1;
 }
-.mini-item.active{
+.mini-item.active {
   font-weight: 400;
 }
 .side-nav-item:hover {
@@ -73,4 +73,23 @@
 .side-nav-text {
   font-size: var(--fs-md);
   font-weight: var(--fw-medium);
+}
+
+@media (max-width: 1023px) {
+  .side {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 50%;
+    z-index: 200;
+    transform: translateX(-100%); /* hidden by default */
+    transition: transform 0.3s ease;
+  }
+
+  .side.open{
+    transform: translateX(0);
+  }
+
+
 }

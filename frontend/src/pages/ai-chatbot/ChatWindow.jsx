@@ -139,7 +139,7 @@ const ChatWindow = () => {
         )}
       </section>
 
-      <div className="absolute flex flex-col bottom-0 right-5 w-4/5  z-10 items-center justify-center gap-4">
+      <div className="absolute flex flex-col bottom-0 lg:right-5 w-full lg:w-4/5  z-10 items-center justify-center gap-4">
         {isAwaitingResponse && (
           <div className="w-full flex justify-center mb-5 h-full ">
             <Button
@@ -158,7 +158,7 @@ const ChatWindow = () => {
             <FaArrowDown className="size-3" />{" "}
           </Button>
         )}
-        <div className="w-2/3 flex justify-center bg-[#0b1220] pb-4">
+        <div className="w-[90%] lg:w-2/3 flex justify-center bg-[#0b1220] pb-10 lg:pb-4">
           <ChatInput placeholder={"Ask anything"} chatEnd={chatEnd} />
         </div>
       </div>

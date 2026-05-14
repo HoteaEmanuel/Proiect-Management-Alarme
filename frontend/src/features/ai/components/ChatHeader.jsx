@@ -13,6 +13,7 @@ import FilesModal from "./FilesModal";
 import Input from "@components/Input";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { RiLoader2Fill } from "react-icons/ri";
+import { IoIosMenu } from "react-icons/io";
 const ChatHeader = () => {
   const { conversation, setConversation } = useChatStore();
   console.log("SHOW THIS");
@@ -42,9 +43,10 @@ const ChatHeader = () => {
     setShowFilesModal(false);
   }, [id]);
   // if (id === undefined || id === null) return <></>;
-  if (isPending) return <RiLoader2Fill className="size-5 animate-spin"/>;
+  if (isPending) return <RiLoader2Fill className="size-5 animate-spin" />;
 
   console.log("SHOW OPTIONS");
+  console.log(showOptionsModal)
   const handleRename = async (e) => {
     if (e.key === "Enter") {
       await renameConversation({
@@ -88,7 +90,7 @@ const ChatHeader = () => {
         />
       ) : (
         <span className="max-w-1/3 text-center truncate">
-          {conversation?.conversation_title || 'Loading...'}
+          {conversation?.conversation_title || "Loading..."}
         </span>
       )}
       {!showOptionsModal ? (

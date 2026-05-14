@@ -11,6 +11,7 @@ import useAuthStore from "@store/authStore";
 import { authApi } from "../api/auth.api";
 
 import "../../../styles/features/auth/components/LoginForm.css";
+import { RiLoader2Fill } from "react-icons/ri";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -26,31 +27,29 @@ const LoginForm = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   // const [error, setError] = useState(undefined);
-  const { setAuth} = useAuthStore();
+  const { setAuth } = useAuthStore();
   const onSubmit = async (data) => {
     try {
       const response = await login(data);
       console.log(response);
-      setAuth(response.user,response.access_token);
+      setAuth(response.user, response.access_token);
       reset();
       navigate("/dashboard");
-      
     } catch (err) {
-      setError("server",{
-        message:err.response.data.detail
+      setError("server", {
+        message: err.response.data.detail,
       });
     }
   };
 
   console.log(errors);
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="login-form"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="login-form">
       <h1 className="login-form-title">Log in</h1>
 
-      {errors.server && <p className="login-form-error"> {errors.server.message}</p>}
+      {errors.server && (
+        <p className="login-form-error"> {errors.server.message}</p>
+      )}
 
       <label htmlFor="username" className="login-form-label">
         Username
@@ -110,7 +109,14 @@ const LoginForm = () => {
       </div>
 
       <button className="login-form-button">
-        {isSubmitting ? "Submitting... " : "Log in"}
+        {isSubmitting ? (
+          <div className="flex gap-2">
+            <RiLoader2Fill className="size-4 animate-spin" />
+            Submitting...
+          </div>
+        ) : (
+          "Log in"
+        )}
       </button>
     </form>
   );

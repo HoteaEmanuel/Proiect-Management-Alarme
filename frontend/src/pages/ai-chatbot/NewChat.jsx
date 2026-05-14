@@ -41,7 +41,7 @@ const NewChat = () => {
   return (
     <div className="w-screen h-full  flex flex-col gap-10 justify-center items-center ">
       <main className="flex flex-col gap-1">
-        <h1 className="font-bold text-4xl">
+        <h1 className="font-bold text-5xl lg:text-4xl">
           Hello, <span className="text-blue-500 italic">{user.username} </span>
         </h1>
         <p className="opacity-50 text-sm text-center">What's new?</p>
@@ -51,7 +51,7 @@ const NewChat = () => {
         placeholder={"How can i help you? :)"}
         className="w-1/2 border border-gray-700 p-4 rounded-xl"
       /> */}
-      <div className="w-1/2">
+      <div className=" w-4/5 lg:w-1/2">
         <ChatInputNewChat
           placeholder={"How can i help you?"}
           className="w-full border border-gray-700 p-4 rounded-xl"

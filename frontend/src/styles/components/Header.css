@@ -1,25 +1,30 @@
 .header {
+  width: 100%;
+  min-height: 3.25rem;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
 
-    width: 100%;
-    min-height: 3.25rem;
-    border-bottom: 1px solid var(--color-border);
-    background-color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
 
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    
-    padding: 0.45rem 1.25rem;
+  padding: 0.45rem 1.25rem;
 }
 
 .header-welcome {
-
-    color: var(--color-text);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-regular);
+  color: var(--color-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-regular);
+  text-align: right;
+  width: 100%;
 }
 
 .header-username {
+  font-weight: var(--fw-bold);
+}
 
-    font-weight: var(--fw-bold);
+@media (min-width:1024px) {
+    .menuBtn{
+        display: none;
+    }
 }
