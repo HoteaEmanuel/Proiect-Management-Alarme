@@ -1,126 +1,63 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  Suspense,
-} from "react";
-
+import React, { useRef, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ChatInput from "@features/ai/components/ChatInput.jsx";
 import { FaArrowDown } from "react-icons/fa";
 
-import Loading from "../../features/ai/components/Loading.jsx";
-import FilePreview from "@features/ai/components/FilePreview.jsx";
 import Button from "@components/Button.jsx";
-import useChatStore from "@store/chatStore.js";
+import Loading from "@features/ai/components/Loading.jsx";
+import FilePreview from "@features/ai/components/FilePreview.jsx";
+import ChatInput from "@features/ai/components/ChatInput.jsx";
 import ChatHeader from "@features/ai/components/ChatHeader.jsx";
 import ConversationContent from "@features/ai/components/ConversationContent.jsx";
 
-const ChatWindow = () => {
+import useChatStore from "@store/chatStore.js";
+
+import "@styles/pages/ai-chatbot/ChatWindow.css";
+
+const ChatWindow = () =>
+{
   const { id } = useParams();
-  // const { data } = useGetConversation(id);
 
-  const [previewFile, setPreviewFile] = useState(null);
-
-  const isInitialLoad = useRef(true);
-  const [showCopy, setShowCopy] = useState(null);
-  const { isAwaitingResponse } = useChatStore();
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
-
-  const conversationRef = useCallback((el) => {
-    if (!el) return;
-
-    const handleScroll = () => {
-      const distanceFromBottom =
-        el.scrollHeight - el.scrollTop - el.clientHeight;
-      setShowScrollBtn(distanceFromBottom > 500);
-    };
-
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll); // cleanup automat
-  }, []);
+  const conversationRef = useRef(null);
   const chatEnd = useRef(null);
 
-  const handleScrollDown = () => {
-    chatEnd?.current.scrollIntoView({ behavior: "smooth" });
+  const [previewFile, setPreviewFile] = useState(null);
+  const [showCopy, setShowCopy] = useState(null);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+
+  const { isAwaitingResponse } = useChatStore();
+
+  const handleScrollDown = () =>
+  {
+    chatEnd.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    isInitialLoad.current = true;
-  }, [id]); // Resetare ref la fiecare intrarea pe un chat
-
-  // Functie care adauga adauga event de scroll astfel incat sa apara posibilitatea de scroll
-  // to chat end daca se urca in istoricul conversatiei
-  useEffect(() => {
+  useEffect(() =>
+  {
     const el = conversationRef.current;
+
     if (!el) return;
-    console.log(el);
-    const handleScroll = () => {
+
+    const handleScroll = () =>
+    {
       const distanceFromBottom =
         el.scrollHeight - el.scrollTop - el.clientHeight;
-      console.log("DISTANCE", distanceFromBottom);
+
       setShowScrollBtn(distanceFromBottom > 500);
     };
 
     el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [conversationRef]);
 
-  // const { mutateAsync: sendMessage, isPending: isPendingAIResponse } =
-  //   useSendMessage({ id });
+    return () =>
+    {
+      el.removeEventListener("scroll", handleScroll);
+    };
+  }, [id]);
 
   return (
-    <div
-      className="w-full h-full overflow-y-auto overflow-x-hidden"
-      ref={conversationRef}
-    >
+    <div className="chat-window" ref={conversationRef}>
       <ChatHeader />
-      <section className="w-full px-7 pb-30 flex justify-center mt-20">
-        {/* <Suspense
-          fallback={
-            <div className="h-screen w-2/3">
-              <MessageSkeleton />
-            </div>
-          }
-        > */}
-        {/* <ol className="flex flex-col gap-4 w-2/3 p-2">
-            {messages?.length > 0 &&
-              messages.map((message, index) => (
-                <li
-                  key={index}
-                  className={` w-full flex  ${message.role === "assistant" ? "justify-start" : "justify-end"} p-2`}
-                  onMouseLeave={() => setShowCopy(undefined)}
-                >
-                  <div
-                    className={`${
-                      message.role === "assistant"
-                        ? "text-left p-2 rounded-2xl max-w-full w-fit wrap-break-word"
-                        : "max-w-[75%] w-fit wrap-break-word"
-                    }`}
-                    onMouseEnter={() => setShowCopy(index)}
-                  >
-                    {message.role === "user" ? (
-                      <UserMessage
-                        message={message}
-                        onFileClick={setPreviewFile}
-                        previewFile={previewFile}
-                        showOptions={showCopy === index}
-                      />
-                    ) : (
-                      <ChatResponse
-                        blocks={message?.blocks}
-                        file={message?.file}
-                        previewFile={previewFile}
-                        onFileClick={setPreviewFile}
-                        showOptions={showCopy === index}
-                      />
-                    )}
-                  </div>
-                </li>
-              ))}
-            <div ref={chatEnd} />
-          </ol> */}
+
+      <section className="chat-window-content">
         <ConversationContent
           previewFile={previewFile}
           setPreviewFile={setPreviewFile}
@@ -129,7 +66,6 @@ const ChatWindow = () => {
           key={id}
           chatEnd={chatEnd}
         />
-        {/* </Suspense> */}
 
         {previewFile && (
           <FilePreview
@@ -139,29 +75,32 @@ const ChatWindow = () => {
         )}
       </section>
 
-      <div className="absolute flex flex-col bottom-0 lg:right-5 w-full lg:w-4/5  z-10 items-center justify-center gap-4">
+      <div className="chat-window-footer">
         {isAwaitingResponse && (
-          <div className="w-full flex justify-center mb-5 h-full ">
+          <div className="chat-window-loading-wrapper">
             <Button
-              className="w-14 z-100 rounded-2xl p-2 cursor-pointer culor-inherit  glassy-container glassy-container-darker"
+              className="chat-window-loading-button glassy-container glassy-container-darker"
               onClick={handleScrollDown}
             >
               <Loading />
             </Button>
           </div>
         )}
+
         {showScrollBtn && !isAwaitingResponse && (
           <Button
             onClick={handleScrollDown}
-            className="scroll-btn glassy-container"
+            className="chat-window-scroll-button glassy-container"
           >
-            <FaArrowDown className="size-3" />{" "}
+            <FaArrowDown className="chat-window-scroll-icon" />
           </Button>
         )}
-        <div className="w-[90%] lg:w-2/3 flex justify-center bg-[#0b1220] pb-10 lg:pb-4">
-          <ChatInput placeholder={"Ask anything"} chatEnd={chatEnd} />
+
+        <div className="chat-window-input-wrapper">
+          <ChatInput placeholder="Ask anything" chatEnd={chatEnd} />
         </div>
       </div>
+
       <div ref={chatEnd} />
     </div>
   );

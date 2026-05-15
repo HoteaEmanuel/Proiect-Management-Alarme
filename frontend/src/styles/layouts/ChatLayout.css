@@ -19,12 +19,15 @@
 
 .chat-layout-content {
   width: 100%;
+  min-width: 0;
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   align-items: center;
+
+  position: relative;
+  overflow: hidden;
   scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
+
