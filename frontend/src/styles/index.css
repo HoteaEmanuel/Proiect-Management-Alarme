@@ -16,6 +16,21 @@
     --color-danger: #ef4444;
     --color-warning: #f59e0b;
 
+    /* Chat input  colors*/
+        /* Chat input */
+    --color-chat-input-bg: #0f1726;
+    --color-chat-input-bg-focus: #111c2e;
+    --color-chat-input-border: #243149;
+    --color-chat-input-border-focus: #3f5272;
+    --color-chat-input-text: #e7eef8;
+    --color-chat-input-placeholder: #8ea0b8;
+    --color-chat-control-bg: transparent;
+    --color-chat-control-bg-hover: #1b2638;
+    --color-chat-send-bg: #233b65;
+    --color-chat-send-bg-hover: #2d4a7a;
+
+
+
     /* Font sizes */
     --fs-2xs: clamp(0.6rem, 0.7rem + 0.12vw, 0.7rem);
     --fs-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.85rem);

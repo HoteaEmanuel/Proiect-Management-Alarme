@@ -48,7 +48,7 @@
 
 .new-chat-input-wrapper {
 
-    width: min(50rem, 80%);
+    width: min(45rem, 72%);
 }
 
 @media(max-width: 1023px) {
@@ -59,8 +59,8 @@
     }
 
     .new-chat-input-wrapper {
-
-        width: 100%;
+        
+        width: min(40rem, 90%);
     }
 }
 
@@ -78,7 +78,13 @@
     }
 
     .new-chat-subtitle {
-        
+
         font-size: var(--fs-md);
     }
+
+    .new-chat-input-wrapper {
+
+        width: 100%;
+    }
 }
+
