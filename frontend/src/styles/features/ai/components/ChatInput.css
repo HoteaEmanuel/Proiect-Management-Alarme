@@ -23,15 +23,23 @@
 
 .chat-input-row {
 
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+        "textarea textarea textarea"
+        "add empty actions";
+    align-items: end;
+    gap: 0.35rem 0.5rem;
 }
 
-.chat-input-row:has(.chat-input-textarea-scrollable),
-.chat-input-row:has(.chat-input-textarea:not(:placeholder-shown)) {
+.chat-input-row > :has(.chat-input-add-button) {
 
-    align-items: flex-end;
+    grid-area: add;
+}
+
+.chat-input-textarea {
+
+    grid-area: textarea;
 }
 
 .chat-input-textarea {
@@ -71,6 +79,8 @@
 }
 
 .chat-input-actions-right {
+
+    grid-area: actions;
 
     display: flex;
     align-items: center;

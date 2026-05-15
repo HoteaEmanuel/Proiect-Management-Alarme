@@ -220,7 +220,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
 
         <Tooltip text={"Add files"}>
           <Button
-            className="chat-input-icon-button"
+            className="chat-input-icon-button chat-input-add-button"
             onClick={() => fileInput.current.click()}
           >
             <IoAdd className="chat-input-icon" />
