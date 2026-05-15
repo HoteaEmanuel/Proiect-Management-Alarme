@@ -32,13 +32,9 @@ db_dependency = Annotated[Session, Depends(get_db)]
 # Creeaza un cont nou de utilizator verificand daca username-ul sau email-ul exista deja,
 # hash-uind parola si salvand noul utilizator in baza de date.
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def create_user(create_user_request: CreateUserRequest, db: db_dependency):
-    
-    try:
-        create_user(create_user_request, db)
-        return {"message": "User created successfully"}
-    except AppError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+def register_user(create_user_request: CreateUserRequest, db: db_dependency):
+    create_user(create_user_request, db)
+    return {"message": "User created successfully"}
 
 
 #######################################################
@@ -76,15 +72,11 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
         "user":jsonable_encoder(userResponse),
     }
 
-
-#######################################################
-
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 # Returneaza datele utilizatorului autentificat daca tokenul este valid.
 @router.get("/me", status_code=status.HTTP_200_OK)
 async def read_current_user(user: user_dependency):
-    print("AICI")
     return user
 
 

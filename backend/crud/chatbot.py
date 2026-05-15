@@ -1,15 +1,21 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy import select, text
+from docx import Document as DocxDocument
+from sqlalchemy.exc import IntegrityError, ProgrammingError, SQLAlchemyError
 import pandas as pd
 import io
 import fitz
 import json
 import requests
-from docx import Document as DocxDocument
+import logging
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import MessageCreate, CloudinaryFileAttachment
 from integrations.cloudinary import get_signed_url
+from core import EntityNotFoundError, FileProcessingError, EmptyContentError, InvalidFilenameError, UnsupportedFileFormatError
+from core import BaseAppException, DatabaseOperationError, LLMQueryExecutionError
+
+logger = logging.getLogger(__name__)
 
 def parse_pdf(content: bytes) -> str:
     try:
@@ -19,16 +25,18 @@ def parse_pdf(content: bytes) -> str:
             text=page.get_text("text") or ""
             if text.strip():
                 pages.append(
-                    f"\n\n[Pagina {page_index+1}]\n{text.strip()}"
+                    f"\n\n[Page {page_index+1}]\n{text.strip()}"
                 )
         extracted_text="\n".join(pages).strip()
-        if not extracted_text:
-            raise AppError(status_code=400, detail="PDF extraction failed")
-        return extracted_text
-    except AppError:
-        raise
+        
     except Exception as e:
-        raise AppError(status_code=400, detail=f"PDF parsing error: {str(e)}")
+        logger.error(f"PDF internal extraction error: {str(e)}", exc_info=True)
+        raise FileProcessingError("The PDF file is corrupted or the format is not supported.")
+    
+    if not extracted_text:
+            raise EmptyContentError("The PDF document was processed successfully, but contains no text")
+    
+    return extracted_text
     
 #functie pentru parsare fisiere docx
 def parse_docx(content:bytes) -> str:
@@ -42,51 +50,50 @@ def parse_docx(content:bytes) -> str:
                 cells=[cell.text.strip() for cell in row.cells]
                 paragraphs.append(" | ".join(cells))
         extracted = "\n".join(paragraphs).strip()
-        if not extracted:
-            raise AppError(status_code=400, detail="DOCX extraction failed")
-        return extracted
-    except AppError:
-        raise
+        
     except Exception as e:
-        raise AppError(status_code=400, detail=f"DOCX parsing error: {str(e)}")
+        logger.error(f"Docx internal extraction error: {str(e)}", exc_info=True)
+        raise FileProcessingError("The docx file is corrupted or the format is not suported.")
     
+    if not extracted:
+            raise EmptyContentError("The docx document was processed successfully, but contains no text")
+    
+    return extracted
+
 def parse_file(filename: str, content: bytes) -> str:
     #extrag extensia fisierului
     if "." not in filename:
-        raise AppError(status_code=400, detail="File has no extension")
+        raise InvalidFilenameError()
+    
     ext = filename.rsplit(".", 1)[-1].lower()
 
-    try:
-        #parsez in functie de extensie
-        if ext=="pdf":
-            return parse_pdf(content)
-        elif ext=="docx":
-            return parse_docx(content)
-        elif ext == "csv":
-            df=pd.read_csv(io.BytesIO(content), on_bad_lines="skip")
-            return df.to_json(orient="records", force_ascii=False)
-        elif ext in ("xlsx", "xls"):
-            df=pd.read_excel(io.BytesIO(content))
-            return df.to_markdown(index=False)
-        else:
-            raise AppError(status_code=400, detail="Invalid format; accepted: .csv, .xlsx, .xls, .pdf, .docx")
-
-    except AppError:
-        raise
-    except Exception as e:
-        raise AppError(status_code=400, detail=f"Parsing error: {str(e)}")
+    #parsez in functie de extensie
+    if ext=="pdf":
+        return parse_pdf(content)
+    elif ext=="docx":
+        return parse_docx(content)
+    elif ext in ("csv", "xlsx", "xls"):
+        try:
+            if ext == "csv":
+                df=pd.read_csv(io.BytesIO(content), on_bad_lines="skip")
+                return df.to_json(orient="records", force_ascii=False)
+            else:
+                df=pd.read_excel(io.BytesIO(content))
+                return df.to_markdown(index=False)
+        except Exception as e:
+            logger.error(f"Pandas parsing error for file {filename}: {str(e)}", exc_info=True)
+            raise FileProcessingError(f"Could not read the {ext.upper()} file. The content might be corrupted.")
+    else:
+        raise UnsupportedFileFormatError(ext)
 
 def get_message_files(db: Session, message_id: int):
-    try:
-        rows = db.execute(
-            select(ConversationFileModel)
-            .where(
-                ConversationFileModel.message_id == message_id,
-                ConversationFileModel.is_deleted == False
-            )
-        ).scalars().all()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    rows = db.execute(
+        select(ConversationFileModel)
+        .where(
+            ConversationFileModel.message_id == message_id,
+            ConversationFileModel.is_deleted == False
+        )
+    ).scalars().all()
 
     return [
         {
@@ -100,6 +107,45 @@ def get_message_files(db: Session, message_id: int):
         for f in rows
     ]
 
+def _parse_assistant_content(raw_content: str) -> str:
+    try:
+        blocks = json.loads(raw_content)
+        return " ".join(
+            block["content"] for block in blocks
+            if block.get("type") == "text"
+        )
+    except (json.JSONDecodeError, TypeError, KeyError):
+        return raw_content
+    
+def _parse_user_files(db: Session, message_id: str, base_content: str) -> str:
+    files = get_message_files(db, message_id)
+    if not files:
+        return base_content
+    
+    parsed_files = []
+    for file in files:
+        filename = file["filename"]
+        try:
+            signed_url = get_signed_url(file["public_id"], file["resource_type"])
+            logger.debug(f"[SIGNED URL] {signed_url}")
+
+            response = requests.get(signed_url, allow_redirects=True, timeout=15)
+            response.raise_for_status() #Raise error if HTTP status is not 2xx (expired URL)
+
+            parsed_text = parse_file(filename, response.content)
+            parsed_files.append(f"[{filename}]:\n{parsed_text}")
+        except BaseAppException as app_error:
+            logger.warning(f"[CONTEXT FILES] Error parsing '{filename}': {app_error.message}")
+            continue
+        except Exception as e:
+            logger.error(f"[CONTEXT FILES] Unexpected error when downlading/parsing '{filename}': {str(e)}")
+            continue
+
+    if parsed_files:
+        return base_content + "\n\nAttached files:\n\n" + "\n\n".join(parsed_files)
+    
+    return base_content
+
 def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
     stmt = (
         select(MessageModel)
@@ -111,48 +157,20 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
         .limit(limit)
     )
     
-    try:
-        rows = db.execute(stmt).scalars().all()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
-    
+    rows = db.execute(stmt).scalars().all()
     messages = list(reversed(rows))
     
     result = []
     for msg in messages:
         if msg.role == "assistant":
-            try:
-                blocks = json.loads(msg.content)
-                content = " ".join(
-                    block["content"] for block in blocks 
-                    if block.get("type") == "text"
-                )
-            except:
-                content = msg.content
-            result.append({"role": msg.role, "content": content})
+            content = _parse_assistant_content(msg.content)
         else:
-            content = msg.content
-
-            files = get_message_files(db, msg.id)
-            if files:
-                parsed_files = []
-                for file in files:
-                    try:
-                        signed_url = get_signed_url(file["public_id"], file["resource_type"])
-                        print(f"[SIGNED URL] {signed_url}")
-                        response = requests.get(signed_url, allow_redirects=True)
-                        print(f"[ISTORIC] {file['filename']} - Status: {response.status_code}, Bytes: {len(response.content)}")
-                        
-                        parsed = parse_file(file["filename"], response.content)
-                        parsed_files.append(f"[{file['filename']}]:\n{parsed}")
-                    except Exception as e:
-                        print(f"[ISTORIC] nu am putut parsa fisierul {file['filename']}: {str(e)}")
-                        continue
-
-                if parsed_files:
-                    content += "\n\nFișiere atașate:\n\n" + "\n\n".join(parsed_files)
-
-            result.append({"role": msg.role, "content": content})
+            content = _parse_user_files(db, msg.id, msg.content)
+        
+        result.append({
+            "role": msg.role,
+            "content": content
+        })
 
     return result
 
@@ -182,72 +200,68 @@ def get_file_history(db: Session, user_id: str, conversation_id: str) -> list[Cl
     ]
     
 def get_conversation_data(db: Session, user_id: str, conversation_id: str):
-    try:
-        conversation = db.execute(
-            select(ConversationModel)
-            .where(
-                ConversationModel.conversation_id == conversation_id,
-                ConversationModel.user_id == user_id
-            )
-        ).scalar()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    conversation = db.execute(
+        select(ConversationModel)
+        .where(
+            ConversationModel.conversation_id == conversation_id,
+            ConversationModel.user_id == user_id
+        )
+    ).scalar()
 
     if conversation is None:
-        raise AppError(status_code=404, detail="Conversation not found")
+        raise EntityNotFoundError(f"Could not find conversation!")
 
     return conversation
         
 
+def _parse_assistant_blocks(raw_content: str):
+    try:
+        return json.loads(raw_content)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return raw_content
+
 #functie ce returneaza intregul istoric al unei conversatii (necesara pentru a returna conversatia catre front folosind MessageModel)
 def get_full_conversation(db: Session, user_id: str, conversation_id: str):
-    try:
-        conversation = db.execute(
-            select(ConversationModel)
-            .where(ConversationModel.conversation_id == conversation_id)
-            # .options(joinedload(ConversationModel.messages))
-        ).scalar()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    conversation = db.execute(
+        select(ConversationModel)
+        .where(
+            ConversationModel.conversation_id == conversation_id,
+            ConversationModel.user_id == user_id
+        )
+    ).scalar()
 
     if conversation is None:
-        raise AppError(status_code=404, detail="Conversation not found")
+        raise EntityNotFoundError("Conversation", conversation_id)
 
-    try:
-        stmt = (
-            select(MessageModel)
-            .where(
-                MessageModel.user_id == user_id,
-                MessageModel.conversation_id == conversation_id
-            )
-            .order_by(MessageModel.created_at.asc())
+    stmt = (
+        select(MessageModel)
+        .where(
+            MessageModel.user_id == user_id,
+            MessageModel.conversation_id == conversation_id
         )
-        messages = db.execute(stmt).scalars().all()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+        .order_by(MessageModel.created_at.asc())
+    )
+    messages = db.execute(stmt).scalars().all()
     
     result = []
     for msg in messages:
         if msg.role == "assistant":
-            try:
-                blocks = json.loads(msg.content)
-            except:
-                blocks = msg.content
-            
-            entry = {"role": msg.role, "blocks": blocks}
-            
-            files = get_message_files(db, msg.id)
-            if files:
-                entry["file"] = files[0]  # sau files daca vrei lista
-            
-            result.append(entry)
+            entry = {
+                "role": msg.role,
+                "blocks": _parse_assistant_blocks(msg.content)
+            }
         else:
-            files = get_message_files(db, msg.id)
-            entry = {"role": msg.role, "content": msg.content}
-            if files:
-                entry["files"] = files
-            result.append(entry)
-    
+            entry = {
+                "role": msg.role,
+                "content": msg.content
+            }
+            
+        files = get_message_files(db, msg.id)
+        if files:
+            entry["files"] = files
+
+        result.append(entry)
+
     return result
 
 #functie ce returneaza lista de conversatii ale user ului
@@ -260,10 +274,7 @@ def get_user_conversations(db: Session, user_id: str):
         .order_by(ConversationModel.created_at.desc())
     )
 
-    try:
-        rows = db.execute(stmt).scalars().all()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    rows = db.execute(stmt).scalars().all()
     
     return rows
 
@@ -283,43 +294,56 @@ def save_message_to_db(db: Session, message_data: MessageCreate):
         db.add(message)
         db.commit()
         db.refresh(message)
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+        return message
     
-    return message
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error saving message {message_data}: {str(e)}")
+        raise DatabaseOperationError("Could not save the message due to a data conflict.")
+    
 
 def set_response_id(db: Session, user_message_id: int, bot_response_id: int):
+    updated_rows = db.query(MessageModel)\
+        .filter(MessageModel.id == user_message_id)\
+        .update({"response_id": bot_response_id})
+
+    if updated_rows == 0:
+        raise EntityNotFoundError("user_message", user_message_id)
+
     try:
-        db.query(MessageModel)\
-            .filter(MessageModel.id == user_message_id)\
-            .update({"response_id": bot_response_id})
         db.commit()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error updating user message {user_message_id}: {str(e)}")
+        raise DatabaseOperationError("Could not update the user message response due to a data conflict.")
     
 def get_conversation_title(db: Session, conversation_id: str):
-    try:
-        result = db.execute(
-            text("SELECT CONVERSATION_TITLE FROM CONVERSATIONS WHERE CONVERSATION_ID = :conversation_id"),
-            {"conversation_id": conversation_id}
-        ).scalar()
+    
+    result = db.execute(
+        text("SELECT CONVERSATION_TITLE FROM CONVERSATIONS WHERE CONVERSATION_ID = :conversation_id"),
+        {"conversation_id": conversation_id}
+    ).scalar()
 
-        if result is None:
-            raise AppError(status_code=400, detail="Conversation not found")
-        
-        return result
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+    if result is None:
+        raise EntityNotFoundError("Conversation", conversation_id)
+    
+    return result
 
 def set_conversation_title(db: Session, conversation_id: str, conversation_title: str):
+    updated_rows = db.query(ConversationModel)\
+        .filter(ConversationModel.conversation_id == conversation_id)\
+        .update({"conversation_title": conversation_title})
+
+    if updated_rows == 0:
+        raise EntityNotFoundError("Conversation", conversation_id)
+
     try:
-        db.query(ConversationModel)\
-            .filter(ConversationModel.conversation_id == conversation_id)\
-            .update({"conversation_title": conversation_title})
         db.commit()
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
     
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error updating conversation {conversation_id}: {str(e)}")
+        raise DatabaseOperationError("Could not update the conversation title due to a data conflict.")
 
 #functie ce creeaza o noua conversatie in baza de date
 def create_new_conversation(db: Session, user_id: str):
@@ -332,8 +356,11 @@ def create_new_conversation(db: Session, user_id: str):
         db.add(conversation)
         db.commit()
         db.refresh(conversation)
-    except Exception as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Could not save the new conversation to the database: {str(e)}")
+        raise DatabaseOperationError("Could not save the new conversation.")
     
     return conversation
 
@@ -342,10 +369,19 @@ def run_llm_query(db: Session, query: str):
         result = db.execute(text(query))
         if result.returns_rows:
             return [dict(row) for row in result.mappings().all()]
-
+        
         return []
-    except AppError as e:
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
+
+    except ProgrammingError as e:
+        db.rollback()
+        logger.error(f"The LLM generated invalid SQL syntax. Query: {query} | Error: {str(e)}")
+        raise LLMQueryExecutionError("The query generated by the LLM has invalid syntax.")
+    
+    except SQLAlchemyError as e:
+        db.rollback()
+        logger.error(f"Error caused by the execution of LLM generated query: {str(e)}")
+        raise LLMQueryExecutionError("The query generated by the LLM has caused an error.")
+    
     
 #functie care sterge o conversatie+toate mesajele asoctiate din baza de date      
 def delete_conversation(db: Session, user_id: str, conversation_id: str):
@@ -380,17 +416,22 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
             ConversationModel.user_id == user_id
         )
     ).scalar()
+
     if conversation is None:
-        raise AppError(status_code=404, detail="Conversation not found")
+        raise EntityNotFoundError("Conversation", conversation_id)
+    
+    conversation.conversation_title=new_title
     
     try:
-        conversation.conversation_title=new_title
         db.commit()
-    except Exception as e:
-        db.rollback()
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}")
-    
+        db.refresh(conversation)
 
+        return conversation
+    
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error while saving the conversation title: {str(e)}")
+        raise DatabaseOperationError("Could not save conversation title due to a data conflict")
 
 def save_conversation_files(
     db: Session,
@@ -409,10 +450,15 @@ def save_conversation_files(
         )
         for file in files
     ]
-
-    db.add_all(db_files)
-    db.commit()
-    for f in db_files:
-        db.refresh(f)
+    try:
+        db.add_all(db_files)
+        db.commit()
+        for f in db_files:
+            db.refresh(f)
+    
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error while saving the message 'persist' files: {str(e)}")
+        raise DatabaseOperationError("Could not save the attached files due to a data conflict.")
 
     return db_files
