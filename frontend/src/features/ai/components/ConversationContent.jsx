@@ -41,10 +41,10 @@ const ConversationContent = ({
   useEffect(() =>
   {
     if (!data) return;
-    setTimeout(() =>
-    {
+   const timeOutId= setTimeout(() => {
       chatEnd.current?.scrollIntoView({ behavior: "instant" });
     }, 0);
+    return ()=>clearTimeout(timeOutId);
   }, [data,chatEnd]);
 
   if (isPending) return <Skeleton />;
