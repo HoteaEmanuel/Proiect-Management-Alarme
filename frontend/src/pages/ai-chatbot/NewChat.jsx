@@ -3,6 +3,7 @@ import { useCreateConversation } from "@features/ai/api/chatBot.api.js";
 import useAuthStore from "@store/authStore.js";
 import ChatInputNewChat from "@features/ai/components/ChatInputNewChat";
 import { greeting } from "@features/ai/lib/greetings";
+import "@styles/pages/ai-chatbot/NewChat.css";
 
 const NewChat = () => {
   const { user } = useAuthStore();
@@ -16,6 +17,7 @@ const NewChat = () => {
 
     const filesToSend = files.map((item) => item.file);
     const filesPreserveStatus = files.map((item) => item.persist);
+
     const mesaj = {
       user_id: user.user_id,
       message: message,
@@ -23,45 +25,30 @@ const NewChat = () => {
       file_preserve_flags: filesPreserveStatus,
     };
 
-    const formData = new FormData();
-    formData.append("message", mesaj.message);
-    formData.append("new_chat", String(mesaj.new_chat ?? false));
-
-    mesaj.files.forEach((file) => {
-      formData.append("files", file);
-    });
-
-    mesaj.file_preserve_flags.forEach((persist) => {
-      formData.append("file_preserve_flags", String(persist === true));
-    });
-
     setFiles([]);
     setMessage("");
+
     await sendMessage(mesaj);
   };
+
   const chatBotGreeting = greeting();
-  console.log("AI GREET");
-  console.log(chatBotGreeting);
+
   return (
-    <div className="w-screen h-full  flex flex-col gap-10 justify-center items-center ">
-      <main className="flex flex-col gap-1 items-center justify-center">
-        <h1 className="font-bold text-4xl">
-          {chatBotGreeting.greeting + ', '}
-          <span className="text-blue-500 italic">{user.username} </span>
+    <div className="new-chat-page">
+      <main className="new-chat-hero">
+        <h1 className="new-chat-title">
+          {chatBotGreeting.greeting + ", "}
+          <span className="new-chat-username">{user.username}</span>
         </h1>
-        <p className="opacity-50 text-lg text-center">
+
+        <p className="new-chat-subtitle">
           {chatBotGreeting.subtitle}
         </p>
       </main>
 
-      {/* <Input
-        placeholder={"How can i help you? :)"}
-        className="w-1/2 border border-gray-700 p-4 rounded-xl"
-      /> */}
-      <div className=" w-4/5 lg:w-1/2">
+      <div className="new-chat-input-wrapper">
         <ChatInputNewChat
           placeholder={"How can i help you?"}
-          className="w-full border border-gray-700 p-4 rounded-xl"
           onSubmit={onSubmit}
           message={message}
           loading={isPending}

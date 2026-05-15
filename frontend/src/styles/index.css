@@ -23,7 +23,7 @@
     --fs-md: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     --fs-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.35rem);
     --fs-xl: clamp(1.4rem, 1.25rem + 0.8vw, 1.8rem);
-    --fs-2xl: clamp(2rem, 1.6rem + 1.4vw, 3rem);
+    --fs-2xl: clamp(2rem, 1.6rem + 1.4vw, 2.4rem);
 
     /* Font weights */
     --fw-regular: 400;
