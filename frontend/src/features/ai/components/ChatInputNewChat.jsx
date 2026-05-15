@@ -8,7 +8,7 @@ import Tooltip from "@components/ToolTip";
 import FilePreview from "./FilePreview";
 import FileList from "./FileList";
 import Button from "@components/Button";
-import "@styles/features/ai/components/ChatInputNewChat.css";
+import "@styles/features/ai/components/ChatInput.css";
 
 const MESSAGE_LIMIT = 5000;
 const MAX_HEIGHT = 200;
