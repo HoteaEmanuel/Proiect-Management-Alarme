@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCreateConversation } from "@features/ai/api/chatBot.api.js";
 import useAuthStore from "@store/authStore.js";
 import ChatInputNewChat from "@features/ai/components/ChatInputNewChat";
@@ -31,7 +31,10 @@ const NewChat = () => {
     await sendMessage(mesaj);
   };
 
-  const chatBotGreeting = greeting();
+  const [chatBotGreeting, setChatBotGreeting] = useState("");
+  useEffect(() => {
+    setChatBotGreeting(greeting());
+  }, []);
 
   return (
     <div className="new-chat-page">
@@ -41,9 +44,7 @@ const NewChat = () => {
           <span className="new-chat-username">{user.username}</span>
         </h1>
 
-        <p className="new-chat-subtitle">
-          {chatBotGreeting.subtitle}
-        </p>
+        <p className="new-chat-subtitle">{chatBotGreeting.subtitle}</p>
       </main>
 
       <div className="new-chat-input-wrapper">

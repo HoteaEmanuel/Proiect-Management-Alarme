@@ -63,6 +63,7 @@ const Dashboard = () => {
       const next = new URLSearchParams(prev);
       next.set(key, value);
       next.set("pageIndex", "0"); // resetam la prima pagina la fiecare schimbare de filtru
+      next.set("page", "1"); // resetam la prima pagina la fiecare schimbare de filtru
       return next;
     });
   };
@@ -89,7 +90,7 @@ const Dashboard = () => {
         console.log(url);
       });
     } catch (e) {
-      toast.error(e?.message  || "Export failed");
+      toast.error(e?.message || "Export failed");
     }
   };
 
@@ -274,7 +275,6 @@ const Dashboard = () => {
         onClose={() => setSelectedAlarm(null)}
       />
 
-
       <div className="dashboard-pagination-info">
         <h2 className="dashboard-pagination-text">
           Total alarms:{" "}
@@ -291,13 +291,15 @@ const Dashboard = () => {
             </span>
           </h2>
         )}
-        <h2 className="dashboard-pagination-text">
-          Page:{" "}
-          <span className="dashboard-pagination-current">
-            {filters.pageIndex + 1}
-          </span>{" "}
-          / {filteredAlarms?.total_pages}
-        </h2>
+        {filteredAlarms?.total_pages > 0 && (
+          <h2 className="dashboard-pagination-text">
+            Page:{" "}
+            <span className="dashboard-pagination-current">
+              {filters.pageIndex + 1}
+            </span>{" "}
+            / {filteredAlarms?.total_pages}
+          </h2>
+        )}
 
         <label className="dashboard-pagination-label" htmlFor="page-size">
           Page size:
