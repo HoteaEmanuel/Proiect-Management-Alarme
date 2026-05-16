@@ -6,7 +6,10 @@ import { GiFiles } from "react-icons/gi";
 import Button from "@components/Button";
 import { toast } from "sonner";
 
+import "@styles/features/ai/components/OptionsModal.css";
+
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
+
 const OptionsModal = ({
   clear,
   showOptions,
@@ -16,10 +19,12 @@ const OptionsModal = ({
   setEditingValue,
   fullOptions = false,
   setShowFilesModal,
-}) => {
+}) =>
+{
   const { mutateAsync: deleteConversation } = useDeleteConversation(
     conversation.conversation_id,
   );
+
   console.log("CONVERSATION TO BE");
   console.log(conversation);
   console.log("POSITION");
@@ -28,8 +33,10 @@ const OptionsModal = ({
   const modalRef = useRef(null);
 
   // Adaug event de mouse down, cand se da click inafara containerului de optiuni
-  useEffect(() => {
-    const handleClickOutside = (e) => {
+  useEffect(() =>
+  {
+    const handleClickOutside = (e) =>
+    {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
         showOptions(false);
         clear(null);
@@ -40,7 +47,8 @@ const OptionsModal = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [clear, showOptions]);
 
-  const handleDelete = async () => {
+  const handleDelete = async () =>
+  {
     try {
       await deleteConversation();
 
@@ -53,59 +61,52 @@ const OptionsModal = ({
   return (
     <div
       ref={modalRef}
-      className="absolute left-50 background
-                    w-44 rounded-xl overflow-hidden
-                     border border-white/10
-                    shadow-[0_8px_32px_rgba(0,0,0,0.6)] "
-      onMouseLeave={() => {
+      className="options-modal"
+      onMouseLeave={() =>
+      {
         showOptions(false);
         clear(null);
       }}
-      onBlur={() => {
+      onBlur={() =>
+      {
         console.log("BLURRRR");
         showOptions(false);
         clear(null);
       }}
-      style={{ position: "fixed", top: position?.top || 10, right: 0 }}
     >
-      <ul className="flex flex-col">
-        <li key={crypto.randomUUID()}>
+      <ul className="options-modal-list">
+        <li>
           <Button
-            className="w-full flex items-center gap-3 p-2
-                             text-sm hover:bg-white/10 cursor-pointer
-                            "
-            onClick={() => {
+            className="options-modal-button"
+            onClick={() =>
+            {
               setEditingId(conversation.conversation_id);
               setEditingValue(conversation.conversation_title);
               showOptions(false);
             }}
           >
-            <MdEdit className="size-4" />
+            <MdEdit className="options-modal-icon" />
             Rename
           </Button>
         </li>
 
-        <li className="border-t border-white/5" key={crypto.randomUUID()}>
+        <li className="options-modal-divider">
           <Button
-            className="w-full flex items-center gap-3 p-2
-                             text-sm text-red-400
-                             hover:bg-red-500/10
-                             cursor-pointer text-left"
+            className="options-modal-button options-modal-button-danger"
             onClick={handleDelete}
           >
-            <RiDeleteBin5Fill />
+            <RiDeleteBin5Fill className="options-modal-icon" />
             Delete
           </Button>
         </li>
 
         {fullOptions && (
-          <li key={crypto.randomUUID()}>
+          <li>
             <Button
-              className="w-full flex items-center gap-3 p-2
-                             text-sm hover:bg-white/10 cursor-pointer"
+              className="options-modal-button"
               onClick={() => setShowFilesModal(true)}
             >
-              <GiFiles className="size-5" />
+              <GiFiles className="options-modal-icon options-modal-icon-large" />
               Files attached
             </Button>
           </li>

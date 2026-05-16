@@ -1,0 +1,83 @@
+.options-modal {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0.5rem);
+    z-index: 300;
+
+    width: 10rem;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+
+    background-color: var(--color-surface);
+    color: var(--color-text);
+
+    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.45);
+}
+
+
+.options-modal-list {
+    display: flex;
+    flex-direction: column;
+
+    list-style: none;
+}
+
+.options-modal-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.options-modal-button {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    border: 0;
+    background-color: transparent;
+    color: var(--color-text);
+
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.options-modal-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.options-modal-button-danger {
+    color: #f87171;
+}
+
+.options-modal-button-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.options-modal-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+
+    flex-shrink: 0;
+}
+
+.options-modal-icon-large {
+    width: 1rem;
+    height: 1rem;
+}
+
+@media(max-width: 640px) {
+    .options-modal {
+        width: min(13.5rem, calc(100vw - 1.5rem));
+    }
+}
