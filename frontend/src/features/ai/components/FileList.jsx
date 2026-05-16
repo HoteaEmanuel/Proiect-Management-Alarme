@@ -9,6 +9,7 @@ import { FaFilePdf, FaRegFileExcel } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 
+import "@styles/features/ai/components/FileList.css";
 
 const FileIcon = ({ type }) => {
   console.log("TYPE");
@@ -24,13 +25,13 @@ const fileTypeColor = (fileType) => {
   const extension = fileType.toUpperCase();
   switch (extension) {
     case "PDF":
-      return "bg-red-700";
+      return "file-list-type-pdf";
     case "XLSX":
-      return "bg-green-700";
+      return "file-list-type-xlsx";
     case "CSV":
-      return "bg-gray-700";
+      return "file-list-type-csv";
     default:
-      return "bg-gray-900";
+      return "file-list-type-default";
   }
 };
 
@@ -46,28 +47,24 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
   if (!files || files?.length == 0) return;
 
   return (
-    <div className="flex gap-1 overflow-hidden shadow-2xl">
-      <ul className="flex gap-1 overflow-x-auto overflow-y-hidden p-5 px-7">
+    <div className="file-list-wrapper">
+      <ul className="file-list">
         {files.map((item) => (
           <li
             key={item?.url}
-            className="relative overflow-visible flex flex-1 gap-2 hover:bg-gray-900 p-1 rounded-md"
+            className="file-list-item"
             onMouseOver={() => setSelectedFile(item.file.name)}
             onMouseLeave={() => setSelectedFile(null)}
             onClick={() => setPreviewFile(item)}
           >
             {selectedFile === item.file.name && (
-              <div className="absolute -top-2 -right-2 z-100 hover:text-white">
-                <button
-                  onClick={(e) => handleRemoveFile(e, item)}
-                  classfilename="cursor-pointer"
-                >
-                  <CiCircleRemove classfilename="size-6" />
-                </button>
-              </div>
+              <button
+                className="file-list-remove-button"
+                onClick={(e) => handleRemoveFile(e, item)}
+              >
+                <CiCircleRemove className="file-list-remove-icon" />
+              </button>
             )}
-
-
 
             <Tooltip text={"Persist"}>
               <IconCheckbox
@@ -85,16 +82,16 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
             </Tooltip>
 
             <div
-              className={`flex rounded-md items-center px-2 py-1 ${fileTypeColor(item.file.name.split(".").pop())}`}
+              className={`file-list-type ${fileTypeColor(item.file.name.split(".").pop())}`}
             >
               <FileIcon type={item.file.name.split(".").pop()} />
             </div>
 
-            <div className="flex flex-col gap-1 max-w-50">
-              <span className="font-semibold text-sm truncate">
+            <div className="file-list-content">
+              <span className="file-list-name">
                 {item.file.name}
               </span>
-              <span className="uppercase opacity-50 text-xs">
+              <span className="file-list-extension">
                 {item.file.name.split(".").pop()}
                 {/* File extension */}
               </span>

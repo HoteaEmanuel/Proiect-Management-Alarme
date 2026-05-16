@@ -6,6 +6,8 @@ import { FaCheck, FaRegFileExcel } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 
+import "@styles/features/ai/components/File.css";
+
 const FILE_ICONS = {
   pdf: <FaFilePdf />,
   xlsx: <FaRegFileExcel />,
@@ -13,7 +15,8 @@ const FILE_ICONS = {
   default: <FaFile />,
 };
 
-const File = ({ file, onClick }) => {
+const File = ({ file, onClick }) =>
+{
   console.log(file);
   const fileName = file?.filename || file?.file?.name;
   console.log(fileName);
@@ -23,13 +26,11 @@ const File = ({ file, onClick }) => {
   return (
     <button
       onClick={() => onClick(file)}
-      className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 
-                 border border-gray-700 rounded-lg px-3 py-2 text-left
-                 transition-colors cursor-pointer max-w-50"
+      className="chat-file"
     >
-      <span className="text-lg shrink-0">{icon}</span>
-      <div className="overflow-hidden">
-        <p className="text-xs truncate">{fileName}</p>
+      <span className="chat-file-icon">{icon}</span>
+      <div className="chat-file-content">
+        <p className="chat-file-name">{fileName}</p>
       </div>
     </button>
   );
