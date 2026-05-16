@@ -1,23 +1,26 @@
 import { FaCheck } from "react-icons/fa";
+import "../styles/components/CheckboxButton.css";
 
-const CheckboxButton = ({ label, checked, onChange }) => (
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      onChange();
-    }}
-    className='inline-flex items-center gap-1.5 rounded-md text-sm transition-all'
-  >
-    <span
-      className={`w-3 h-3 rounded-sm border-[1.5px] flex items-center justify-center flex-shrink-0
-       ${checked ? "bg-gray-100 border-gray-100" : "border-current"}`}
+const CheckboxButton = ({ label, checked, onChange }) => {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onChange();
+      }}
+      className="checkbox-button"
     >
-      {checked && (
-        <FaCheck className="size-4 text-gray-900"/>
-      )}
-    </span>
-    {label}
-  </button>
-);
+      <span
+        className={`checkbox-button-box ${
+          checked ? "checkbox-button-box-checked" : ""
+        }`}
+      >
+        {checked && <FaCheck className="checkbox-button-icon" />}
+      </span>
+
+      {label}
+    </button>
+  );
+};
 
 export default CheckboxButton;
