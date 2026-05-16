@@ -17,9 +17,8 @@
     --color-warning: #f59e0b;
 
     /* Chat input  colors*/
-        /* Chat input */
     --color-chat-input-bg: #0f1726;
-    --color-chat-input-bg-focus: #111c2e;
+    --color-chat-input-bg-focus: #0f1829;
     --color-chat-input-border: #243149;
     --color-chat-input-border-focus: #3f5272;
     --color-chat-input-text: #e7eef8;
