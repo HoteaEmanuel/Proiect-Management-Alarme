@@ -5,7 +5,15 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    WITH FilteredAlarms AS (
+    -- Validate input parameters to prevent logic errors
+    IF @start_date > @end_date
+    BEGIN
+        ;THROW 50000, 'Start date cannot be strictly greater than the end date.', 1;
+    END
+
+    -- Filter alarms based on the provided date range
+    -- Am adaugat ; inainte de WITH aici:
+    ;WITH FilteredAlarms AS (
         SELECT *
         FROM dbo.Alarms
         WHERE (
@@ -15,13 +23,13 @@ BEGIN
         )
     )
 
-    -- Numar total de alarme
+    -- Total number of alarms
     SELECT 'General' AS Category, 'Total' AS Label, COUNT(*) AS CountValue
     FROM FilteredAlarms
 
     UNION ALL
 
-    -- Numar de alarme per severitate (cu LEFT JOIN pt a avea si valorile 0)
+    -- Number of alarms per severity (using LEFT JOIN to include 0 counts)
     SELECT 'Severity' AS Category, s.name AS Label, COUNT(a.alarm_number) AS CountValue
     FROM dbo.Severities s
     LEFT JOIN FilteredAlarms a ON s.id = a.severity_id
@@ -40,7 +48,7 @@ BEGIN
 
     UNION ALL
 
-    -- Timpul mediu de rezolvare (doar cele clearate in interval)
+    -- Average resolution time in minutes (only for alarms cleared within the interval)
     SELECT 
         'TimeKPI' AS Category, 
         'Avg_Resolution_Time_Minutes' AS Label, 
@@ -50,7 +58,7 @@ BEGIN
 
     UNION ALL
 
-    -- Timpul mediu de reaparitie
+    -- Average time between first and last occurrence in minutes
     SELECT 
         'TimeKPI' AS Category, 
         'Avg_Time_Between_Occurrences_Minutes' AS Label, 
@@ -59,4 +67,3 @@ BEGIN
     WHERE LAST_OCCURENCE_DATETIME > FIRST_OCCURENCE_DATETIME;
 
 END
-GO

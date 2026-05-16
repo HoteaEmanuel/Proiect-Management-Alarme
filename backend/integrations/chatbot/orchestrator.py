@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-import requests
 
 from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock, RawFileAttachment
 from .client import llm_request
@@ -94,8 +93,8 @@ AVAILABLE_AGENTS = {
     }
 }
     
-
-def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = None):
+# Constructs the orchestrator's system prompt by compiling available agents and appending file context if present
+def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = None) -> str:
     language_rule = get_system_prompt(persona_prompt=False, language_prompt=True)
     
     agents_list = "\n".join(
@@ -117,7 +116,8 @@ def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = Non
         files_context=files_context
     )
 
-def build_output_blocks(context: AgentContext):
+# Formats the agent context properties into a list of standardized output blocks for the chat response
+def build_output_blocks(context: AgentContext) -> list:
     blocks = []
     if context.text_response:
         blocks.append(TextBlock(type="text", content=context.text_response))
@@ -125,18 +125,15 @@ def build_output_blocks(context: AgentContext):
         blocks.append(ChartBlock(type="chart", content=context.chart_config))
     return blocks
 
-def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
-
-    print(f"[ORCHESTRATOR] request.files: {len(request.files)}")
-    for f in request.files:
-        print(f"[ORCHESTRATOR] - {f.filename}, {len(f.content)} bytes")
+# Analyzes the incoming message, delegates tasks to appropriate agents, and orchestrates the complete response
+def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]) -> tuple[list, AgentContext]:
     
     system_prompt = build_orchestrator_system_prompt(files=request.files or None)
 
     orchestrator_response = llm_request(system_prompt, request.message, context_history, OrchestratorResponse)
 
-    print(f"[ORCHESTRATOR] Agents selectați: {[a.agent for a in orchestrator_response.agents]}")
-    print(f"[ORCHESTRATOR] Instrucțiuni: {[(a.agent, a.instruction) for a in orchestrator_response.agents]}")
+    print(f"[ORCHESTRATOR] Agents selectati: {[a.agent for a in orchestrator_response.agents]}")
+    print(f"[ORCHESTRATOR] Instructiuni: {[(a.agent, a.instruction) for a in orchestrator_response.agents]}")
 
     if request.new_chat:
         conversation_title = orchestrator_response.conversation_title

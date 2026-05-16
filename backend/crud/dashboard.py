@@ -1,19 +1,23 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from sqlalchemy.exc import ProgrammingError, OperationalError, IntegrityError
+import logging
 
-from models import Alarm, Severity, AppError
+from models import Alarm, Severity
 from schemas import RequestFilters, AlarmCreate, AlarmUpdate
+from core import DatabaseOperationError, InvalidInputError, DuplicateResourceError, EntityNotFoundError
+    
+logger = logging.getLogger(__name__)
 
-
-def get_filtered_alarms(db: Session, filters: RequestFilters):
-    #apelez procedura aia nenorocita din baza de date care face toata treaba de filtrare, sortare si paginare
+# Calls the stored procedure that handles filtering, sorting, and pagination
+def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list[dict]]:
+# Executes a stored procedure to filtered, sorted, and paginated alarms
     query = text("""
         EXEC dbo.CautareFiltrata 
             @status = :status,
             @severity = :severity,
             @type = :type,
             @alert_group = :alert_group,
-            @server_name = :server_name,
             @project = :project,
             @summary_like = :summary_like,
             @alert_description_like = :alert_description_like,
@@ -27,45 +31,50 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
             @page_size = :page_size
     """)
 
-    #extrag valorile din filters intr un dictionar ca sa le pot pasa la query
+    # Extracts values from filters into a dictionary to pass to the query
     params = filters.model_dump()
 
     try:
-        #execut interogarea, mappings da rezultatele sub forma de dictionare
+        # Executes the query; mappings provides the results as dictionaries
         result = db.execute(query, params).mappings().all()
-    except Exception as e:
-        #daca am gherlit baza de date primesc eroarea si o dau mai departe
-        raise AppError(status_code=400, detail=f"Database error: {str(e)}")
 
-    #daca nu sunt rezultate, back to front :)
+    except (ProgrammingError, OperationalError) as e:
+        db.rollback()
+        if "start date cannot be strictly greater than the end date" in str(e).lower():
+            raise InvalidInputError("Start date cannot be strictly greater than the end date.")
+        
+        raise
+
     if not result:
         return 0, []
 
-    #preiau numarul total de alarme din prima linie 
+    # Retrieves the total number of alarms from the first row
     total_alarms = result[0]["TotalAlarms"]
 
-    # convertesc rezultatul la dictionare si scot TotalAlarms ca sa 
-    # nu imi pice schema de Pydantic care se asteapta doar la campurile de alarme
+    total_pages = (total_alarms + filters.page_size - 1) // filters.page_size
+
+    # Converts the result to dictionaries and removes TotalAlarms to comply with the Pydantic schema
     alarms_list = []
     for row in result:
-        row_dict = {key.lower(): value for key, value in dict(row).items()}
+        row_dict = {key.lower(): value for key, value in row.items()}
         row_dict.pop("totalalarms", None) 
         alarms_list.append(row_dict)
 
-    return total_alarms, alarms_list
+    return total_pages, total_alarms, alarms_list
 
-def create_alarm(db: Session, alarm_data: AlarmCreate):
-    #verific daca exista deja alarma
+# Creates a new alarm in the database
+def create_alarm(db: Session, alarm_data: AlarmCreate) -> Alarm:
+    # Checks if the alarm already exists
     existing_alarm = db.query(Alarm).filter(Alarm.alarm_number == alarm_data.alarm_number).first()
     if existing_alarm:
-        raise AppError(status_code=400, detail="Alarm with this number already exists")
+        raise DuplicateResourceError("An alarm with this number already exists.")
     
-    #verific daca exista severitatea specificata
+    # Checks if the specified severity exists
     severity = db.query(Severity).filter(Severity.id == alarm_data.severity_id).first()
     if not severity:
-        raise AppError(status_code=400, detail="Invalid severity ID")
+        raise InvalidInputError("Invalid alarm severity")
     
-    #creez alarma
+    # Creates the new alarm
     new_alarm = Alarm(
         alarm_number=alarm_data.alarm_number,
         status=alarm_data.status,
@@ -87,31 +96,44 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
         category_tier_2=alarm_data.category_tier_2,
         category_tier_3=alarm_data.category_tier_3,
     )
-    #adaug alarma in baza de date
-    db.add(new_alarm)
-    db.commit()
-    db.refresh(new_alarm)
-    return new_alarm
+    
+    try:
+        db.add(new_alarm)
+        db.commit()
+        db.refresh(new_alarm)
+        return new_alarm
+    
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error creating alarm {alarm_data.alarm_number}: {str(e)}")
+        raise DatabaseOperationError("Could not create alarm due to a database conflict.")
 
-def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
-    #verific daca exista alarma pe care doresc sa o modific
+# Updates specific fields of an existing alarm
+def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate) -> Alarm:
+    # Checks if the target alarm exists
     alarm=db.query(Alarm).filter(Alarm.alarm_number==alarm_number).first()
     if not alarm:
-        raise AppError(status_code=404, detail="Alarm not found")
+        raise EntityNotFoundError("Alarm", alarm_number)
     
-    #preiau doar campurile care au fost setate in request (cele care nu sunt None)
+    # Retrieves only the fields that were set in the request (excluding None)
     update_data = alarm_data.model_dump(exclude_unset=True)
     
-    #verific daca severitatea specificata e valida (daca a fost specificata)
+    # Checks if the specified severity is valid (if provided)
     if "severity_id" in update_data:
         severity = db.query(Severity).filter(Severity.id == update_data["severity_id"]).first()
         if not severity:
-            raise AppError(status_code=400, detail="Invalid severity ID")
+            raise InvalidInputError("Invalid alarm severity")
     
-    #actualizez campurile alarmei cu noile valori
+    # Updates the alarm fields with the new values
     for field, value in update_data.items():
         setattr(alarm, field, value)
+
+    try:
+        db.commit()
+        db.refresh(alarm)
+        return alarm
     
-    db.commit()
-    db.refresh(alarm)
-    return alarm
+    except IntegrityError as e:
+        db.rollback() # Curățăm sesiunea
+        logger.error(f"Integrity error updating alarm {alarm_number}: {str(e)}")
+        raise DatabaseOperationError("Could not update the alarm due to a data conflict.")

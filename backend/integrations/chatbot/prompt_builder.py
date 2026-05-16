@@ -1,5 +1,6 @@
 from .prompts import *
 
+# Builds and returns the comprehensive system prompt by concatenating requested contextual templates
 def get_system_prompt(
         new_conversation_prompt: bool = False,
         persona_prompt: bool = True,
@@ -12,7 +13,7 @@ def get_system_prompt(
         error_handling_prompt: bool = False,
         file_analysis_prompt: bool = False
 
-):
+) -> str:
     system_prompt = ""
 
     if persona_prompt:

@@ -1,14 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import alarms, auth, chatbot
+
+from routers import alarms, auth, chatbot, text_to_speech
 from database import get_db, engine
+from core.error_handlers import setup_exception_handlers
 import models.users
 
 models.users.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Middleware pentru a permite conectarea backendului cu frontenului
+setup_exception_handlers(app)
+
+setup_exception_handlers(app)
+
+# Middleware for backend-frontend connection
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -17,13 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-
-def greet():
-    return "Hello"
 app.include_router(auth.router)
 app.include_router(alarms.router, prefix="/alarms", tags=["Alarms"])
 app.include_router(chatbot.router, prefix="/api", tags=["Chatbot"])
-
-
-print("HELLO :)")
+app.include_router(text_to_speech.router, prefix="/audio", tags=["Text_To_Speech"])
