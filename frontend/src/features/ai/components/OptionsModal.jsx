@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { MdEdit } from "react-icons/md";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { useDeleteConversation } from "../api/chatBot.api";
@@ -27,12 +27,17 @@ const OptionsModal = ({
 
   console.log("CONVERSATION TO BE");
   console.log(conversation);
-  console.log("POSITION");
-  console.log(position);
 
   const modalRef = useRef(null);
 
-  // Adaug event de mouse down, cand se da click inafara containerului de optiuni
+  useLayoutEffect(() =>
+  {
+    if (!position || !modalRef.current) return;
+
+    modalRef.current.style.setProperty("--options-modal-top", `${position.top}px`);
+    modalRef.current.style.setProperty("--options-modal-left", `${position.left}px`);
+  }, [position]);
+
   useEffect(() =>
   {
     const handleClickOutside = (e) =>
@@ -61,7 +66,7 @@ const OptionsModal = ({
   return (
     <div
       ref={modalRef}
-      className="options-modal"
+      className={`options-modal ${position ? "options-modal-floating" : ""}`}
       onMouseLeave={() =>
       {
         showOptions(false);

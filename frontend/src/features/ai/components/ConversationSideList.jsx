@@ -7,7 +7,10 @@ import OptionsModal from "./OptionsModal";
 import { useNavigate, useParams } from "react-router-dom";
 import { SlOptions } from "react-icons/sl";
 import Input from "@components/Input";
-const ConversationSideList = ( { onNavigate }) => {
+import "@styles/features/ai/components/ConversationSideList.css";
+
+const ConversationSideList = ({ onNavigate }) =>
+{
   const { id } = useParams();
   console.log("NAVIGATE");
   console.log(onNavigate);
@@ -17,9 +20,11 @@ const ConversationSideList = ( { onNavigate }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const { mutateAsync: renameConversation } = useRenameConversation();
   const [showOptions, setShowOptions] = useState(false);
-  const [position, setPosition] = useState({ top: 0 }); // folosit pentru positionarea modalului de optiuni
+  const [position, setPosition] = useState({ top: 0, left: 0 });
   const navigate = useNavigate();
-  const handleRename = async (e) => {
+
+  const handleRename = async (e) =>
+  {
     if (e.key === "Enter") {
       await renameConversation({
         conversationId: editingId,
@@ -32,28 +37,48 @@ const ConversationSideList = ( { onNavigate }) => {
     }
   };
 
-  const handleBlur = async () => {
+  const handleBlur = async () =>
+  {
     await renameConversation(editingId, editValue);
     setEditingId(null);
   };
 
-  const handleNavigateToConversation = (conversation) => {
+  const handleNavigateToConversation = (conversation) =>
+  {
     console.log("NAVIGATIN");
     console.log(conversation);
     onNavigate();
 
     return navigate(`/chat/${conversation.conversation_id}`);
   };
+
+  const handleOpenOptions = (e, conversation) =>
+  {
+    e.stopPropagation();
+
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    setSelectedConversation(conversation);
+    setPosition({
+      top: rect.top - 8,
+      left: rect.right + 8,
+    });
+    setShowOptions(true);
+  };
+
   return (
-    <div>
-      {conversations?.length === 0 && <h1>No chats yet!</h1>}
+    <div className="conversation-side-list-wrapper">
+      {conversations?.length === 0 && (
+        <h1 className="conversation-side-empty">No chats yet!</h1>
+      )}
+
       {conversations?.length > 0 && (
-        <ul className="overflow-y-auto flex-1 flex flex-col gap-2 text-xs">
+        <ul className="conversation-side-list">
           {conversations.map((conv) =>
             editingId === conv.conversation_id ? (
               <li
                 key={conv.conversation_id}
-                className={`side-nav-item  mini-item ${id === conv.conversation_id && "active"}`}
+                className={`side-nav-item mini-item ${id === conv.conversation_id && "active"}`}
               >
                 <Input
                   autoFocus
@@ -62,7 +87,7 @@ const ConversationSideList = ( { onNavigate }) => {
                   handleBlur={() => handleBlur()}
                   maxSize={50}
                   defaultValue={editValue}
-                  style={{ padding: 2, fontSize: 12 }}
+                  className="input conversation-side-input"
                 />
               </li>
             ) : (
@@ -70,30 +95,28 @@ const ConversationSideList = ( { onNavigate }) => {
                 key={conv.conversation_id}
                 onClick={() => handleNavigateToConversation(conv)}
                 onMouseEnter={() => setSelectedConversation(conv)}
-                // onMouseLeave={() => setSelectedChat(null)}
-                className={`side-nav-item mini-item ${id === conv.conversation_id && "active"}`}
+                className={`side-nav-item mini-item conversation-side-item ${id === conv.conversation_id && "active"}`}
               >
-                <span className="truncate text-sm">
+                <span className="conversation-side-title">
                   {conv.conversation_title}
                 </span>
+
                 {selectedConversation?.conversation_id ===
                   conv.conversation_id && (
-                  <SlOptions
-                    className="size-3 hover:bg-black/50 hover:scale-120 p-0.5 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowOptions(true);
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      setPosition({ top: rect.top });
-                    }}
-                  />
+                  <div className="conversation-side-options-wrapper">
+                    <SlOptions
+                      className="conversation-side-options-icon"
+                      onClick={(e) => handleOpenOptions(e, conv)}
+                    />
+                  </div>
                 )}
               </li>
             ),
           )}
         </ul>
       )}
-      {showOptions && (
+
+      {showOptions && selectedConversation && (
         <OptionsModal
           clear={setSelectedConversation}
           showOptions={setShowOptions}
