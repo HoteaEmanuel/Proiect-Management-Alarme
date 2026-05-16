@@ -21,7 +21,9 @@ import { BsCloudFogFill } from "react-icons/bs";
 import ChatSkeleton from "./Skeletons/ChatSkeleton";
 import ConversationSideList from "./ConversationSideList";
 import ConversationListSkeleton from "./Skeletons/ConversationListSkeleton";
-const Side = ({ isOpen, onNavigate }) => {
+
+const Side = ({ isOpen, onNavigate }) =>
+{
   const { pathname } = useLocation();
   const { id } = useParams();
   console.log("ID CONV");
@@ -31,27 +33,25 @@ const Side = ({ isOpen, onNavigate }) => {
   console.log("NAVIGATIN");
   console.log(onNavigate);
 
-
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [position, setPosition] = useState({ top: 0 }); // folosit pentru positionarea modalului de optiuni
- 
+
   return (
-    <aside className={`side ${isOpen ? "open" : ''}  `}>
+    <aside className={`side chat-side ${isOpen ? "open" : ''}  `}>
       <NavLink
         to={"/dashboard"}
-        // className="flex items-center"
         className={`side-nav-item  ${pathname === "/" && "active"}`}
         type="button"
         onClick={onNavigate}
       >
-        <IoMdArrowBack className="size-7" />
+        <IoMdArrowBack className="chat-side-back-icon" />
         Go back
       </NavLink>
 
-      <nav className="side-nav flex flex-col h-[90%]">
+      <nav className="side-nav chat-side-nav">
         <NavLink
           type="button"
           className={`side-nav-item  ${pathname === "/chat/new" && "active"}`}
@@ -74,7 +74,7 @@ const Side = ({ isOpen, onNavigate }) => {
         </NavLink>
 
         <hr />
-        <h1 className="text-sm opacity-50">Recents</h1>
+        <h1 className="chat-side-recents-title">Recents</h1>
         <Suspense fallback={<ConversationListSkeleton />}>
           <ConversationSideList onNavigate={onNavigate} />
         </Suspense>

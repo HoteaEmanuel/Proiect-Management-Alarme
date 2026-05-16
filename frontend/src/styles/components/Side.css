@@ -91,5 +91,48 @@
     transform: translateX(0);
   }
 
+}
 
+.chat-side {
+  flex-shrink: 0;
+}
+
+.chat-side-nav {
+  height: 90%;
+}
+
+.chat-side-back-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+}
+
+.chat-side-recents-title {
+  color: var(--color-text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  opacity: 0.5;
+}
+
+@media (max-width: 1023px) {
+  .chat-side {
+    width: min(20rem, 78vw);
+    min-width: 0;
+  }
+
+  .chat-side-nav {
+    height: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .chat-side {
+    width: min(18rem, 84vw);
+    padding-inline: 0.75rem;
+  }
+
+  .chat-side-back-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
