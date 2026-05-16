@@ -25,8 +25,27 @@
   overflow: hidden;
   border-radius: 1.25rem;
   padding: 1rem 1.25rem;
-  width: min(var(--bubble-width), 80%);
   min-width: 140px;
+}
+
+.message-bubble-width-280 {
+  width: min(17.5rem, 80%);
+}
+
+.message-bubble-width-340 {
+  width: min(21.25rem, 80%);
+}
+
+.message-bubble-width-420 {
+  width: min(26.25rem, 80%);
+}
+
+.message-bubble-width-460 {
+  width: min(28.75rem, 80%);
+}
+
+.message-bubble-width-520 {
+  width: min(32.5rem, 80%);
 }
 
 .user-bubble {
@@ -50,6 +69,58 @@
   height: 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
+}
+
+.skeleton-line-w-100 {
+  width: 100%;
+}
+
+.skeleton-line-w-92 {
+  width: 92%;
+}
+
+.skeleton-line-w-90 {
+  width: 90%;
+}
+
+.skeleton-line-w-88 {
+  width: 88%;
+}
+
+.skeleton-line-w-83 {
+  width: 83%;
+}
+
+.skeleton-line-w-82 {
+  width: 82%;
+}
+
+.skeleton-line-w-76 {
+  width: 76%;
+}
+
+.skeleton-line-w-70 {
+  width: 70%;
+}
+
+.skeleton-line-w-64 {
+  width: 64%;
+}
+
+.skeleton-line-w-56 {
+  width: 56%;
+}
+
+.skeleton-line-w-48 {
+  width: 48%;
+}
+
+.skeleton-line-w-42 {
+  width: 42%;
+}
+
+.skeleton-line-w-38 {
+  width: 38%;
 }
 
 .shimmer {
@@ -115,9 +186,13 @@
 
 /* Tablet */
 @media (max-width: 1024px) {
-  .message-bubble {
-    width: min(var(--bubble-width), 88%);
-  }
+    .message-bubble-width-280,
+    .message-bubble-width-340,
+    .message-bubble-width-420,
+    .message-bubble-width-460,
+    .message-bubble-width-520 {
+      max-width: 88%;
+    }
 }
 
 /* Mobile */

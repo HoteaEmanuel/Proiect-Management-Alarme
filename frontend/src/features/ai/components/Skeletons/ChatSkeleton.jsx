@@ -1,37 +1,36 @@
 import "@styles/features/chatbot/components/Skeletons/ChatSkeleton.css";
+
 const ChatSkeleton =()=> {
   return (
     <div className="chat-skeleton">
-      <Bubble side="left" width="420px" lines={["100%", "82%", "56%"]} />
+      <Bubble side="left" bubbleWidth="message-bubble-width-420" lines={["skeleton-line-w-100", "skeleton-line-w-82", "skeleton-line-w-56"]} />
 
-      <Bubble side="right" width="280px" lines={["100%", "64%"]} user />
+      <Bubble side="right" bubbleWidth="message-bubble-width-280" lines={["skeleton-line-w-100", "skeleton-line-w-64"]} user />
 
-      <Bubble side="left" width="520px" lines={["100%", "92%", "76%", "48%"]} />
+      <Bubble side="left" bubbleWidth="message-bubble-width-520" lines={["skeleton-line-w-100", "skeleton-line-w-92", "skeleton-line-w-76", "skeleton-line-w-48"]} />
 
-      <Bubble side="right" width="340px" lines={["100%", "88%", "42%"]} user />
+      <Bubble side="right" bubbleWidth="message-bubble-width-340" lines={["skeleton-line-w-100", "skeleton-line-w-88", "skeleton-line-w-42"]} user />
 
       <Bubble
         side="left"
-        width="460px"
-        lines={["100%", "90%", "83%", "70%", "38%"]}
+        bubbleWidth="message-bubble-width-460"
+        lines={["skeleton-line-w-100", "skeleton-line-w-90", "skeleton-line-w-83", "skeleton-line-w-70", "skeleton-line-w-38"]}
       />
     </div>
   );
 }
 
-function Bubble({ side, width, lines, user = false }) {
+function Bubble({ side, bubbleWidth, lines, user = false }) {
   return (
     <div className={`bubble-row ${side}`}>
       <div
-        className={`message-bubble ${user ? "user-bubble" : "assistant-bubble"}`}
-        style={{ "--bubble-width": width }}
+        className={`message-bubble ${bubbleWidth} ${user ? "user-bubble" : "assistant-bubble"}`}
       >
         <div className={`message-lines ${user ? "align-end" : ""}`}>
           {lines.map((lineWidth, index) => (
             <div
               key={index}
-              className="skeleton-line"
-              style={{ width: lineWidth }}
+              className={`skeleton-line ${lineWidth}`}
             />
           ))}
         </div>
