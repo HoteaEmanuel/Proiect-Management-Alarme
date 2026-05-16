@@ -7,52 +7,67 @@ import ChatResponse from "./ChatResponse";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatSkeleton from "./Skeletons/ChatSkeleton";
-const Skeleton = () => {
+
+import "@styles/features/ai/components/ConversationContent.css";
+
+const Skeleton = () =>
+{
   return (
-    <div className="w-[90%] lg:w-2/3 h-full overflow-y-auto overflow-x-hidden">
+    <div className="conversation-content-skeleton">
       {/* <ChatHeader /> */}
       <ChatSkeleton />
     </div>
   );
 };
+
 const ConversationContent = ({
   setShowCopy,
   setPreviewFile,
   previewFile,
   showCopy,
   chatEnd,
-}) => {
+}) =>
+{
   const { id } = useParams();
   const { data, isPending } = useGetConversation(id);
   const { messages, setMessages } = useChatStore();
-  useEffect(() => {
+
+  useEffect(() =>
+  {
     setMessages(data?.messages);
   }, [setMessages, data]);
 
   // La deschiderea chat ului va da automat scroll la finalul conversatiei
-  useEffect(() => {
+  useEffect(() =>
+  {
     if (!data) return;
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       chatEnd.current?.scrollIntoView({ behavior: "instant" });
     }, 0);
   }, [data,chatEnd]);
+
   if (isPending) return <Skeleton />;
 
   return (
-    <ol className="flex flex-col gap-4  w-[95%] lg:w-2/3 p-2">
+    <ol className="conversation-content-list">
       {messages?.length > 0 &&
         messages.map((message, index) => (
           <li
             key={index}
-            className={` w-full flex  ${message.role === "assistant" ? "justify-start" : "justify-end"} p-2`}
+            className={`conversation-content-item ${
+              message.role === "assistant"
+                ? "conversation-content-item-assistant"
+                : "conversation-content-item-user"
+            }`}
             onMouseLeave={() => setShowCopy(undefined)}
             onMouseEnter={()=>setShowCopy(index)}
           >
             <div
-              className={`${
+              className={`conversation-content-message ${
                 message.role === "assistant"
-                  ? "text-left px-5 rounded-2xl max-w-full w-fit wrap-break-word"
-                  : "max-w-[75%] w-fit wrap-break-word"
+                  ? "conversation-content-message-assistant"
+                  : "conversation-content-message-user"
               }`}
               onMouseEnter={() => setShowCopy(index)}
             >
