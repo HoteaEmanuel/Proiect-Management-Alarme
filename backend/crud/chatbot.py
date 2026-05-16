@@ -59,6 +59,7 @@ def parse_docx(content:bytes) -> str:
     
     return extracted
 
+# Parses a file with a specific extension
 def parse_file(filename: str, content: bytes) -> str:
     if "." not in filename:
         raise InvalidFilenameError()
@@ -105,6 +106,7 @@ def get_message_files(db: Session, message_id: int) -> list[dict]:
         for f in rows
     ]
 
+# Parses the raw JSON content of an assistant's message and extracts the combined text from its blocks
 def _parse_assistant_content(raw_content: str) -> str:
     try:
         blocks = json.loads(raw_content)
@@ -114,7 +116,8 @@ def _parse_assistant_content(raw_content: str) -> str:
         )
     except (json.JSONDecodeError, TypeError, KeyError):
         return raw_content
-    
+
+# Retrieves, downloads, and parses files attached to a user message, appending their content to the base text
 def _parse_user_files(db: Session, message_id: str, base_content: str) -> str:
     files = get_message_files(db, message_id)
     if not files:
@@ -144,7 +147,8 @@ def _parse_user_files(db: Session, message_id: str, base_content: str) -> str:
     
     return base_content
 
-def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10):
+# Retrieves and parses a limited history of messages for a specific conversation, returning them in chronological order
+def get_conversation_history(db: Session, user_id: str, conversation_id: str, limit: int = 10) -> list[dict]:
     stmt = (
         select(MessageModel)
         .where(
@@ -434,7 +438,9 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
     except IntegrityError as e:
         db.rollback()
         logger.error(f"Integrity error while saving the conversation title: {str(e)}")
-        raise DatabaseOperationError("Could not save conversation title due to a data conflict")# Saves metadata for multiple uploaded files to the database
+        raise DatabaseOperationError("Could not save conversation title due to a data conflict")
+    
+# Saves metadata for multiple uploaded files to the database
 def save_conversation_files(db: Session, message_id: int, files: list[CloudinaryFileAttachment]) -> list[CloudinaryFileAttachment]:
     db_files = [
         ConversationFileModel(
