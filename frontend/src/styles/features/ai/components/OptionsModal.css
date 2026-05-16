@@ -1,8 +1,8 @@
 .options-modal {
-
     position: absolute;
     top: calc(100% + 0.35rem);
-    right: 0;
+    left: 0;
+    right: auto;
     z-index: 300;
 
     width: 10rem;
@@ -19,7 +19,6 @@
 }
 
 .options-modal-floating {
-
     position: fixed;
     top: var(--options-modal-top);
     left: var(--options-modal-left);
