@@ -12,6 +12,7 @@ CREATE TABLE Messages (
     role VARCHAR(20) NOT NULL,
     response_id INT NULL,
     content TEXT NOT NULL,
+    smart_replies NVARCHAR(MAX) NULL,
     has_sql_query BIT NOT NULL DEFAULT 0,
     sql_query TEXT NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
@@ -24,4 +25,7 @@ CREATE TABLE Messages (
 
     CONSTRAINT CHK_Message_Role 
         CHECK (role IN ('user', 'assistant', 'system'))
+    
+    CONSTRAINT CHK_Message_SmartReplies_JSON 
+        CHECK (smart_replies IS NULL OR ISJSON(smart_replies) = 1)
 );

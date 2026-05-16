@@ -44,6 +44,7 @@ class MessageCreate(BaseModel):
     role: str
     has_sql_query: bool = False
     content: str
+    smart_replies: list[str] | None = None
     sql_query: str | None = None
 
 class TextBlock(BaseModel):
@@ -65,6 +66,7 @@ class AssistantMessage(BaseModel):
     conversation_id: str | None = None
     role: Literal["assistant"] = "assistant"
     blocks: list[OutputBlock]
+    smart_replies: list[str] | None = None
     file: CloudinaryFileAttachment | None = None
 
 ChatMessage = Annotated[
@@ -90,6 +92,10 @@ class LLMSQLResponse(BaseModel):
     sql_query: str | None
     text_response: str | None
 
+class TextAgentResponse(BaseModel):
+    text: str
+    smart_replies: list[str]
+
 class AgentCall(BaseModel):
     agent: str
     instruction: str
@@ -107,4 +113,5 @@ class AgentContext(BaseModel):
     sql_result: list[dict] | None = None
     text_response: str | None = None
     chart_config: dict | None = None
+    smart_replies: list[str] | None = None
     file_export: CloudinaryFileAttachment | None = None

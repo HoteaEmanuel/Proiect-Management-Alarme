@@ -1,7 +1,7 @@
 # text_agent.py
 from sqlalchemy.orm import Session
 
-from schemas import AgentCall, AgentContext
+from schemas import AgentCall, AgentContext, TextAgentResponse
 from .prompt_builder import get_system_prompt
 from .client import llm_request
 
@@ -40,6 +40,16 @@ Format your responses using Markdown to ensure clarity and visual appeal:
 - Prefer tables over plain lists when data has multiple attributes per item
 """
 
+SMART_REPLIES_PROMPT = """
+You must also generate exactly 3 "smart replies" (follow-up suggestions) for the user.
+These will be rendered as clickable buttons to help the user continue the conversation smoothly.
+- Anticipate the most logical next questions or actions based on your current response
+- Write them strictly from the USER'S perspective (e.g., "Show me the details", NOT "Would you like details?")
+- Keep them very concise (maximum 4-6 words per reply)
+- Match the exact language of the current conversation
+- Ensure variety: one could ask for a drill-down, another for a visualization, and another for a related topic
+"""
+
 # Generates a natural language response using the LLM, incorporating SQL results or file contents if available
 def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall) -> AgentContext:
     
@@ -53,7 +63,7 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
     system_prompt = get_system_prompt(
         persona_prompt=False,
         language_prompt=True,
-    ) + TEXT_FORMAT_PROMPT
+    ) + TEXT_FORMAT_PROMPT + SMART_REPLIES_PROMPT
 
     if context.sql_query_text:
         system_prompt += QUERY_RESULT_PROMPT
@@ -61,8 +71,9 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
     if context.file_export:
         system_prompt += FILE_EXPORT_PROMPT
 
-    print(f"\n\n[TEXT AGENT] Instruction: {instruction}\n\n")
+    response = llm_request(system_prompt, instruction, context.conversation_history, TextAgentResponse)
 
-    context.text_response = llm_request(system_prompt, instruction, context.conversation_history)
+    context.text_response = response.text
+    context.smart_replies = response.smart_replies
 
     return context

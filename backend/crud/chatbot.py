@@ -253,7 +253,8 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
         if msg.role == "assistant":
             entry = {
                 "role": msg.role,
-                "blocks": _parse_assistant_blocks(msg.content)
+                "blocks": _parse_assistant_blocks(msg.content),
+                "smart_replies": msg.smart_replies
             }
         else:
             entry = {
@@ -291,6 +292,7 @@ def save_message_to_db(db: Session, message_data: MessageCreate) -> MessageModel
         user_id=message_data.user_id,
         role=message_data.role,
         content=message_data.content,
+        smart_replies=message_data.smart_replies,
         has_sql_query=message_data.has_sql_query,
         sql_query=message_data.sql_query
     )

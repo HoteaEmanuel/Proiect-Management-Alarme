@@ -127,17 +127,13 @@ def build_output_blocks(context: AgentContext) -> list:
 
 # Analyzes the incoming message, delegates tasks to appropriate agents, and orchestrates the complete response
 def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]) -> tuple[list, AgentContext]:
-
-    print(f"[ORCHESTRATOR] request.files: {len(request.files)}")
-    for f in request.files:
-        print(f"[ORCHESTRATOR] - {f.filename}, {len(f.content)} bytes")
     
     system_prompt = build_orchestrator_system_prompt(files=request.files or None)
 
     orchestrator_response = llm_request(system_prompt, request.message, context_history, OrchestratorResponse)
 
-    print(f"[ORCHESTRATOR] Agents selectați: {[a.agent for a in orchestrator_response.agents]}")
-    print(f"[ORCHESTRATOR] Instrucțiuni: {[(a.agent, a.instruction) for a in orchestrator_response.agents]}")
+    print(f"[ORCHESTRATOR] Agents selectati: {[a.agent for a in orchestrator_response.agents]}")
+    print(f"[ORCHESTRATOR] Instructiuni: {[(a.agent, a.instruction) for a in orchestrator_response.agents]}")
 
     if request.new_chat:
         conversation_title = orchestrator_response.conversation_title

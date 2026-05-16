@@ -1,18 +1,10 @@
 import uuid
-from sqlalchemy import String, Integer, Text, DateTime, CheckConstraint, ForeignKey, Boolean, BigInteger
+from sqlalchemy import String, Integer, Text, DateTime, CheckConstraint, ForeignKey, Boolean, BigInteger, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from datetime import datetime
 
 from database import Base
-
-# class ConversationInfoModel(Base):
-#     __tablename__ = "Conversations"
-#     user_id: Mapped[str] = mapped_column(String(36), nullable=False)
-#     conversation_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-#     conversation_title: Mapped[str] = mapped_column(String(50), nullable=True)
-#     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-
 
 class ConversationModel(Base):
     __tablename__ = "Conversations"
@@ -38,6 +30,8 @@ class MessageModel(Base):
     response_id: Mapped[int] = mapped_column(Integer, ForeignKey("Messages.id"), nullable=True)
     
     content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    smart_replies: Mapped[list | None] = mapped_column(JSON(none_as_null=True), nullable=True)
 
     has_sql_query: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
