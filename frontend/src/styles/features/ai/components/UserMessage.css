@@ -40,6 +40,9 @@
 
     padding: 0.65rem 1rem 1.25rem;
 
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -52,6 +55,22 @@
 
     font-size: var(--fs-sm);
     line-height: 1.5;
+}
+
+.user-message-bubble-collapsed {
+
+    max-height: 300px;
+}
+
+.user-message-bubble-expanded {
+
+    max-height: none;
+}
+
+.user-message-bubble-fade {
+
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
 }
 
 .user-message-expand-wrapper {

@@ -71,20 +71,9 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) =>
             <div className="user-message-content-wrapper">
               <div
                 ref={contentRef}
-                style={{
-                  maxHeight: expanded ? "none" : `${MESSAGE_HEIGHT}px`,
-                  overflow: "hidden",
-                  transition: "max-height 0.3s ease",
-                  maskImage:
-                    isClamped && !expanded
-                      ? "linear-gradient(to bottom, black 60%, transparent 100%)"
-                      : "none",
-                  WebkitMaskImage:
-                    isClamped && !expanded
-                      ? "linear-gradient(to bottom, black 60%, transparent 100%)"
-                      : "none",
-                }}
-                className="user-message-bubble"
+                className={`user-message-bubble ${
+                  expanded ? "user-message-bubble-expanded" : "user-message-bubble-collapsed"
+                } ${isClamped && !expanded ? "user-message-bubble-fade" : ""}`}
               >
                 {message.content}
               </div>
