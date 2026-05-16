@@ -31,6 +31,8 @@ import { toast } from "sonner";
 import removeMarkdown from "remove-markdown";
 import File from "./File";
 
+import "@styles/features/ai/components/ChatResponse.css";
+
 const COLORS = [
   "#6366f1",
   "#22d3ee",
@@ -39,12 +41,15 @@ const COLORS = [
   "#f43f5e",
   "#a78bfa",
 ];
-const Chart = ({ content }) => {
+
+const Chart = ({ content }) =>
+{
   console.log("CHART CONTENT ");
   console.log(content);
   const chartRef = useRef(null);
 
-  const downloadPNG = async () => {
+  const downloadPNG = async () =>
+  {
     if (!chartRef.current) return;
 
     const dataUrl = await toPng(chartRef.current, {
@@ -64,7 +69,7 @@ const Chart = ({ content }) => {
   try {
     config = typeof content === "string" ? JSON.parse(content) : content;
   } catch {
-    return <p className="text-red-400 text-sm">Invalid chart data</p>;
+    return <p className="chat-response-error">Invalid chart data</p>;
   }
 
   const { chart_type, title, data, x_key, y_keys } = config;
@@ -103,27 +108,18 @@ const Chart = ({ content }) => {
     });
 
   return (
-    <div
-      className="statistics-chart-card  max-w-1/2 flex  flex-col items-center justify-center "
-      style={{
-        width: "800px",
-        height: "500px",
-      }}
-    >
+    <div className="chat-response-chart-card">
       {title && (
-        <p className="text-sm font-medium text-gray-300 mb-2">{title}</p>
+        <p className="chat-response-chart-title">{title}</p>
       )}
       <div
         ref={chartRef}
-        style={{
-          width: "800px",
-          height: "500px",
-        }}
+        className="chat-response-chart"
       >
         <ResponsiveContainer
           width={"100%"}
           height={"100%"}
-          className={"space-y-4"}
+          className={"chat-response-chart-container"}
         >
           {chart_type === "pie" ? (
             <PieChart>
@@ -180,14 +176,14 @@ const Chart = ({ content }) => {
         </ResponsiveContainer>
       </div>
 
-      <div className="relative bg-red-500 w-full">
-        <div className="absolute bottom-0 right-0">
+      <div className="chat-response-chart-actions">
+        <div className="chat-response-chart-actions-inner">
           <ToolTip text={"Download as .png"}>
             <Button
               onClick={downloadPNG}
-              className="p-2 rounded-full hover:bg-gray-800 hover:scale-110 cursor-pointer"
+              className="chat-response-chart-download-button"
             >
-              <GoDownload className="size-5" />
+              <GoDownload className="chat-response-chart-download-icon" />
             </Button>
           </ToolTip>
         </div>
@@ -202,7 +198,8 @@ const ChatResponse = ({
   onFileClick,
   previewFile,
   file = null,
-}) => {
+}) =>
+{
   console.log("BLOCKS");
   console.log(blocks);
   console.log("FILE HE");
@@ -216,43 +213,47 @@ const ChatResponse = ({
   console.log("COPIED");
   console.log(copied);
 
-  const handleFileClick = (file) => {
+  const handleFileClick = (file) =>
+  {
     if (previewFile) onFileClick(null);
     else onFileClick(file);
   };
 
-  const handleCopy = async (message) => {
+  const handleCopy = async (message) =>
+  {
     try {
       const text = removeMarkdown(message); // Copiez mesajul eliminand markdown ul
       await navigator.clipboard.writeText(text);
       setCopied(true);
       // Feedback copiere
-      setTimeout(() => {
+      setTimeout(() =>
+      {
         setCopied(false);
       }, 2000);
     } catch (err) {
       toast.error(err?.message || "Failed to copy");
     }
   };
+
   return (
-    <div className="min-w-0 w-full">
+    <div className="chat-response">
       {file && <File file={file} onClick={handleFileClick} />}
       {blocks.map((block, index) => (
-        <div key={index} className="">
+        <div key={index} className="chat-response-block">
           {block.type === "chart" ? (
-            <div className="w-screen">
+            <div className="chat-response-chart-wrapper">
               <Chart content={block.content} />
             </div>
           ) : (
-            <div className="prose prose-invert min-w-0 pb-5">
-              <div className="mb-2">
+            <div className="chat-response-markdown">
+              <div className="chat-response-markdown-content">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {block.content}
                 </ReactMarkdown>
               </div>
               {showOptions && (
-                <div className="relative">
-                  <div className="absolute flex gap-2">
+                <div className="chat-response-options">
+                  <div className="chat-response-options-inner">
                     <ToolTip text={speaking ? "Stop" : "Read loud"}>
                       <Button
                         onClick={() => {
@@ -262,12 +263,12 @@ const ChatResponse = ({
                             speak(block.content);
                           }
                         }}
-                        className="cursor-pointer hover:scale-120 text-white/80"
+                        className="chat-response-action-button"
                       >
                         {speaking ? (
-                          <FaStop className="size-4" />
+                          <FaStop className="chat-response-action-icon" />
                         ) : (
-                          <AiFillSound className="size-4" />
+                          <AiFillSound className="chat-response-action-icon" />
                         )}
                       </Button>
                     </ToolTip>
@@ -275,17 +276,17 @@ const ChatResponse = ({
                     {!copied && (
                       <ToolTip text={"Copy"}>
                         <Button
-                          className="cursor-pointer hover:scale-125 hover:bg-gray-800  p-1 rounded-full"
+                          className="chat-response-copy-button"
                           onClick={() => handleCopy(block.content)}
                         >
-                          <MdContentCopy className="size-4  " />
+                          <MdContentCopy className="chat-response-action-icon" />
                         </Button>
                       </ToolTip>
                     )}
 
                     {copied && (
                       <ToolTip text={"Copied succesfully"}>
-                        <FaCheck className="size-4" />
+                        <FaCheck className="chat-response-action-icon" />
                       </ToolTip>
                     )}
                   </div>
