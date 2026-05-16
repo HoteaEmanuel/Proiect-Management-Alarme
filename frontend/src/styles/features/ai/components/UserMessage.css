@@ -1,0 +1,165 @@
+.user-message {
+
+    display: flex;
+    min-width: 0;
+}
+
+.user-message-body {
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.user-message-files {
+
+    padding: 0.5rem;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+
+    border-radius: 1rem;
+}
+
+.user-message-content {
+
+    min-width: 0;
+}
+
+.user-message-content-wrapper {
+
+    position: relative;
+}
+
+.user-message-bubble {
+
+    padding: 0.65rem 1rem 1.25rem;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    border-radius: 1rem;
+    border-top-right-radius: var(--radius-sm);
+
+    background-color: rgba(31, 41, 55, 0.5);
+    color: var(--color-text);
+
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+}
+
+.user-message-expand-wrapper {
+
+    position: absolute;
+    bottom: 0.25rem;
+    left: 0.75rem;
+
+    display: flex;
+    justify-content: center;
+
+    opacity: 0.8;
+}
+
+.user-message-expand-button {
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    border: 0;
+    background-color: transparent;
+    color: var(--color-text-muted);
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        transform 0.12s ease;
+}
+
+.user-message-expand-button:hover {
+
+    color: var(--color-text);
+    transform: scale(1.03);
+}
+
+.user-message-expand-text {
+
+    font-size: var(--fs-xs);
+    font-style: italic;
+}
+
+.user-message-expand-icon {
+
+    width: 1rem;
+    height: 1rem;
+}
+
+.user-message-options {
+
+    position: relative;
+}
+
+.user-message-options-inner {
+
+    position: absolute;
+    right: 0;
+}
+
+.user-message-copy-button {
+
+    padding: 0.25rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--color-text);
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.12s ease;
+}
+
+.user-message-copy-button:hover {
+
+    background-color: var(--color-surface);
+    transform: scale(1.12);
+}
+
+.user-message-copy-icon {
+
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+@media(max-width: 640px) {
+
+    .user-message-body {
+
+        max-width: 100%;
+    }
+
+    .user-message-files {
+
+        padding: 0.35rem;
+        gap: 0.35rem;
+    }
+
+    .user-message-bubble {
+
+        padding: 0.6rem 0.85rem 1.2rem;
+        font-size: var(--fs-sm);
+    }
+}

@@ -11,7 +11,10 @@ import Button from "@components/Button";
 import File from "./File";
 import { MdExpandMore } from "react-icons/md";
 
-const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
+import "@styles/features/ai/components/UserMessage.css";
+
+const UserMessage = ({ message, onFileClick, previewFile, showOptions }) =>
+{
   const MESSAGE_HEIGHT = 300;
   const hasFiles = message.files?.length > 0;
   const hasText = message?.content.trim().length > 0;
@@ -21,34 +24,42 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
   const contentRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     const el = contentRef.current;
     if (!el) return;
     setIsClamped(el.scrollHeight > MESSAGE_HEIGHT);
   }, [message?.content]);
-  const handleCopy = async (message) => {
+
+  const handleCopy = async (message) =>
+  {
     try {
       await navigator.clipboard.writeText(message);
       setCopied(true);
       // Feedback copiere
-      setTimeout(() => {
+      setTimeout(() =>
+      {
         setCopied(false);
       }, 2000);
     } catch (err) {
       toast.error(err?.message || "Failed to copy");
     }
   };
+
   console.log("CLAMPED");
   console.log(isClamped);
-  const handleFileClick = (file) => {
+
+  const handleFileClick = (file) =>
+  {
     if (previewFile) onFileClick(null);
     else onFileClick(file);
   };
+
   return (
-    <div className="flex">
-      <div className="flex flex-col items-end gap-2">
+    <div className="user-message">
+      <div className="user-message-body">
         {hasFiles && (
-          <div className="flex flex-wrap gap-2 p-2 rounded-2xl justify-end">
+          <div className="user-message-files">
             {message.files.map((file, i) => (
               <File key={i} file={file} onClick={handleFileClick} />
             ))}
@@ -56,8 +67,8 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
         )}
 
         {hasText && (
-          <div>
-            <div className="relative">
+          <div className="user-message-content">
+            <div className="user-message-content-wrapper">
               <div
                 ref={contentRef}
                 style={{
@@ -73,24 +84,24 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
                       ? "linear-gradient(to bottom, black 60%, transparent 100%)"
                       : "none",
                 }}
-                className="whitespace-pre-wrap wrap-break-word bg-gray-800/50 rounded-2xl rounded-tr-sm px-4 py-2.5 pb-5 text-sm leading-relaxed"
+                className="user-message-bubble"
               >
                 {message.content}
               </div>
 
               {isClamped && (
-                <div className="absolute bottom-1 left-3 flex justify-center opacity-80">
+                <div className="user-message-expand-wrapper">
                   <Button
-                    className="flex gap-2 items-center hover:scale-105 cursor-pointer"
+                    className="user-message-expand-button"
                     onClick={() => setExpanded((prev) => !prev)}
                   >
-                    <span className="italic text-xs">
+                    <span className="user-message-expand-text">
                       {expanded ? "Show less" : "Show more"}
                     </span>
                     {expanded ? (
-                      <MdExpandLess className="size-4" />
+                      <MdExpandLess className="user-message-expand-icon" />
                     ) : (
-                      <MdExpandMore className="size-4" />
+                      <MdExpandMore className="user-message-expand-icon" />
                     )}
                   </Button>
                 </div>
@@ -98,22 +109,22 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
             </div>
 
             {showOptions && (
-              <div className="relative">
-                <div className="absolute right-0">
+              <div className="user-message-options">
+                <div className="user-message-options-inner">
                   {!copied && (
                     <Tooltip text={"Copy"}>
                       <Button
-                        className="cursor-pointer hover:scale-125 hover:bg-gray-800  p-1 rounded-full"
+                        className="user-message-copy-button"
                         onClick={() => handleCopy(message.content)}
                       >
-                        <MdContentCopy className="size-3  " />
+                        <MdContentCopy className="user-message-copy-icon" />
                       </Button>
                     </Tooltip>
                   )}
 
                   {copied && (
                     <Tooltip text={"Copied succesfully"}>
-                      <FaCheck className="size-3" />
+                      <FaCheck className="user-message-copy-icon" />
                     </Tooltip>
                   )}
                 </div>
