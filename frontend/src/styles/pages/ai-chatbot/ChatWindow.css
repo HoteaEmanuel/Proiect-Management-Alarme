@@ -20,7 +20,7 @@
   display: flex;
   justify-content: center;
 
-  margin-top: 5rem;
+  margin-top: 1rem;
   padding: 0 1.75rem 2rem;
 }
 
@@ -81,7 +81,7 @@
 
 @media (max-width: 1023px) {
   .chat-window-content {
-    margin-top: 4.5rem;
+    margin-top: 1rem;
     padding: 0 1.25rem 2rem;
   }
 

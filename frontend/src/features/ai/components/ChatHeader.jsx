@@ -72,48 +72,57 @@ const ChatHeader = () => {
   // console.log(showOptionsButton);
   console.log("EDITING ID", editingId);
   return (
+
     <header
-      className="chat-header glassy-container"
+      className="chat-header"
       // onMouseEnter={() => setShowOptionsButton(true)}
       // onMouseLeave={() => setShowOptionsButton(false)}
     >
-      {editingId === conversation?.conversation_id ? (
-        <Input
-          autoFocus
-          handleChange={(e) => setEditValue(e.target.value)}
-          handleKeyDown={(e) => handleRename(e)}
-          handleBlur={() => handleBlur()}
-          maxSize={50}
-          defaultValue={editValue}
-          style={{ padding: 2, fontSize: 12 }}
-          className="max-w-4xl"
-        />
-      ) : (
-        <span className="max-w-1/3 text-center truncate">
-          {conversation?.conversation_title || "Loading..."}
-        </span>
-      )}
-      {!showOptionsModal ? (
-        <Button>
-          <MdExpandMore
-            className="size-5 cursor-pointer hover:bg-black/50 hover:scale-120 p-0.5 rounded-full opacity-50"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowOptionsModal(true);
-            }}
+      <div className="chat-header-content">
+        {editingId === conversation?.conversation_id ? (
+          <Input
+            autoFocus
+            handleChange={(e) => setEditValue(e.target.value)}
+            handleKeyDown={(e) => handleRename(e)}
+            handleBlur={() => handleBlur()}
+            maxSize={50}
+            defaultValue={editValue}
+            className="input chat-header-input"
           />
-        </Button>
-      ) : (
-        <Button>
-          <MdExpandLess
-            className="size-5 cursor-pointer hover:bg-black/50 hover:scale-120 p-0.5 rounded-full opacity-50"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowOptionsModal(false);
-            }}
-          />
-        </Button>
-      )}
+        ) : (
+          <span className="chat-header-title">
+            {conversation?.conversation_title || "Loading..."}
+          </span>
+        )}
+
+        {!showOptionsModal ? (
+          <Button
+            className="chat-header-options-button"
+            aria-label="Open conversation options"
+          >
+            <MdExpandMore
+              className="chat-header-options-icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowOptionsModal(true);
+              }}
+            />
+          </Button>
+        ) : (
+          <Button
+            className="chat-header-options-button"
+            aria-label="Close conversation options"
+          >
+            <MdExpandLess
+              className="chat-header-options-icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowOptionsModal(false);
+              }}
+            />
+          </Button>
+        )}
+      </div>
 
       {showOptionsModal && (
         <OptionsModal
@@ -129,7 +138,7 @@ const ChatHeader = () => {
 
       {showFilesModal && <FilesModal close={() => setShowFilesModal(false)} />}
     </header>
-  );
+  )
 };
 
 export default ChatHeader;
