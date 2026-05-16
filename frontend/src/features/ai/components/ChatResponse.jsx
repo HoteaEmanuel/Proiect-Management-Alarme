@@ -32,6 +32,7 @@ import removeMarkdown from "remove-markdown";
 import File from "./File";
 
 import "@styles/features/ai/components/ChatResponse.css";
+import useChatStore from "@store/chatStore";
 
 const COLORS = [
   "#6366f1",
@@ -42,14 +43,12 @@ const COLORS = [
   "#a78bfa",
 ];
 
-const Chart = ({ content }) =>
-{
+const Chart = ({ content }) => {
   console.log("CHART CONTENT ");
   console.log(content);
   const chartRef = useRef(null);
 
-  const downloadPNG = async () =>
-  {
+  const downloadPNG = async () => {
     if (!chartRef.current) return;
 
     const dataUrl = await toPng(chartRef.current, {
@@ -109,13 +108,8 @@ const Chart = ({ content }) =>
 
   return (
     <div className="chat-response-chart-card">
-      {title && (
-        <p className="chat-response-chart-title">{title}</p>
-      )}
-      <div
-        ref={chartRef}
-        className="chat-response-chart"
-      >
+      {title && <p className="chat-response-chart-title">{title}</p>}
+      <div ref={chartRef} className="chat-response-chart">
         <ResponsiveContainer
           width={"100%"}
           height={"100%"}
@@ -192,44 +186,57 @@ const Chart = ({ content }) =>
   );
 };
 
+const ChatSuggestions = ({ suggestions }) => {
+  const { setMessage } = useChatStore();
+  if (suggestions === null || suggestions?.length == 0) return null;
+  return (
+    <div className="w-full mt-10">
+      <p className="font-semibold w-full mb-5">Suggestions: </p>
+      <ul className="flex flex-col md:flex-row gap-2 ">
+        {suggestions.map((item) => (
+          <li
+            key={crypto.randomUUID()}
+            className="chat-suggestion-card "
+            onClick={() => setMessage(item)}
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const ChatResponse = ({
   blocks,
   showOptions,
   onFileClick,
   previewFile,
+  smart_replies,
+  last_message,
   file = null,
-}) =>
-{
-  console.log("BLOCKS");
-  console.log(blocks);
-  console.log("FILE HE");
-  console.log(file);
+}) => {
   const [copied, setCopied] = useState(false);
   const { speaking, speak, stop } = useSpeechSynthesis();
 
-  console.log("SPEAKING");
-  console.log(speaking);
-
-  console.log("COPIED");
   console.log(copied);
 
-  const handleFileClick = (file) =>
-  {
+  const handleFileClick = (file) => {
     if (previewFile) onFileClick(null);
     else onFileClick(file);
   };
 
-  const handleCopy = async (message) =>
-  {
+  const handleCopy = async (message) => {
     try {
       const text = removeMarkdown(message); // Copiez mesajul eliminand markdown ul
       await navigator.clipboard.writeText(text);
       setCopied(true);
       // Feedback copiere
-      setTimeout(() =>
-      {
+      const timeOutId = setTimeout(() => {
         setCopied(false);
       }, 2000);
+
+      return () => clearTimeout(timeOutId);
     } catch (err) {
       toast.error(err?.message || "Failed to copy");
     }
@@ -238,6 +245,7 @@ const ChatResponse = ({
   return (
     <div className="chat-response">
       {file && <File file={file} onClick={handleFileClick} />}
+
       {blocks.map((block, index) => (
         <div key={index} className="chat-response-block">
           {block.type === "chart" ? (
@@ -293,6 +301,10 @@ const ChatResponse = ({
                 </div>
               )}
             </div>
+          )}
+
+          {smart_replies && last_message && (
+            <ChatSuggestions suggestions={smart_replies} />
           )}
         </div>
       ))}

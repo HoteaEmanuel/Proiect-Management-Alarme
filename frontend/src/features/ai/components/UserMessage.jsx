@@ -13,8 +13,7 @@ import { MdExpandMore } from "react-icons/md";
 
 import "@styles/features/ai/components/UserMessage.css";
 
-const UserMessage = ({ message, onFileClick, previewFile, showOptions }) =>
-{
+const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
   const MESSAGE_HEIGHT = 300;
   const hasFiles = message.files?.length > 0;
   const hasText = message?.content.trim().length > 0;
@@ -24,23 +23,22 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) =>
   const contentRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
     setIsClamped(el.scrollHeight > MESSAGE_HEIGHT);
   }, [message?.content]);
 
-  const handleCopy = async (message) =>
-  {
+  const handleCopy = async (message) => {
     try {
       await navigator.clipboard.writeText(message);
       setCopied(true);
       // Feedback copiere
-      setTimeout(() =>
-      {
+      const timeOutId = setTimeout(() => {
         setCopied(false);
       }, 2000);
+
+      return () => clearTimeout(timeOutId);
     } catch (err) {
       toast.error(err?.message || "Failed to copy");
     }
@@ -49,8 +47,7 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) =>
   console.log("CLAMPED");
   console.log(isClamped);
 
-  const handleFileClick = (file) =>
-  {
+  const handleFileClick = (file) => {
     if (previewFile) onFileClick(null);
     else onFileClick(file);
   };
@@ -72,7 +69,9 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) =>
               <div
                 ref={contentRef}
                 className={`user-message-bubble ${
-                  expanded ? "user-message-bubble-expanded" : "user-message-bubble-collapsed"
+                  expanded
+                    ? "user-message-bubble-expanded"
+                    : "user-message-bubble-collapsed"
                 } ${isClamped && !expanded ? "user-message-bubble-fade" : ""}`}
               >
                 {message.content}

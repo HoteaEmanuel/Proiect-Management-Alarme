@@ -49,6 +49,9 @@ const ConversationContent = ({
 
   if (isPending) return <Skeleton />;
 
+  console.log("MESSAGES");
+  console.log(messages);
+
   return (
     <ol className="conversation-content-list">
       {messages?.length > 0 &&
@@ -82,9 +85,11 @@ const ConversationContent = ({
                 <ChatResponse
                   blocks={message?.blocks}
                   file={message?.file}
+                  smart_replies={message?.smart_replies}
                   previewFile={previewFile}
                   onFileClick={setPreviewFile}
                   showOptions={showCopy === index}
+                  last_message={index===messages.length-1}
                 />
               )}
             </div>

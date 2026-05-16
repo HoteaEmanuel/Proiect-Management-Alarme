@@ -37,7 +37,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const [files, setFiles] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const { user } = useAuthStore();
-
+  const timeOutId=useRef();
   const { recording, start, stop, clear, transcript, isSpeaking } =
     useVoiceToText();
 
@@ -72,7 +72,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     if (isAwaitingResponse) return;
 
     setIsAwaiting(true);
-
     try {
       addMessage({
         conversation_id: conversation.conversation_id,
@@ -111,7 +110,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       setFiles([]);
       clear();
 
-      setTimeout(() => {
+      timeOutId.current=setTimeout(() => {
         chatEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
 
@@ -127,6 +126,8 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     } finally {
       setIsAwaiting(false);
     }
+
+    return ()=>clearTimeout(timeOutId.current);
   };
 
   const handleInput = (e) => {
