@@ -112,30 +112,6 @@
     animation: chat-header-spin 0.8s linear infinite;
 }
 
-.mobile-header {
-
-    position: fixed;
-    z-index: 100;
-
-    width: 100%;
-    min-width: 100%;
-    min-height: 4rem;
-    padding: 1rem;
-
-    display: flex;
-    align-items: center;
-
-    border: none;
-    background-color: transparent;
-
-    pointer-events: none;
-}
-
-.mobile-header .menuBtn {
-
-    pointer-events: auto;
-}
-
 @keyframes chat-header-spin {
 
     from {

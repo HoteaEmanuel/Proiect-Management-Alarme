@@ -43,7 +43,7 @@ const ChatHeader = () => {
     setShowFilesModal(false);
   }, [id]);
   // if (id === undefined || id === null) return <></>;
-  if (isPending) return <RiLoader2Fill className="size-5 animate-spin" />;
+  if (isPending) return <RiLoader2Fill className="chat-header-loader" />;
 
   console.log("SHOW OPTIONS");
   console.log(showOptionsModal)

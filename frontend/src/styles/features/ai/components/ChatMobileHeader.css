@@ -1,0 +1,53 @@
+.chat-mobile-header {
+
+    position: fixed;
+    z-index: 100;
+
+    width: 100%;
+    min-width: 100%;
+    min-height: 4rem;
+    padding: 1rem;
+
+    display: none;
+    align-items: center;
+
+    border: none;
+    background-color: transparent;
+
+    pointer-events: none;
+}
+
+.chat-mobile-header-menu-button {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    background-color: transparent;
+    color: var(--color-text);
+
+    cursor: pointer;
+    pointer-events: auto;
+
+    transition: transform 0.12s ease;
+}
+
+.chat-mobile-header-menu-button:hover {
+
+    transform: scale(1.05);
+}
+
+.chat-mobile-header-menu-icon {
+
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+@media(max-width: 1023px) {
+
+    .chat-mobile-header {
+
+        display: flex;
+    }
+}
