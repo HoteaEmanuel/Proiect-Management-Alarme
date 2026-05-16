@@ -3,8 +3,8 @@ ALLOWED_PROCEDURES = {"dbo.CautareFiltrata", "dbo.GetDashboardKPIs"}
 
 BLACKLISTED_WORDS = {"DELETE", "UPDATE", "INSERT", "ALTER", "TRUNCATE"}
 
-
-def is_query_safe(query: str):
+# Validates an SQL query string to ensure it only uses allowed commands and procedures
+def is_query_safe(query: str) -> bool:
 
     if not query:
         return False

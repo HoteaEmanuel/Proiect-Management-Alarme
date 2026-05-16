@@ -13,6 +13,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)]
 )
 
+# Processes a user message and uploaded files, forwards them to the AI orchestrator, and returns the assistant's response
 @router.post("/chatbot", response_model=AssistantMessage)
 async def send_message_to_chatbot(
     db: Session = Depends(get_db),
@@ -22,7 +23,7 @@ async def send_message_to_chatbot(
     new_chat: bool = Form(False),
     files: list[UploadFile] = File(default=[]),
     file_preserve_flags: list[str] = Form(default=[])
-):
+) -> AssistantMessage:
     print(user_id,conversation_id,message,new_chat,files,file_preserve_flags)
     parsed_flags = [f.lower() == "true" for f in file_preserve_flags]
     while len(parsed_flags) < len(files):
@@ -57,26 +58,28 @@ async def send_message_to_chatbot(
         print(f"{str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Retrieves a list of all chat conversations associated with the current user
 @router.get("/conversations", response_model=ConversationListresponse)
-def get_conversations_list(user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_conversations_list(user_id: str = Depends(get_current_user), db: Session = Depends(get_db)) -> ConversationListresponse:
     try:
         return ConversationListresponse(
             conversations=get_user_conversations(db=db, user_id=user_id["id"])
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
- 
+
+# Fetches the entire message history for a specific conversation
 @router.get("/conversations/{conversation_id}", response_model=ConversationHistory)
-def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_chat_history(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)) -> ConversationHistory:
     try:
         conversation = get_full_conversation(db=db, user_id=user_id["id"], conversation_id=conversation_id)
         return ConversationHistory(messages=conversation)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-  
+# Retrieves metadata and basic information for a specific conversation ID
 @router.get("/conversations/{conversation_id}/info",response_model=ConversationResponse)  
-def get_conversation_info(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)):  
+def get_conversation_info(conversation_id: str, user_id : str = Depends(get_current_user), db: Session = Depends(get_db)) -> ConversationResponse:  
     try:
         print("BUNA DE AICI", conversation_id)
         conversation= get_conversation_data(db=db, user_id=user_id["id"], conversation_id=conversation_id)
@@ -84,24 +87,26 @@ def get_conversation_info(conversation_id: str, user_id : str = Depends(get_curr
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))  
    
+# Fetches the history of all files uploaded and generated within a specific conversation
 @router.get("/conversations/{conversation_id}/files", response_model=list[CloudinaryFileAttachment])
-def get_conversation_files(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_conversation_files(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)) -> list[CloudinaryFileAttachment]:
     try:
         files = get_file_history(db=db, user_id=user_id["id"], conversation_id=conversation_id)
         return files
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    
+# Deletes a specific conversation and all its associated messages  
 @router.delete("/conversations/{conversation_id}", status_code=204)
-def delete_chat(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
+def delete_chat(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)) -> None:
     try:
         delete_conversation(db=db, user_id=user_id["id"], conversation_id=conversation_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# Updates the generated title of a specific conversation
 @router.patch("/conversations/{conversation_id}", status_code=200)
-def edit_conversation_title(conversation_id: str, body: UpdateTitleRequest , user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
+def edit_conversation_title(conversation_id: str, body: UpdateTitleRequest , user_id: str = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
     try:
         update_conversation_title(db=db, user_id=user_id["id"], conversation_id=conversation_id, new_title=body.new_title)
         return {"detail": "Title updated successfully"}

@@ -6,9 +6,8 @@ from schemas import CreateUserRequest
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Interogheaza baza de date pentru a gasi primul utilizator al carui username corespunde cu username-ul primit
-def authenticate_user(username: str, password: str, db: Session):
-
+# Queries the database to authenticate a user
+def authenticate_user(username: str, password: str, db: Session) -> Users | None:
     user = db.query(Users).filter(Users.username == username).first()
     if user is None:
         return None
@@ -18,7 +17,8 @@ def authenticate_user(username: str, password: str, db: Session):
     
     return user
 
-def create_user(create_user_request: CreateUserRequest, db: Session):
+# Creates a new user in the database
+def create_user(create_user_request: CreateUserRequest, db: Session) -> Users:
     
     existing_user = db.query(Users).filter(
         (Users.username == create_user_request.username) |

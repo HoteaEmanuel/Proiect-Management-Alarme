@@ -94,8 +94,8 @@ AVAILABLE_AGENTS = {
     }
 }
     
-
-def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = None):
+# Constructs the orchestrator's system prompt by compiling available agents and appending file context if present
+def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = None) -> str:
     language_rule = get_system_prompt(persona_prompt=False, language_prompt=True)
     
     agents_list = "\n".join(
@@ -117,7 +117,8 @@ def build_orchestrator_system_prompt(files: list[RawFileAttachment] | None = Non
         files_context=files_context
     )
 
-def build_output_blocks(context: AgentContext):
+# Formats the agent context properties into a list of standardized output blocks for the chat response
+def build_output_blocks(context: AgentContext) -> list:
     blocks = []
     if context.text_response:
         blocks.append(TextBlock(type="text", content=context.text_response))
@@ -125,7 +126,8 @@ def build_output_blocks(context: AgentContext):
         blocks.append(ChartBlock(type="chart", content=context.chart_config))
     return blocks
 
-def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]):
+# Analyzes the incoming message, delegates tasks to appropriate agents, and orchestrates the complete response
+def get_orchestrator_response(db: Session, request: MessageCreate, context_history: list[dict[str, str]]) -> tuple[list, AgentContext]:
 
     print(f"[ORCHESTRATOR] request.files: {len(request.files)}")
     for f in request.files:

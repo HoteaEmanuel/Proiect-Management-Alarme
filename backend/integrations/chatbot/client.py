@@ -2,6 +2,7 @@ import os
 
 from pydantic import BaseModel
 from openai import AzureOpenAI
+from typing import Any
 
 from models import AppError
 
@@ -16,7 +17,8 @@ client = AzureOpenAI(
     api_version="2025-04-01-preview"
 )
 
-def llm_request(system_prompt: str, user_prompt: str, context: list[dict[str, str]] = None, response_model: type[BaseModel] = None):
+# Sends a formatted request to the Azure OpenAI model and returns the response payload
+def llm_request(system_prompt: str, user_prompt: str, context: list[dict[str, str]] = None, response_model: type[BaseModel] = None) -> Any:
 
     system_prompt = {"role": "system", "content": system_prompt}
     user_prompt = {"role": "user", "content": user_prompt}

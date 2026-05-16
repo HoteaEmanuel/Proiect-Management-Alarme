@@ -8,7 +8,7 @@ models.users.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Middleware pentru a permite conectarea backendului cu frontenului
+# Middleware for backend-frontend connection
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -17,9 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Root endpoint to verify if the API is running
 @app.get("/")
-
-def greet():
+def greet() -> str:
     return "Hello"
 app.include_router(auth.router)
 app.include_router(alarms.router, prefix="/alarms", tags=["Alarms"])

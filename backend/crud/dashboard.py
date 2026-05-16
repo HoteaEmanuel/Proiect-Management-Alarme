@@ -4,9 +4,9 @@ from sqlalchemy import text
 from models import Alarm, Severity, AppError
 from schemas import RequestFilters, AlarmCreate, AlarmUpdate
 
-
-def get_filtered_alarms(db: Session, filters: RequestFilters):
-    #apelez procedura aia nenorocita din baza de date care face toata treaba de filtrare, sortare si paginare
+# Executes a stored procedure to filtered, sorted, and paginated alarms
+def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list[dict]]:
+    # Calls the stored procedure that handles filtering, sorting, and pagination
     query = text("""
         EXEC dbo.CautareFiltrata 
             @status = :status,
@@ -27,25 +27,24 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
             @page_size = :page_size
     """)
 
-    #extrag valorile din filters intr un dictionar ca sa le pot pasa la query
+    # Extracts values from filters into a dictionary to pass to the query
     params = filters.model_dump()
 
     try:
-        #execut interogarea, mappings da rezultatele sub forma de dictionare
+        # Executes the query; mappings provides the results as dictionaries
         result = db.execute(query, params).mappings().all()
     except Exception as e:
-        #daca am gherlit baza de date primesc eroarea si o dau mai departe
+        # Handles database execution failures
         raise AppError(status_code=400, detail=f"Database error: {str(e)}")
 
-    #daca nu sunt rezultate, back to front :)
+    # Returns empty results if none are found
     if not result:
         return 0, []
 
-    #preiau numarul total de alarme din prima linie 
+    # Retrieves the total number of alarms from the first row
     total_alarms = result[0]["TotalAlarms"]
 
-    # convertesc rezultatul la dictionare si scot TotalAlarms ca sa 
-    # nu imi pice schema de Pydantic care se asteapta doar la campurile de alarme
+    # Converts the result to dictionaries and removes TotalAlarms to comply with the Pydantic schema
     alarms_list = []
     for row in result:
         row_dict = {key.lower(): value for key, value in dict(row).items()}
@@ -54,18 +53,19 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
 
     return total_alarms, alarms_list
 
-def create_alarm(db: Session, alarm_data: AlarmCreate):
-    #verific daca exista deja alarma
+# Creates a new alarm in the database
+def create_alarm(db: Session, alarm_data: AlarmCreate) -> Alarm:
+    # Checks if the alarm already exists
     existing_alarm = db.query(Alarm).filter(Alarm.alarm_number == alarm_data.alarm_number).first()
     if existing_alarm:
         raise AppError(status_code=400, detail="Alarm with this number already exists")
     
-    #verific daca exista severitatea specificata
+    # Checks if the specified severity exists
     severity = db.query(Severity).filter(Severity.id == alarm_data.severity_id).first()
     if not severity:
         raise AppError(status_code=400, detail="Invalid severity ID")
     
-    #creez alarma
+    # Creates the new alarm
     new_alarm = Alarm(
         alarm_number=alarm_data.alarm_number,
         status=alarm_data.status,
@@ -87,28 +87,29 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
         category_tier_2=alarm_data.category_tier_2,
         category_tier_3=alarm_data.category_tier_3,
     )
-    #adaug alarma in baza de date
+    # Adds the alarm to the database
     db.add(new_alarm)
     db.commit()
     db.refresh(new_alarm)
     return new_alarm
 
-def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate):
-    #verific daca exista alarma pe care doresc sa o modific
+# Updates specific fields of an existing alarm
+def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate) -> Alarm:
+    # Checks if the target alarm exists
     alarm=db.query(Alarm).filter(Alarm.alarm_number==alarm_number).first()
     if not alarm:
         raise AppError(status_code=404, detail="Alarm not found")
     
-    #preiau doar campurile care au fost setate in request (cele care nu sunt None)
+    # Retrieves only the fields that were set in the request (excluding None)
     update_data = alarm_data.model_dump(exclude_unset=True)
     
-    #verific daca severitatea specificata e valida (daca a fost specificata)
+    # Checks if the specified severity is valid (if provided)
     if "severity_id" in update_data:
         severity = db.query(Severity).filter(Severity.id == update_data["severity_id"]).first()
         if not severity:
             raise AppError(status_code=400, detail="Invalid severity ID")
     
-    #actualizez campurile alarmei cu noile valori
+    # Updates the alarm fields with the new values
     for field, value in update_data.items():
         setattr(alarm, field, value)
     

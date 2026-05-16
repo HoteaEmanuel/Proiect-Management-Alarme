@@ -4,8 +4,8 @@ from datetime import datetime
 
 from models import AppError
 
-#datetime e YYYY-MM-DD
-def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime):
+# Fetches KPI statistics from a stored procedure for a given date range and formats them into a nested dictionary
+def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime) -> dict:
 
     query = text("""
         EXEC dbo.GetDashboardKPIs 
@@ -25,11 +25,11 @@ def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime):
 
     stats = {}
     for row in result:
-        #aici fac o conversie sigura la tring, ca crapa daca nu 
+        # Performs a safe string conversion to prevent crashes
         category = str(row["Category"]) if row["Category"] else "Unknown"
         label = str(row["Label"]) if row["Label"] else "Unknown"
         
-        #si aici fac conversie la float ca in procedura sql am countr uri si avg uri care returneaza float uri si crapa pydantic
+        # Converts to float since the SQL procedure returns counts and averages as floats, which could crash Pydantic
         raw_value = row["CountValue"]
         value = float(raw_value) if raw_value is not None else 0.0
         
@@ -40,15 +40,16 @@ def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime):
         
     return stats
 
-def get_raw_alarms_by_category(db: Session, category: str, label: str):
-    #apelez procedura stocata
+# Retrieves a raw list of alarms matching a specific category and label using a stored procedure
+def get_raw_alarms_by_category(db: Session, category: str, label: str) -> list[dict]:
+    # Calls the stored procedure
     query = text("""
         EXEC dbo.GetAlarmsByCategory
             @category = :category,
             @label    = :label
     """)
-    #execut si mapez rezultatele
+    # Executes and maps the results
     result = db.execute(query, {"category": category, "label": label})
     
-    #returnez o lista de dictionare (usor de transformat in JSON sau EXCEL)
+    # Returns a list of dictionaries (easily convertible to JSON or Excel)
     return [dict(row) for row in result.mappings().all()]

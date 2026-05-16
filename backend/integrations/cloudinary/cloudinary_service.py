@@ -20,6 +20,7 @@ import cloudinary.uploader
 import io
 from uuid import uuid4
 
+# Generates a secure, signed URL for accessing a specific Cloudinary resource
 def get_signed_url(public_id: str, resource_type: str = "raw") -> str:
     url, _ = cloudinary.utils.cloudinary_url(
         public_id,
@@ -29,6 +30,7 @@ def get_signed_url(public_id: str, resource_type: str = "raw") -> str:
     )
     return url
 
+# Uploads a file to Cloudinary based on its extension and returns the stored metadata
 def upload_file_to_cloudinary(file: RawFileAttachment) -> CloudinaryFileAttachment:
     extension = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
     image_types = {"jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff"}

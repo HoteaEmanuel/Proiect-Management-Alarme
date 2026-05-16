@@ -19,7 +19,8 @@ The JSON must include:
 - y_keys: array of strings — the keys used for the Y axis
 """
 
-def get_graphics_agent_response(db: Session, context: AgentContext, call: AgentCall):
+# Requests a JSON chart configuration from the LLM using available data and appends it to the agent context
+def get_graphics_agent_response(db: Session, context: AgentContext, call: AgentCall) -> AgentContext:
 
     if context.sql_result is not None:
         call.instruction += f"\n\nSQL results:\n{context.sql_result}"
