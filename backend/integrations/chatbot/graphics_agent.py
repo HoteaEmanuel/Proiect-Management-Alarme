@@ -1,10 +1,13 @@
 from sqlalchemy.orm import Session
 from schemas import AgentCall, AgentContext
 import json
+import logging
 
 from .prompt_builder import get_system_prompt
 from .client import llm_request
-from models import AppError
+from core import LLMQueryExecutionError
+
+logger = logging.getLogger(__name__)
 
 CHART_OUTPUT_PROMPT = """
 You are a chart configuration generator.
@@ -35,7 +38,13 @@ def get_graphics_agent_response(db: Session, context: AgentContext, call: AgentC
     try:
         clean = raw_response.strip().removeprefix("```json").removesuffix("```").strip()
         context.chart_config = json.loads(clean)
+
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse AI chart config. Raw response: {raw_response}")
+        raise LLMQueryExecutionError("The AI model failed to generate a valid chart configuration format.")
+    
     except Exception as e:
-        raise AppError(status_code=500, detail=f"Chart parsing error: {str(e)}")
+        logger.error(f"Unexpected error processing AI chart config: {str(e)}")
+        raise LLMQueryExecutionError(f"An unexpected error occurred while processing the graphics instruction.")
 
     return context

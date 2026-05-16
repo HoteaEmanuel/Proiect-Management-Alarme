@@ -1,15 +1,12 @@
 import io
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
-from openpyxl import Workbook
-from openpyxl.styles import Font
-import pandas as pd
 
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters
 from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel
-from models import Alarm, AppError
+from models import Alarm
 from database import get_db
 from auth_utils import get_current_user
 

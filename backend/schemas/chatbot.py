@@ -16,6 +16,11 @@ class CloudinaryFileAttachment(BaseModel):
     resource_type: str
     file_format: str
     file_size: int
+    role: str | None = None
+
+class ConversationFileList(BaseModel):
+    user_files: list[CloudinaryFileAttachment]
+    assistant_files: list[CloudinaryFileAttachment]   
 
 class ExcelStructure(BaseModel):
     filename: str

@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from openai import AzureOpenAI
 from typing import Any
 
-from models import AppError
 from core import LLMQueryExecutionError, ExternalServiceError
 
 logger = logging.getLogger(__name__)

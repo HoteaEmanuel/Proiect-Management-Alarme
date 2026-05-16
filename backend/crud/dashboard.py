@@ -3,7 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError, OperationalError, IntegrityError
 import logging
 
-from models import Alarm, Severity, AppError
+from models import Alarm, Severity
 from schemas import RequestFilters, AlarmCreate, AlarmUpdate
 from core import DatabaseOperationError, InvalidInputError, DuplicateResourceError, EntityNotFoundError
     

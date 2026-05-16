@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import alarms, auth, chatbot
+from routers import alarms, auth, chatbot, text_to_speech
 from database import get_db, engine
 from core.error_handlers import setup_exception_handlers
 import models.users
@@ -26,3 +26,4 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(alarms.router, prefix="/alarms", tags=["Alarms"])
 app.include_router(chatbot.router, prefix="/api", tags=["Chatbot"])
+app.include_router(text_to_speech.router, prefix="/audio", tags=["Text_To_Speech"])

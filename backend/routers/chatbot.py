@@ -4,7 +4,8 @@ from database import get_db
 from sqlalchemy.orm import Session
 from typing import List
 
-from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment, UpdateTitleRequest, CloudinaryFileAttachment, ConversationResponse
+from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment 
+from schemas import UpdateTitleRequest, CloudinaryFileAttachment, ConversationResponse, ConversationFileList
 from integrations.chatbot import user_chat_request, parse_raw_files
 from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, get_file_history, get_conversation_data
 from auth_utils import get_current_user
@@ -52,9 +53,13 @@ def get_conversation_info(conversation_id: str, user_id : str = Depends(get_curr
     return get_conversation_data(db=db, user_id=user_id["id"], conversation_id=conversation_id)
    
 # Fetches the history of all files uploaded and generated within a specific conversation
-@router.get("/conversations/{conversation_id}/files", response_model=list[CloudinaryFileAttachment])
+@router.get("/conversations/{conversation_id}/files", response_model=ConversationFileList)
 def get_conversation_files(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
-    return get_file_history(db=db, user_id=user_id["id"], conversation_id=conversation_id)
+    all_files = get_file_history(db=db, user_id=user_id["id"], conversation_id=conversation_id)
+    return ConversationFileList(
+        user_files=[f for f in all_files if f.role == "user"],
+        assistant_files=[f for f in all_files if f.role == "assistant"]
+    )
 
 @router.delete("/conversations/{conversation_id}", status_code=204)
 def delete_chat(conversation_id: str, user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):

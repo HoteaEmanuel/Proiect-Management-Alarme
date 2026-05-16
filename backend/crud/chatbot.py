@@ -9,7 +9,7 @@ import json
 import requests
 import logging
 
-from models import MessageModel, ConversationModel, AppError, ConversationFileModel
+from models import MessageModel, ConversationModel, ConversationFileModel
 from schemas import MessageCreate, CloudinaryFileAttachment
 from integrations.cloudinary import get_signed_url, delete_files_from_cloudinary
 from core import EntityNotFoundError, FileProcessingError, EmptyContentError, InvalidFilenameError, UnsupportedFileFormatError
@@ -179,7 +179,7 @@ def get_conversation_history(db: Session, user_id: str, conversation_id: str, li
 # Retrieves a list of all uploaded files within a specific conversation
 def get_file_history(db: Session, user_id: str, conversation_id: str) -> list[CloudinaryFileAttachment]:
     files = (
-        db.query(ConversationFileModel)
+        db.query(ConversationFileModel, MessageModel.role)
         .join(MessageModel, MessageModel.id == ConversationFileModel.message_id)
         .filter(
             MessageModel.conversation_id == conversation_id,
@@ -197,9 +197,10 @@ def get_file_history(db: Session, user_id: str, conversation_id: str) -> list[Cl
             public_id=f.public_id or "",
             resource_type=f.resource_type or "",
             file_format=f.file_format or "",
-            file_size=f.file_size or 0
+            file_size=f.file_size or 0,
+            role=role
         )
-        for f in files
+        for f, role in files
     ]
 
 # Fetches a specific conversation record for a given user

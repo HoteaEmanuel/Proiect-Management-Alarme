@@ -8,8 +8,7 @@ import pandas as pd
 import io
 import logging
 
-from models import AppError
-from core import InvalidInputError, DatabaseOperationError
+from core import InvalidInputError
 from schemas import ChartCategoryFilters
 
 logger = logging.getLogger(__name__)

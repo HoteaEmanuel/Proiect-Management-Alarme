@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-import requests
 
 from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock, RawFileAttachment
 from .client import llm_request
