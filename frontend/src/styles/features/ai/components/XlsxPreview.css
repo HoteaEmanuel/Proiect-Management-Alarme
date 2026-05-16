@@ -1,0 +1,144 @@
+.xlsx-preview {
+
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background-color: #1e1e1e;
+}
+
+.xlsx-preview-header {
+
+    padding: 0.35rem 0.5rem;
+
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+
+    border-bottom: 1px solid var(--color-border);
+    background-color: #181818;
+}
+
+.xlsx-preview-download-button {
+
+    padding: 0.25rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 999px;
+
+    background-color: transparent;
+    color: var(--color-text);
+
+    cursor: pointer;
+}
+
+.xlsx-preview-download-button:hover {
+
+    background-color: var(--color-surface);
+}
+
+.xlsx-preview-download-icon {
+
+    width: 1.35rem;
+    height: 1.35rem;
+}
+
+.xlsx-preview-table-wrapper {
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    overflow: auto;
+
+    touch-action: pan-x pan-y;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.xlsx-preview-table {
+
+    min-width: max-content;
+
+    border-collapse: collapse;
+
+    font-size: var(--fs-sm);
+}
+
+.xlsx-preview-table thead {
+
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.xlsx-preview-heading,
+.xlsx-preview-row-number {
+
+    background-color: #2b2b2b;
+    color: #d1d5db;
+}
+
+.xlsx-preview-corner-cell {
+
+    position: sticky;
+    left: 0;
+    z-index: 3;
+}
+
+.xlsx-preview-heading,
+.xlsx-preview-row-number,
+.xlsx-preview-cell {
+
+    padding: 0.25rem 0.55rem;
+
+    border: 1px solid #374151;
+
+    white-space: nowrap;
+}
+
+.xlsx-preview-row-number {
+
+    position: sticky;
+    left: 0;
+    z-index: 1;
+
+    text-align: center;
+    color: #9ca3af;
+}
+
+.xlsx-preview-cell {
+
+    min-width: 5rem;
+
+    color: #f3f4f6;
+}
+
+.xlsx-preview-cell:hover {
+
+    background-color: #2a2a2a;
+}
+
+@media(max-width: 640px) {
+
+    .xlsx-preview-table {
+
+        font-size: 0.8rem;
+    }
+
+    .xlsx-preview-heading,
+    .xlsx-preview-row-number,
+    .xlsx-preview-cell {
+
+        padding: 0.2rem 0.45rem;
+    }
+}

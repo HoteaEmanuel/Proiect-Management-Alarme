@@ -1,0 +1,126 @@
+.file-preview-backdrop {
+
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+
+    padding: 3rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.78);
+}
+
+.file-preview-close-button {
+
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 51;
+
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+
+    background-color: rgba(15, 23, 38, 0.9);
+    color: var(--color-text);
+
+    cursor: pointer;
+}
+
+.file-preview-close-button:hover {
+
+    background-color: rgba(31, 41, 55, 0.95);
+}
+
+.file-preview-close-icon {
+
+    width: 1.35rem;
+    height: 1.35rem;
+}
+
+.file-preview-content {
+
+    width: min(64rem, calc(100vw - 6rem));
+    height: min(76vh, 40rem);
+    min-height: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: var(--radius-lg);
+    background-color: #111827;
+}
+
+.file-preview-content-xlsx {
+
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.file-preview-image {
+
+    max-width: 100%;
+    max-height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+}
+
+.file-preview-video {
+
+    width: 100%;
+    max-height: 100%;
+
+    display: block;
+}
+
+.file-preview-pdf {
+
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+    border-radius: var(--radius-lg);
+}
+
+@media(max-width: 768px) {
+
+    .file-preview-backdrop {
+
+        padding: 4rem 1.5rem 3rem;
+    }
+
+    .file-preview-content {
+
+        width: min(100%, 34rem);
+        height: 64dvh;
+    }
+}
+
+@media(max-width: 480px) {
+
+    .file-preview-backdrop {
+
+        padding: 5rem 1.5rem 4rem;
+    }
+
+    .file-preview-content {
+
+        width: min(100%, 22rem);
+        height: 56dvh;
+    }
+}

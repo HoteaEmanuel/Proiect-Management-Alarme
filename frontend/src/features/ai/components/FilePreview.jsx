@@ -1,28 +1,44 @@
 import { createPortal } from "react-dom";
+import { IoClose } from "react-icons/io5";
 import XlsxPreview from "./XlsxPreview";
 
-const FilePreview = ({ file, onClose, ...props }) => {
+import "@styles/features/ai/components/FilePreview.css";
+
+const FilePreview = ({ file, onClose, ...props }) =>
+{
   console.log("FILE HERE");
   console.log(file);
   const fileItem = file?.file;
   console.log(file);
   const type = fileItem?.type || file.file_format;
+  const isXlsx =
+    type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    type.toLowerCase() === "xlsx";
+
   console.log("FILE TYPE", type);
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+      className="file-preview-backdrop"
       onClick={onClose}
       {...props}
     >
+      <button
+        className="file-preview-close-button"
+        onClick={onClose}
+        aria-label="Close preview"
+      >
+        <IoClose className="file-preview-close-icon" />
+      </button>
+
       <div
-        className="max-w-6xl h-[90vh] w-full overflow-hidden"
+        className={`file-preview-content ${isXlsx ? "file-preview-content-xlsx" : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
         {type.includes("image") && (
           <img
             src={file?.url}
-            className="max-h-[90vh] mx-auto object-contain"
+            className="file-preview-image"
           />
         )}
 
@@ -30,15 +46,11 @@ const FilePreview = ({ file, onClose, ...props }) => {
           <iframe
             src={file?.url}
             title={file?.filename || fileItem.name}
-            width={"100%"}
-            height={"100%"}
-            style={{ border: "none", borderRadius: "8px" }}
+            className="file-preview-pdf"
           />
         )}
 
-        {(type ===
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-          type.toLowerCase() === "xlsx") && (
+        {isXlsx && (
           <XlsxPreview file={file?.file} url={file?.url} />
         )}
 
@@ -46,7 +58,7 @@ const FilePreview = ({ file, onClose, ...props }) => {
           <video
             src={file?.preview || file?.url}
             controls
-            className="w-full max-h-[90vh]"
+            className="file-preview-video"
           />
         )}
       </div>

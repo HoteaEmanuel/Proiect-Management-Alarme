@@ -2,14 +2,20 @@ import Button from "@components/Button";
 import { useEffect, useState } from "react";
 import { MdFileDownload } from "react-icons/md";
 import * as XLSX from "xlsx";
+
+import "@styles/features/ai/components/XlsxPreview.css";
+
 // Excel preview
-const XlsxPreview = ({ file, url }) => {
+const XlsxPreview = ({ file, url }) =>
+{
   console.log("XLSX PREVIEW")
   const [rows, setRows] = useState([]);
   console.log(file,url);
 
-  useEffect(() => {
-    const loadExcel = async () => {
+  useEffect(() =>
+  {
+    const loadExcel = async () =>
+    {
       let data;
 
       if (file) {
@@ -30,7 +36,8 @@ const XlsxPreview = ({ file, url }) => {
     loadExcel();
   }, [file, url]);
 
-  const handleDownload = async () => {
+  const handleDownload = async () =>
+  {
     if (file) {
       const url = URL.createObjectURL(file);
       const a = document.createElement("a");
@@ -48,22 +55,26 @@ const XlsxPreview = ({ file, url }) => {
 
   return (
     // Afisare asemanatoare cu un xlsx
-    <div className="max-h-[90vh] bg-[#1e1e1e] p-2 rounded-lg ">
-      <div className="w-full h-full flex justify-end">
-        <Button onClick={handleDownload}>
-          <MdFileDownload className="size-7 cursor-pointer text-white p-1 hover:bg-gray-900 rounded-full hover:scale-110" />
+    <div className="xlsx-preview">
+      <div className="xlsx-preview-header">
+        <Button
+          className="xlsx-preview-download-button"
+          onClick={handleDownload}
+        >
+          <MdFileDownload className="xlsx-preview-download-icon" />
         </Button>
       </div>
-      <div className="overflow-auto">
-        <table className="border-collapse text-sm overflow-auto ">
-          <thead className="sticky top-0 z-10">
+
+      <div className="xlsx-preview-table-wrapper">
+        <table className="xlsx-preview-table">
+          <thead>
             <tr>
-              <th className="bg-[#2b2b2b] border border-gray-700 px-3 py-1"></th>
+              <th className="xlsx-preview-heading xlsx-preview-corner-cell"></th>
 
               {rows[0]?.map((_, i) => (
                 <th
                   key={i}
-                  className="bg-[#2b2b2b] border border-gray-700 px-3 py-1 text-gray-300 font-medium text-center"
+                  className="xlsx-preview-heading"
                 >
                   {String.fromCharCode(65 + i)}
                 </th>
@@ -74,14 +85,14 @@ const XlsxPreview = ({ file, url }) => {
           <tbody>
             {rows.map((row, i) => (
               <tr key={i}>
-                <td className="sticky left-0 bg-[#2b2b2b] border border-gray-700 px-3 py-1 text-gray-400 text-center">
+                <td className="xlsx-preview-row-number">
                   {i + 1}
                 </td>
 
                 {row.map((cell, j) => (
                   <td
                     key={j}
-                    className="border border-gray-700 px-3 py-1 text-gray-100 min-w-[80px] hover:bg-[#2a2a2a] transition"
+                    className="xlsx-preview-cell"
                   >
                     {cell ?? ""}
                   </td>
