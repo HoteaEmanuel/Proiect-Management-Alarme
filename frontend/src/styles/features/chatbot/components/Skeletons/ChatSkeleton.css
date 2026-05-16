@@ -186,13 +186,13 @@
 
 /* Tablet */
 @media (max-width: 1024px) {
-    .message-bubble-width-280,
-    .message-bubble-width-340,
-    .message-bubble-width-420,
-    .message-bubble-width-460,
-    .message-bubble-width-520 {
-      max-width: 88%;
-    }
+  .message-bubble-width-280,
+  .message-bubble-width-340,
+  .message-bubble-width-420,
+  .message-bubble-width-460,
+  .message-bubble-width-520 {
+    max-width: 88%;
+  }
 }
 
 /* Mobile */
