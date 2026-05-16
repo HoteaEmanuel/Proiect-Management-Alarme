@@ -2,13 +2,16 @@ import React, { useRef, useState } from "react";
 import { useGetConversationFiles } from "../api/chatBot.api";
 import useChatStore from "@store/chatStore";
 import { RiLoader2Fill } from "react-icons/ri";
-import { FaRegFileExcel, FaFilePdf, FaFileCsv } from "react-icons/fa";
+import { FaRegFileExcel, FaFilePdf, FaFileCsv, FaFile } from "react-icons/fa";
 import { TbFilesOff } from "react-icons/tb";
 import { CiCircleList, CiCircleRemove } from "react-icons/ci";
 import Button from "@components/Button";
 import FilePreview from "./FilePreview";
 
-const FileIcon = ({ type }) => {
+import "@styles/features/ai/components/FilesModal.css";
+
+const FileIcon = ({ type }) =>
+{
   console.log("TYPE");
   console.log(type);
   if (type.toLowerCase() === "pdf") return <FaFilePdf />;
@@ -17,22 +20,24 @@ const FileIcon = ({ type }) => {
   return <FaFile />;
 };
 
-const fileTypeColor = (fileType) => {
+const fileTypeColor = (fileType) =>
+{
   console.log(fileType);
   const extension = fileType.toUpperCase();
   switch (extension) {
     case "PDF":
-      return "bg-red-700";
+      return "files-modal-type-pdf";
     case "XLSX":
-      return "bg-green-700";
+      return "files-modal-type-xlsx";
     case "CSV":
-      return "bg-gray-700";
+      return "files-modal-type-csv";
     default:
-      return "bg-gray-900";
+      return "files-modal-type-default";
   }
 };
 
-const FilesModal = ({ close }) => {
+const FilesModal = ({ close }) =>
+{
   const modalRef1 = useRef();
   console.log("FILES MODAL Active");
 
@@ -43,55 +48,59 @@ const FilesModal = ({ close }) => {
   const { data, isPending } = useGetConversationFiles(
     conversation.conversation_id,
   );
-  if (isPending) return <RiLoader2Fill className="size-4 animate-spin" />;
+
+  if (isPending) return <RiLoader2Fill className="files-modal-loader" />;
+
   return (
     <div
       ref={modalRef1}
-      className="fixed top-full right-0 z-50 w-1/6 rounded-xl overflow-hidden border border-white/10 "
+      className="files-modal"
     >
       <Button
-        className="absolute right-1 cursor-pointer hover:scale-110"
+        className="files-modal-close-button"
         onClick={close}
       >
-        <CiCircleRemove className="size-4" />
+        <CiCircleRemove className="files-modal-close-icon" />
       </Button>
+
       {data.length === 0 && (
-        <div className="flex flex-col h-1/2 items-center justify-between py-5">
-          <h2 className="font-bold text-xl text-center">No files attached</h2>
-          <div className="flex flex-col  items-center gap-4">
-            <p className="opacity-80 text-xs">
+        <div className="files-modal-empty">
+          <h2 className="files-modal-empty-title">No files attached</h2>
+          <div className="files-modal-empty-content">
+            <p className="files-modal-empty-text">
               No files found - try to upload some
             </p>
-            <TbFilesOff className="size-10 text-white/80" />
+            <TbFilesOff className="files-modal-empty-icon" />
           </div>
         </div>
       )}
+
       {data.length > 0 && (
         <>
-          <div className="rounded-t-xl bg-gray-900 p-1">
-            <h2 className="font-bold text-lg text-center">Files attached</h2>
+          <div className="files-modal-header">
+            <h2 className="files-modal-title">Files attached</h2>
           </div>
 
-          <ul className="flex flex-col gap-2 max-h-[80%] overflow-y-auto  py-5  px-4">
+          <ul className="files-modal-list">
             {data.map((file) => (
               <li
                 key={file?.url}
-                className="relative overflow-hidden flex flex-1 gap-2 hover:bg-gray-900 p-1 rounded-md cursor-pointer"
+                className="files-modal-item"
                 onMouseOver={() => setSelectedFile(file.filename)}
                 onMouseLeave={() => setSelectedFile(null)}
                 onClick={() => setPreviewFile(file)}
               >
                 <div
-                  className={`flex rounded-md items-center px-1.5 ${fileTypeColor(file.filename.split(".").pop())}`}
+                  className={`files-modal-type ${fileTypeColor(file.filename.split(".").pop())}`}
                 >
                   <FileIcon type={file.filename.split(".").pop()} />
                 </div>
 
-                <div className="flex flex-col gap-1 max-w-30">
-                  <span className="font-semibold text-sm truncate">
+                <div className="files-modal-file-content">
+                  <span className="files-modal-file-name">
                     {file.filename}
                   </span>
-                  <span className="uppercase opacity-50 text-xs">
+                  <span className="files-modal-file-extension">
                     {file.filename.split(".").pop()}
                     {/* File extension */}
                   </span>
@@ -101,6 +110,7 @@ const FilesModal = ({ close }) => {
           </ul>
         </>
       )}
+
       {previewFile && (
         <FilePreview file={previewFile} onClose={() => setPreviewFile(null)} />
       )}
