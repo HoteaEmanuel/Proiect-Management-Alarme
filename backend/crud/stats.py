@@ -59,15 +59,7 @@ def get_kpi_stats(db: Session, start_date: datetime, end_date: datetime) -> dict
         
     return stats
 
-<<<<<<< HEAD
-# Retrieves a raw list of alarms matching a specific category and label using a stored procedure
-def get_raw_alarms_by_category(db: Session, category: str, label: str) -> list[dict]:
-    # Calls the stored procedure
-=======
 def get_raw_alarms_by_category(db: Session, filters: ChartCategoryFilters):
-    
-    #apelez procedura stocata
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
     query = text("""
         EXEC dbo.GetAlarmsByCategory
             @category = :category,
@@ -75,17 +67,8 @@ def get_raw_alarms_by_category(db: Session, filters: ChartCategoryFilters):
             @start_date = :start_date,
             @end_date = :end_date
     """)
-<<<<<<< HEAD
-    # Executes and maps the results
-    result = db.execute(query, {"category": category, "label": label})
-    
-    # Returns a list of dictionaries (easily convertible to JSON or Excel)
-    return [dict(row) for row in result.mappings().all()]
-=======
     try:
-        #execut si mapez rezultatele
         result = db.execute(query, filters.model_dump())
-        #returnez o lista de dictionare (usor de transformat in JSON sau EXCEL)
         return [dict(row) for row in result.mappings().all()]
     
     except (ProgrammingError, OperationalError) as e:
@@ -118,4 +101,3 @@ def export_data_to_excel(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=statistics_export.xlsx"}
     )
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)

@@ -6,16 +6,12 @@ import logging
 from models import Alarm, Severity, AppError
 from schemas import RequestFilters, AlarmCreate, AlarmUpdate
 from core import DatabaseOperationError, InvalidInputError, DuplicateResourceError, EntityNotFoundError
-
-<<<<<<< HEAD
-# Executes a stored procedure to filtered, sorted, and paginated alarms
-def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list[dict]]:
-    # Calls the stored procedure that handles filtering, sorting, and pagination
-=======
+    
 logger = logging.getLogger(__name__)
 
-def get_filtered_alarms(db: Session, filters: RequestFilters):
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
+# Calls the stored procedure that handles filtering, sorting, and pagination
+def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list[dict]]:
+# Executes a stored procedure to filtered, sorted, and paginated alarms
     query = text("""
         EXEC dbo.CautareFiltrata 
             @status = :status,
@@ -41,13 +37,6 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
     try:
         # Executes the query; mappings provides the results as dictionaries
         result = db.execute(query, params).mappings().all()
-<<<<<<< HEAD
-    except Exception as e:
-        # Handles database execution failures
-        raise AppError(status_code=400, detail=f"Database error: {str(e)}")
-
-    # Returns empty results if none are found
-=======
 
     except (ProgrammingError, OperationalError) as e:
         db.rollback()
@@ -56,52 +45,36 @@ def get_filtered_alarms(db: Session, filters: RequestFilters):
         
         raise
 
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
     if not result:
         return 0, []
 
     # Retrieves the total number of alarms from the first row
     total_alarms = result[0]["TotalAlarms"]
 
-<<<<<<< HEAD
-    # Converts the result to dictionaries and removes TotalAlarms to comply with the Pydantic schema
-=======
     total_pages = (total_alarms + filters.page_size - 1) // filters.page_size
 
-    # convertesc rezultatul la dictionare si scot TotalAlarms ca sa 
-    # nu imi pice schema de Pydantic care se asteapta doar la campurile de alarme
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
+    # Converts the result to dictionaries and removes TotalAlarms to comply with the Pydantic schema
     alarms_list = []
     for row in result:
         row_dict = {key.lower(): value for key, value in row.items()}
         row_dict.pop("totalalarms", None) 
         alarms_list.append(row_dict)
 
-    return total_alarms, total_alarms, alarms_list
+    return total_pages, total_alarms, alarms_list
 
-<<<<<<< HEAD
 # Creates a new alarm in the database
 def create_alarm(db: Session, alarm_data: AlarmCreate) -> Alarm:
     # Checks if the alarm already exists
-=======
-def create_alarm(db: Session, alarm_data: AlarmCreate):
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
     existing_alarm = db.query(Alarm).filter(Alarm.alarm_number == alarm_data.alarm_number).first()
     if existing_alarm:
         raise DuplicateResourceError("An alarm with this number already exists.")
     
-<<<<<<< HEAD
     # Checks if the specified severity exists
-=======
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
     severity = db.query(Severity).filter(Severity.id == alarm_data.severity_id).first()
     if not severity:
         raise InvalidInputError("Invalid alarm severity")
     
-<<<<<<< HEAD
     # Creates the new alarm
-=======
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
     new_alarm = Alarm(
         alarm_number=alarm_data.alarm_number,
         status=alarm_data.status,
@@ -123,13 +96,6 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
         category_tier_2=alarm_data.category_tier_2,
         category_tier_3=alarm_data.category_tier_3,
     )
-<<<<<<< HEAD
-    # Adds the alarm to the database
-    db.add(new_alarm)
-    db.commit()
-    db.refresh(new_alarm)
-    return new_alarm
-=======
     
     try:
         db.add(new_alarm)
@@ -141,7 +107,6 @@ def create_alarm(db: Session, alarm_data: AlarmCreate):
         db.rollback()
         logger.error(f"Integrity error creating alarm {alarm_data.alarm_number}: {str(e)}")
         raise DatabaseOperationError("Could not create alarm due to a database conflict.")
->>>>>>> bf064d4 (Modified the error handling in all the files. Solved a few bugs related to statistics and excel exports. Completed deletion logic for AI Assistant conversations.)
 
 # Updates specific fields of an existing alarm
 def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate) -> Alarm:

@@ -71,7 +71,7 @@ async def refresh_token(
 
     new_access_token, user_id, username = process_token_refresh(refresh_token)
 
-    user_response = UserResponse(user_id, username)
+    user_response = UserResponse(user_id=user_id, username=username)
 
     return {
         "accesToken": new_access_token,
