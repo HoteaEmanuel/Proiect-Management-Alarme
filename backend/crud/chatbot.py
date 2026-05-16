@@ -11,7 +11,7 @@ import logging
 
 from models import MessageModel, ConversationModel, AppError, ConversationFileModel
 from schemas import MessageCreate, CloudinaryFileAttachment
-from integrations.cloudinary import get_signed_url
+from integrations.cloudinary import get_signed_url, delete_files_from_cloudinary
 from core import EntityNotFoundError, FileProcessingError, EmptyContentError, InvalidFilenameError, UnsupportedFileFormatError
 from core import BaseAppException, DatabaseOperationError, LLMQueryExecutionError
 
@@ -398,21 +398,23 @@ def delete_conversation(db: Session, user_id: str, conversation_id: str) -> None
                 ConversationModel.conversation_id == conversation_id,
                 ConversationModel.user_id == user_id)
         ).scalar()
+
         if conversation is None:
-            raise AppError(status_code=404, detail="Conversation not found")
+            raise EntityNotFoundError("Conversation", conversation_id)
         
-        # Delete all the messages associated to the conversation
-        db.query(MessageModel).filter(MessageModel.conversation_id == conversation_id).delete()
+        files = get_file_history(db, user_id, conversation_id)
+
+        delete_files_from_cloudinary(files)
         
-        # Delete conversation
         db.delete(conversation)
         db.commit()
         
-    except AppError:
+    except EntityNotFoundError:
         raise
     except Exception as e:
         db.rollback()
-        raise AppError(status_code=500, detail=f"Database error: {str(e)}") 
+        logger.error(f"Failed to delete conversation {conversation_id}: {str(e)}")
+        raise DatabaseOperationError("An error occurred while deleting the conversation from the database.")
 
 # Modifies the title of an existing conversation
 def update_conversation_title(db: Session, user_id: str, conversation_id: str, new_title: str) -> None:

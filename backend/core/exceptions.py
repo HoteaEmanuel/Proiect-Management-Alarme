@@ -71,3 +71,11 @@ class LLMQueryExecutionError(BaseAppException):
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, 
             error_code="LLM_QUERY_ERROR"
         )
+
+class InvalidInputError(BaseAppException):
+    def __init__(self, message: str = "Invalid input parameters provided."):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error_code="INVALID_INPUT"
+        )

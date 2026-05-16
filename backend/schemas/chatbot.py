@@ -26,8 +26,6 @@ class ExcelStructure(BaseModel):
 class UpdateTitleRequest(BaseModel):
     new_title: str
     
-    
-    
 class MessageRequest(BaseModel):
     user_id: str | None = None
     conversation_id: str | None = None

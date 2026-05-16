@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from datetime import datetime
+from core import InvalidInputError
 
 class SeverityResponse(BaseModel):
     id: int
@@ -49,7 +50,6 @@ class RequestFilters(BaseModel):
     severity: str | None = None
     type: str | None = None
     alert_group: str | None = None
-    server_name: str | None = None
     project: str | None = None
     date_column_to_filter: str | None = None
     start_date: datetime | None = None
@@ -98,3 +98,15 @@ class AlarmUpdate(BaseModel):
     category_tier_1: str | None = None
     category_tier_2: str | None = None
     category_tier_3: str | None = None
+
+class ChartCategoryFilters(BaseModel):
+    category: str
+    label: str
+    start_date: datetime = datetime(2026, 1, 1, 0, 0, 0)
+    end_date: datetime = datetime(2026, 12, 31, 23, 59, 59)
+
+    @model_validator(mode='after')
+    def check_dates(self):
+        if self.start_date > self.end_date:
+            raise InvalidInputError("Start date cannot be strictly greater than the end date.")
+        return self

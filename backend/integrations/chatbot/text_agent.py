@@ -61,7 +61,7 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
     if context.file_export:
         system_prompt += FILE_EXPORT_PROMPT
 
-    print(f"\n\n[TEXT AGENT] System Prompt: {system_prompt}\n\n")
+    print(f"\n\n[TEXT AGENT] Instruction: {instruction}\n\n")
 
     context.text_response = llm_request(system_prompt, instruction, context.conversation_history)
 

@@ -1,10 +1,13 @@
 import os
-
+import logging
 from pydantic import BaseModel
 from openai import AzureOpenAI
 from typing import Any
 
 from models import AppError
+from core import LLMQueryExecutionError, ExternalServiceError
+
+logger = logging.getLogger(__name__)
 
 ai_model = os.getenv("AI_MODEL")
 model_key = os.getenv("MODEL_KEY")
@@ -34,9 +37,18 @@ def llm_request(system_prompt: str, user_prompt: str, context: list[dict[str, st
         if response_model:
             config["response_format"] = response_model
             response = client.beta.chat.completions.parse(**config)
+
+            if not response.choices[0].message.parsed:
+                raise LLMQueryExecutionError("The AI model failed to structure the response correctly.")
+
             return response.choices[0].message.parsed
+        
         else:
             response = client.beta.chat.completions.create(**config)
             return response.choices[0].message.content
+        
     except Exception as e:
-        raise AppError(status_code=500, detail=f"AI model API call error: str({e})")
+        raise ExternalServiceError(
+            service_name="OpenAI",
+            details=f"API call failed: {str(e)}"
+        )
