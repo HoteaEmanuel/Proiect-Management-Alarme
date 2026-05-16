@@ -79,7 +79,7 @@ const ChatWindow = () =>
         {isAwaitingResponse && (
           <div className="chat-window-loading-wrapper">
             <Button
-              className="chat-window-loading-button glassy-container glassy-container-darker"
+              className="chat-window-loading-button"
               onClick={handleScrollDown}
             >
               <Loading />
@@ -90,7 +90,7 @@ const ChatWindow = () =>
         {showScrollBtn && !isAwaitingResponse && (
           <Button
             onClick={handleScrollDown}
-            className="chat-window-scroll-button glassy-container"
+            className="chat-window-scroll-button"
           >
             <FaArrowDown className="chat-window-scroll-icon" />
           </Button>
