@@ -27,21 +27,21 @@ ALGORITHM = os.getenv("ALGORITHM")
 
 db_dependency = Annotated[Session, Depends(get_db)]
         
-#######################################################
-
-# Creeaza un cont nou de utilizator verificand daca username-ul sau email-ul exista deja,
-# hash-uind parola si salvand noul utilizator in baza de date.
+# Creates a new user account by verifying username/email uniqueness, hashing the password, and saving it to the database
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register_user(create_user_request: CreateUserRequest, db: db_dependency):
-    create_user(create_user_request, db)
-    return {"message": "User created successfully"}
+async def create_user(create_user_request: CreateUserRequest, db: db_dependency) -> dict:
+    
+    try:
+        create_user(create_user_request, db)
+        return {"message": "User created successfully"}
+    except AppError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-#######################################################
 
-# Primeste datele de login, verifica utilizatorul in baza de date si returneaza un token daca autentificarea este valida.
+# Authenticates the user credentials and returns an access token along with an HTTP-only refresh token cookie
 @router.post("/login", response_model= TokenResponse , status_code=status.HTTP_200_OK)
-async def login(response: Response,login_request: LoginRequest, db: db_dependency):
+async def login(response: Response,login_request: LoginRequest, db: db_dependency) -> dict:
 
     user = authenticate_user(login_request.username, login_request.password, db)
     if user is None:
@@ -50,12 +50,11 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
             detail="Invalid username or password"
         )
     
-    # Creare acces token + refresh token 
-    # Acces token ul se pastreaza in memorie => il returnez
-    accesToken = create_jwt_token(user.username, user.id, timedelta(minutes=15)) # creeaza acces token cu durata de 15 minute
-    refreshToken = create_jwt_token(user.username, user.id, timedelta(days=30)) # creeaza refresh token cu durata de 30 de zile    
+    # Create access token (15 mins) and refresh token (30 days)
+    accesToken = create_jwt_token(user.username, user.id, timedelta(minutes=15))
+    refreshToken = create_jwt_token(user.username, user.id, timedelta(days=30))    
     
-    # Salvam refresh token in cookie HttpOnly pentru protectie
+    # Save refresh token in an HttpOnly cookie for security
     response.set_cookie(
             key="refresh_token",
             value=refreshToken,
@@ -65,32 +64,34 @@ async def login(response: Response,login_request: LoginRequest, db: db_dependenc
             max_age=60 * 60 * 24 * 30 # 30 de zile
         )
     
-    # returneaza access tokenul si userul
+    # Return the access token and user payload
     userResponse = UserResponse(user_id=user.id, username=user.username)
     return {
         "access_token": accesToken,
         "user":jsonable_encoder(userResponse),
     }
 
+
+
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
-# Returneaza datele utilizatorului autentificat daca tokenul este valid.
+# Returns the currently authenticated user's data if the access token is valid
 @router.get("/me", status_code=status.HTTP_200_OK)
-async def read_current_user(user: user_dependency):
+async def read_current_user(user: user_dependency) -> dict:
     return user
 
 
-# Creeaza un nou acces token daca refresh tokenul e valid si nu e expirat => userul ramane logat
+# Generates a new access token if the provided refresh token is valid and not expired
 @router.post("/refresh")
 async def refresh_token(
     response: Response,
     refresh_token: Annotated[str | None, Cookie()] = None
-):
+) -> dict:
     if refresh_token is None:
         raise HTTPException(status_code=401, detail="No refresh token")
 
     try:
-        # Verifica daca tokenul e valid
+        # Verify if the token is valid
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         user_id  = payload.get("id")
@@ -98,10 +99,10 @@ async def refresh_token(
         if username is None or user_id is None:
             raise HTTPException(status_code=401, detail="Invalid refresh token")
 
-        # genereaza un nou access token
+        # Generate a new access token
         new_acces_token = create_jwt_token(username, user_id, timedelta(minutes=15))
         userResponse = UserResponse(user_id=user_id, username=username)
-        # returneaza noul access token si userul
+        # Return the new access token and user payload
         return { "accessToken": new_acces_token, "user": userResponse }
 
     except JWTError:

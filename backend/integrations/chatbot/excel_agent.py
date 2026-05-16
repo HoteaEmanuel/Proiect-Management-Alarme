@@ -19,6 +19,7 @@ Your output must be a valid ExcelStructure JSON object:
 Do NOT reproduce the data. Only define the structure.
 """
 
+# Processes a row of data by safely converting its cells to integer, float, or string types for Excel
 def coerce_row(row: list) -> list:
     result = []
     for cell in row:
@@ -38,8 +39,8 @@ def coerce_row(row: list) -> list:
         result.append(str(cell))
     return result
 
-
-def get_excel_agent_response(db: Session, context: AgentContext, call: AgentCall):
+# Generates an Excel file based on the LLM-defined structure and database results, then saves it to the context
+def get_excel_agent_response(db: Session, context: AgentContext, call: AgentCall) -> AgentContext:
 
     instruction = call.instruction
 

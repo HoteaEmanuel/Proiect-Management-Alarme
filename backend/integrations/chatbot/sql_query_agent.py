@@ -6,7 +6,8 @@ from .prompt_builder import get_system_prompt
 from .client import llm_request
 from .query_validator import is_query_safe
 
-def get_sql_agent_response(db: Session, context: AgentContext, call: AgentCall):
+# Invokes the LLM to generate an SQL query, validates it, and executes it against the database
+def get_sql_agent_response(db: Session, context: AgentContext, call: AgentCall) -> AgentContext:
 
     system_prompt = get_system_prompt(
         persona_prompt=True,

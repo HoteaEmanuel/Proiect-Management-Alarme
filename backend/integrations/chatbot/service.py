@@ -2,29 +2,30 @@ from sqlalchemy.orm import Session
 import json
 from datetime import datetime
 
-from models import AppError
+from models import AppError, MessageModel
 from schemas import MessageRequest, MessageCreate, AssistantMessage, AgentContext, OutputBlock, RawFileAttachment, CloudinaryFileAttachment
 from crud import get_conversation_history, save_message_to_db, get_user_conversations
 from crud import create_new_conversation, set_response_id, save_conversation_files
 from integrations.cloudinary import upload_file_to_cloudinary
 from .orchestrator import get_orchestrator_response
 
-def prepare_conversation(db: Session, request: MessageRequest):
-    #daca e conversatie noua o creez si ii preiau id-ul creat de baza de date
+# Sets up the conversation context by validating the ID, saving the user's message, and fetching chat history
+def prepare_conversation(db: Session, request: MessageRequest) -> tuple[str, int, list[dict]]:
+    # If it's a new conversation, create it and retrieve the database-generated ID
     if request.new_chat:
         conversation = create_new_conversation(db=db, user_id=request.user_id)
         conversation_id = conversation.conversation_id
     else:
         conversation_id = request.conversation_id
 
-    #verificare conversation id
+    # Verify conversation ID
     conversations_list = get_user_conversations(db=db, user_id=request.user_id)
     conversations_list = [p.conversation_id for p in conversations_list]
 
     if conversation_id not in conversations_list:
         raise AppError(status_code=400, detail="conversation_id not found")
 
-    #salvez mesajul utilizatorului in baza de date
+    # Save the user's message to the database
     user_message_data = MessageCreate(
         conversation_id=conversation_id,
         user_id=request.user_id,
@@ -39,7 +40,8 @@ def prepare_conversation(db: Session, request: MessageRequest):
 
     return conversation_id, saved_user_message.id, context_history 
 
-def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[OutputBlock], agent_context: AgentContext, user_message_id: int):
+# Saves the generated assistant response to the database and links it to the triggering user message
+def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[OutputBlock], agent_context: AgentContext, user_message_id: int) -> MessageModel:
     bot_message_data = MessageCreate(
         conversation_id=request.conversation_id,
         user_id=request.user_id,
@@ -54,12 +56,12 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
 
     return bot_message_data
 
-
+# Uploads preserved files to Cloudinary and saves their metadata to the database
 def upload_and_save_user_preserve_files(
     db: Session,
     message_id: int,
     files: list[RawFileAttachment]
-):
+) -> list:
     preserve_files = [f for f in files if f.preserve]
     if not preserve_files:
         return []
@@ -75,8 +77,8 @@ def upload_and_save_user_preserve_files(
 
     return save_conversation_files(db, message_id, uploaded)
 
-#functie ce gestioneaza conversatiile user-agent din pagina de chat (practic un agent)
-def user_chat_request(db: Session, request: MessageRequest):
+# Manages user-agent conversations from the chat interface, acting as the main entry point
+def user_chat_request(db: Session, request: MessageRequest) -> AssistantMessage:
     try:
         request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
         

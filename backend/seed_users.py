@@ -1,10 +1,10 @@
-# Ce face scriptul:
-# - se conecteaza la baza de date
-# - verifica daca username-ul sau email-ul exista deja
-# - hash-uieste parola folosind bcrypt
-# - insereaza doar userii care nu exista deja
+# Script functionality:
+# - Connects to the database
+# - Checks if the username or email already exists
+# - Hashes the password using bcrypt
+# - Inserts only the users that do not already exist
 
-# Se ruleaza cu: "python seed_users.py"
+# Run with: "python seed_users.py"
 
 from passlib.context import CryptContext
 from database import SessionLocal
@@ -86,8 +86,8 @@ users_to_seed = [
     },
 ]
 
-
-def seed_users():
+# Seeds the database with a predefined list of users, skipping those that already exist
+def seed_users() -> None:
     db = SessionLocal()
 
     try:

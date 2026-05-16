@@ -9,7 +9,7 @@ from core import UnauthorizedError, DuplicateResourceError
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 #Queries the DB with the given credentials, raises UnauthorizedError if the username or password in invalid
-def authenticate_user(username: str, password: str, db: Session):
+def authenticate_user(username: str, password: str, db: Session) -> Users | None:
     user = db.query(Users).filter(Users.username == username).first()
     
     if not user or not bcrypt_context.verify(password, user.hashed_password):
@@ -17,8 +17,8 @@ def authenticate_user(username: str, password: str, db: Session):
     
     return user
 
-#Registers the new user
-def create_user(create_user_request: CreateUserRequest, db: Session):
+# Creates a new user in the database
+def create_user(create_user_request: CreateUserRequest, db: Session) -> Users:
     
     existing_user = db.query(Users).filter(
         (Users.username == create_user_request.username) |

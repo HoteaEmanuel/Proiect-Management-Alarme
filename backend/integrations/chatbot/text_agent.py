@@ -40,7 +40,8 @@ Format your responses using Markdown to ensure clarity and visual appeal:
 - Prefer tables over plain lists when data has multiple attributes per item
 """
 
-def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall):
+# Generates a natural language response using the LLM, incorporating SQL results or file contents if available
+def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall) -> AgentContext:
     
     instruction = call.instruction
     if context.sql_result is not None:

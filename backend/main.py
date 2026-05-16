@@ -12,7 +12,9 @@ app = FastAPI()
 
 setup_exception_handlers(app)
 
-# Middleware pentru a permite conectarea backendului cu frontenului
+setup_exception_handlers(app)
+
+# Middleware for backend-frontend connection
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
