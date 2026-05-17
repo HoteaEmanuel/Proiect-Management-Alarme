@@ -20,7 +20,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
         
 # Creates a new user account by verifying username/email uniqueness, hashing the password, and saving it to the database
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def create_user(create_user_request: CreateUserRequest, db: db_dependency) -> dict:
+async def register_user(create_user_request: CreateUserRequest, db: db_dependency) -> dict:
     create_user(create_user_request, db)
     return {"message": "User created successfully"}
 
@@ -46,7 +46,7 @@ async def login(response: Response, login_request: LoginRequest, db: db_dependen
     userResponse = UserResponse(user_id=user.id, username=user.username)
 
     return {
-        "access_token": acces_token,
+        "accessToken": acces_token,
         "user":jsonable_encoder(userResponse),
     }
 
@@ -74,6 +74,6 @@ async def refresh_token(
     user_response = UserResponse(user_id=user_id, username=username)
 
     return {
-        "accesToken": new_access_token,
+        "accessToken": new_access_token,
         "user": user_response
     }
