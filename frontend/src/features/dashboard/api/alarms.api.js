@@ -95,23 +95,25 @@ export const alarmsApi = {
   },
 
   // cere lista de alarme de la o o bucata din grafic, format json, pt popup
-  getChartDetails: async ({ category, label }) => {
+  getChartDetails: async ({ category, label, start_date, end_date }) => {
     const response = await api.get(
-        `${VITE_URL_APP}/alarms/chart-details?category=${category}&&label=${label}`,
+      `${VITE_URL_APP}/alarms/chart-details`,
+      {
+        params: { category, label, start_date, end_date }
+      }
     );
-
     return response.data;
   },
   // la fel dar Excel, pt descarcare
-  exportChartDetails: async ({ category, label }) => {
-      const response = await api.get(
-          `${VITE_URL_APP}/alarms/chart-details?category=${category}&&label=${label}&&export=true`,
-          {
-              responseType: "arraybuffer",
-          },
-      );
-
-      return response.data;
+  exportChartDetails: async ({ category, label, start_date, end_date }) => {
+    const response = await api.get(
+      `${VITE_URL_APP}/alarms/chart-details`,
+      {
+        params: { category, label, start_date, end_date, export: true },
+        responseType: "arraybuffer"
+      }
+    );
+    return response.data;
   },
 
 };

@@ -51,6 +51,8 @@ export const Statistics = () => {
             const data = await alarmsApi.getChartDetails({
                 category,
                 label,
+                start_date: filters.start_date,
+                end_date: filters.end_date,
             });
             console.log("Chart details data:", data);
             console.log("First alarm:", data[0]);
@@ -76,6 +78,8 @@ export const Statistics = () => {
         const data = await alarmsApi.exportChartDetails({
             category: selectedChart.category,
             label: selectedChart.label,
+            start_date: filters.start_date,
+            end_date: filters.end_date,
         });
 
         const blob = new Blob([data], {

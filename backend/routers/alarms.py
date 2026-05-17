@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 
 from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters, RecentAlarmsFilters
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated, get_alarms_for_export
 from models import Alarm
 from database import get_db
 from auth_utils import get_current_user
@@ -56,13 +56,8 @@ def edit_alarm(number:str, alarm_data: AlarmUpdate, db: Session = Depends(get_db
 
 # Exports all alarms matching current filters into a downloadable Excel file
 @router.get("/export")
-def export_alarms(filters: RequestFilters=Depends(), db: Session=Depends(get_db)) -> StreamingResponse:
-    # Ignore pagination limits for full export
-    filters.current_page = 1
-    filters.page_size = 1000
-    
-    #preiau alarmele (filtrate) fara paginare
-    _, _, alarms_list = get_filtered_alarms(db, filters)
+def export_alarms(filters: RequestFilters = Depends(), db: Session = Depends(get_db)) -> StreamingResponse:
+    alarms_list = get_alarms_for_export(db, filters)
     
     # Retrieve column names from the AlarmResponse schema and add them as headers
     columns=list(AlarmResponse.model_fields.keys())
@@ -72,10 +67,10 @@ def export_alarms(filters: RequestFilters=Depends(), db: Session=Depends(get_db)
         filename="alarms_export.xlsx",
         columns=columns
     )
-    
-@router.get("/chart-details")
-def get_chart_details(filters: ChartCategoryFilters, export: bool=False, db: Session=Depends(get_db)):
 
+# Retrieves alarms grouped by a specific chart category and label, with optional date filtering and Excel export
+@router.get("/chart-details", response_model=None)
+def get_chart_details(filters: ChartCategoryFilters=Depends(), export: bool=False, db: Session=Depends(get_db)) -> list[dict] | StreamingResponse:
     raw_data = get_raw_alarms_by_category(db, filters)
     
     # If the frontend only needs data for the popup, return the raw dictionary list
@@ -86,7 +81,7 @@ def get_chart_details(filters: ChartCategoryFilters, export: bool=False, db: Ses
 
 # Retrieves the most recent X alarms based on the provided limit
 @router.get("/recent", response_model=AlarmPaginationResponse)
-def get_recent_alarms(filters: RecentAlarmsFilters = Depends(), db: Session = Depends(get_db)):
+def get_recent_alarms(filters: RecentAlarmsFilters = Depends(), db: Session = Depends(get_db)) -> AlarmPaginationResponse:
     total_pages, total_alarms, alarms_list = get_recent_alarms_paginated(db, filters)
     return {
         "total_alarms": total_alarms,
