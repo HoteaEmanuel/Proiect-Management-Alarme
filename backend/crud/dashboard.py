@@ -10,7 +10,7 @@ from core import DatabaseOperationError, InvalidInputError, DuplicateResourceErr
 logger = logging.getLogger(__name__)
 
 # Calls the stored procedure that handles filtering, sorting, and pagination
-def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list[dict]]:
+def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, int, list[dict]]:
 # Executes a stored procedure to filtered, sorted, and paginated alarms
     query = text("""
         EXEC dbo.CautareFiltrata 
@@ -46,7 +46,7 @@ def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list
         raise
 
     if not result:
-        return 0, []
+        return 0, 0, []
 
     # Retrieves the total number of alarms from the first row
     total_alarms = result[0]["TotalAlarms"]

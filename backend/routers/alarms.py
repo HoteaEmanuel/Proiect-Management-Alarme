@@ -66,9 +66,6 @@ def export_alarms(filters: RequestFilters=Depends(), db: Session=Depends(get_db)
     
     # Retrieve column names from the AlarmResponse schema and add them as headers
     columns=list(AlarmResponse.model_fields.keys())
-    
-    print(columns)
-    print(f"alarme: {alarms_list}")
 
     return export_data_to_excel(
         raw_data=alarms_list,
