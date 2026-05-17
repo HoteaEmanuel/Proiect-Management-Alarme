@@ -122,6 +122,8 @@ def user_chat_request(db: Session, request: MessageRequest) -> AssistantMessage:
 
     bot_message_data = save_bot_response(db, request, output_blocks, agent_context, user_message_id)
     
+    print(agent_context.file_export)
+
     if agent_context.file_export:
         save_conversation_files(db, bot_message_data.id, [agent_context.file_export])
 
@@ -129,7 +131,7 @@ def user_chat_request(db: Session, request: MessageRequest) -> AssistantMessage:
         conversation_id=request.conversation_id,
         blocks=output_blocks,
         smart_replies=agent_context.smart_replies,
-        file=agent_context.file_export
+        files=agent_context.file_export
     )
     
     

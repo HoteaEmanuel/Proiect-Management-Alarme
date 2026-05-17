@@ -46,7 +46,7 @@ async def login(response: Response, login_request: LoginRequest, db: db_dependen
     userResponse = UserResponse(user_id=user.id, username=user.username)
 
     return {
-        "accessToken": acces_token,
+        "access_token": acces_token,
         "user":jsonable_encoder(userResponse),
     }
 

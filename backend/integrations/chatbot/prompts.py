@@ -57,7 +57,7 @@ You have access to a Microsoft SQL Server database with the following tables and
 
 ### dbo.CautareFiltrata
 Filters, searches and paginates alarms. Parameters:
-- Exact filters: @status, @severity (severity name), @type, @alert_group, @server_name, @project
+- Exact filters: @status, @severity (severity name), @type, @alert_group, @project
 - Text search (LIKE): @summary_like, @alert_description_like, @server_name_like
 - Date filtering: @date_column_to_filter, @start_date, @end_date
 - Sorting and pagination: @sort_by (default: alarm_number), @sort_order (ASC/DESC), @current_page, @page_size

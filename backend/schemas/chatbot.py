@@ -67,7 +67,7 @@ class AssistantMessage(BaseModel):
     role: Literal["assistant"] = "assistant"
     blocks: list[OutputBlock]
     smart_replies: list[str] | None = None
-    file: CloudinaryFileAttachment | None = None
+    files: list[CloudinaryFileAttachment] | None = []
 
 ChatMessage = Annotated[
     Union[UserMessage, AssistantMessage],

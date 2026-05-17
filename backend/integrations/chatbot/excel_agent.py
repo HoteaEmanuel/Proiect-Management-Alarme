@@ -34,7 +34,7 @@ def get_excel_agent_response(db: Session, context: AgentContext, call: AgentCall
         for record in (context.sql_result or [])
     ]
 
-    buffer = io.BytesIO
+    buffer = io.BytesIO()
     df = pd.DataFrame(mapped_data, columns=llm_response.headers)
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name=llm_response.sheet_name)

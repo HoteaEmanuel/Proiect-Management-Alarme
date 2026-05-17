@@ -465,9 +465,10 @@ def save_conversation_files(db: Session, message_id: int, files: list[Cloudinary
         for f in db_files:
             db.refresh(f)
     
+        return db_files
+    
     except IntegrityError as e:
         db.rollback()
         logger.error(f"Integrity error while saving the message 'persist' files: {str(e)}")
         raise DatabaseOperationError("Could not save the attached files due to a data conflict.")
 
-    return db_files
