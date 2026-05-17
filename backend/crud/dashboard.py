@@ -4,7 +4,7 @@ from sqlalchemy.exc import ProgrammingError, OperationalError, IntegrityError
 import logging
 
 from models import Alarm, Severity
-from schemas import RequestFilters, AlarmCreate, AlarmUpdate
+from schemas import RequestFilters, AlarmCreate, AlarmUpdate, RecentAlarmsFilters
 from core import DatabaseOperationError, InvalidInputError, DuplicateResourceError, EntityNotFoundError
     
 logger = logging.getLogger(__name__)
@@ -137,3 +137,13 @@ def update_alarm(db: Session, alarm_number: str, alarm_data: AlarmUpdate) -> Ala
         db.rollback() # Curățăm sesiunea
         logger.error(f"Integrity error updating alarm {alarm_number}: {str(e)}")
         raise DatabaseOperationError("Could not update the alarm due to a data conflict.")
+
+# Retrieves the most recent X alarms from the database, sorted by last occurrence datetime in descending order
+def get_recent_alarms_paginated(db: Session, filters: RecentAlarmsFilters) -> tuple[int, int, list[dict]]:
+    request_filters=RequestFilters(
+        current_page=1,
+        page_size=filters.limit,
+        sort_by="last_occurence_datetime",
+        sort_order="desc"
+    )
+    return get_filtered_alarms(db, request_filters)

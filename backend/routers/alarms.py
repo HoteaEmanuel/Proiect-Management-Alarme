@@ -4,8 +4,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 
-from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel
+from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters, RecentAlarmsFilters
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated
 from models import Alarm
 from database import get_db
 from auth_utils import get_current_user
@@ -86,4 +86,15 @@ def get_chart_details(filters: ChartCategoryFilters, export: bool=False, db: Ses
         return raw_data
     
     return export_data_to_excel(raw_data)
+
+# Retrieves the most recent X alarms based on the provided limit
+@router.get("/recent", response_model=AlarmPaginationResponse)
+def get_recent_alarms(filters: RecentAlarmsFilters = Depends(), db: Session = Depends(get_db)):
+    total_pages, total_alarms, alarms_list = get_recent_alarms_paginated(db, filters)
+    return {
+        "total_alarms": total_alarms,
+        "total_pages": total_pages,
+        "current_page": 1,
+        "alarms": alarms_list
+    }
     

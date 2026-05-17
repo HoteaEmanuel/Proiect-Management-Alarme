@@ -110,3 +110,6 @@ class ChartCategoryFilters(BaseModel):
         if self.start_date > self.end_date:
             raise InvalidInputError("Start date cannot be strictly greater than the end date.")
         return self
+    
+class RecentAlarmsFilters(BaseModel):
+    limit: int = 10
