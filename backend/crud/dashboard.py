@@ -46,7 +46,7 @@ def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, list
         raise
 
     if not result:
-        return 0, []
+        return 0, [], []
 
     # Retrieves the total number of alarms from the first row
     total_alarms = result[0]["TotalAlarms"]
@@ -147,3 +147,20 @@ def get_recent_alarms_paginated(db: Session, filters: RecentAlarmsFilters) -> tu
         sort_order="desc"
     )
     return get_filtered_alarms(db, request_filters)
+
+# Retrieves all alarms matching the given filters, ignoring pagination, for export purposes
+def get_alarms_for_export(db: Session, filters: RequestFilters) -> list[dict]:
+    filters.current_page = 1
+    filters.page_size = 1000
+    
+    # Converteste 'All' la None ca procedura sa ignore filtrul
+    if filters.status == 'All':
+        filters.status = None
+    if filters.severity == 'All':
+        filters.severity = None
+    if filters.type == 'All':
+        filters.type = None
+    
+    _, _, alarms_list = get_filtered_alarms(db, filters)
+    
+    return alarms_list
