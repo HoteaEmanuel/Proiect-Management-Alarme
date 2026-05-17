@@ -24,7 +24,7 @@ CREATE TABLE Messages (
         REFERENCES Conversations(conversation_id),
 
     CONSTRAINT CHK_Message_Role 
-        CHECK (role IN ('user', 'assistant', 'system'))
+        CHECK (role IN ('user', 'assistant', 'system')),
     
     CONSTRAINT CHK_Message_SmartReplies_JSON 
         CHECK (smart_replies IS NULL OR ISJSON(smart_replies) = 1)
