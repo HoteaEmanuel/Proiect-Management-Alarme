@@ -8,6 +8,7 @@ import { api } from "@lib/axios.js";
 import useAuthStore from "@store/authStore.js";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import removeMarkdown from "remove-markdown";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const useCreateConversation = () => {
   const navigate = useNavigate();
@@ -185,7 +186,22 @@ export const useGetConversationFiles = (conversationId) => {
     queryKey: ["conversationFiles", conversationId],
   });
 };
-
+export const useReadChatResponse = () => {
+  return useMutation({
+    mutationFn: async ({ text }) => {
+      console.log("TEXT TO READ");
+      const cleanText = removeMarkdown(text);
+      console.log(cleanText);
+      const response = await api.post(`${VITE_URL_APP}/audio/speak`, {
+        text: cleanText,
+      }, {
+         responseType:'arraybuffer'
+      });
+      return response;
+    },
+    mutationKey: ["read-chat-response"],
+  });
+};
 // export const useReadResponse=()=>{
 //   return useMutation({
 //     mutationFn:async()=>{

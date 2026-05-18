@@ -4,7 +4,7 @@ import useChatStore from "@store/chatStore";
 import { RiLoader2Fill } from "react-icons/ri";
 import { FaRegFileExcel, FaFilePdf, FaFileCsv, FaFile } from "react-icons/fa";
 import { TbFilesOff } from "react-icons/tb";
-import { CiCircleList, CiCircleRemove } from "react-icons/ci";
+import { CiCircleList, CiCircleRemove, CiFileOff } from "react-icons/ci";
 import Button from "@components/Button";
 import FilePreview from "./FilePreview";
 
@@ -48,7 +48,6 @@ const FilesModal = ({ close }) => {
 
   if (isPending) return <RiLoader2Fill className="files-modal-loader" />;
 
-
   return (
     <div ref={modalRef1} className="files-modal">
       <Button className="files-modal-close-button" onClick={close}>
@@ -66,7 +65,13 @@ const FilesModal = ({ close }) => {
           </div>
         </div>
       )}
-
+      { /* Verificare in caz de siguranta  */}
+      {data.user_files.length === 0 && data.assistant_files.length === 0 && (
+        <div className="files-modal-header">
+          <p className="font-semibold">No files found</p>
+          <CiFileOff className="size-4"/>
+        </div>
+      )}
       {(data.user_files.length > 0 || data.assistant_files.length > 0) && (
         <>
           <div className="files-modal-header">
@@ -74,7 +79,7 @@ const FilesModal = ({ close }) => {
           </div>
 
           <ul className="files-modal-list">
-            {data?.user_files?.length>0 && (
+            {data?.user_files?.length > 0 && (
               <>
                 <p>Your files</p>
                 {data.user_files.map((file) => (
@@ -104,7 +109,7 @@ const FilesModal = ({ close }) => {
                 ))}
               </>
             )}
-            {data?.assistant_files.length>0 && (
+            {data?.assistant_files.length > 0 && (
               <>
                 <p>Assistant generated files</p>
                 {data.assistant_files.map((file) => (

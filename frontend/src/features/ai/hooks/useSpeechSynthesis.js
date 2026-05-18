@@ -1,8 +1,11 @@
 import { useRef, useState } from "react";
+import { useReadChatResponse } from "../api/chatBot.api";
+import { toast } from "sonner";
 const VITE_ELEVENLABS_KEY = import.meta.env.VITE_ELEVENLABS_KEY;
 const useSpeechSynthesis = () => {
   const [speaking, setSpeaking] = useState(false);
   const audioRef = useRef(null);
+  const { mutateAsync: readResponse } = useReadChatResponse();
 
   const speak = async (text) => {
     if (!text) return;
@@ -15,34 +18,8 @@ const useSpeechSynthesis = () => {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
-      
-      const response = await fetch(
-        "https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB",
-        {
-          method: "POST",
-          headers: {
-            "xi-api-key": VITE_ELEVENLABS_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            text,
-            model_id: "eleven_multilingual_v2",
-            voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.75,
-            },
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const err = await response.text();
-        console.error(err);
-        throw new Error("TTS failed");
-      }
-
-      const blob = await response.blob();
-
+      const response = await readResponse({ text });
+      const blob = new Blob([response.data], { type: "audio/mpeg" });
       const audioUrl = URL.createObjectURL(blob);
 
       const audio = new Audio(audioUrl);
@@ -61,7 +38,8 @@ const useSpeechSynthesis = () => {
 
       await audio.play();
     } catch (err) {
-      console.error("Speech error:", err);
+      // console.error("Speech error:", err);
+      toast.error(err?.message || "Reading failed");
       setSpeaking(false);
     }
   };

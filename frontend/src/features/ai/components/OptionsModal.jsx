@@ -1,7 +1,10 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { MdEdit } from "react-icons/md";
-import { RiDeleteBin5Fill } from "react-icons/ri";
-import { useDeleteConversation } from "../api/chatBot.api";
+import { RiDeleteBin5Fill, RiLoader2Fill } from "react-icons/ri";
+import {
+  useDeleteConversation,
+  useGetConversationFiles,
+} from "../api/chatBot.api";
 import { GiFiles } from "react-icons/gi";
 import Button from "@components/Button";
 import { toast } from "sonner";
@@ -19,9 +22,11 @@ const OptionsModal = ({
   setEditingValue,
   fullOptions = false,
   setShowFilesModal,
-}) =>
-{
+}) => {
   const { mutateAsync: deleteConversation } = useDeleteConversation(
+    conversation.conversation_id,
+  );
+  const { data, isPending } = useGetConversationFiles(
     conversation.conversation_id,
   );
 
@@ -30,18 +35,21 @@ const OptionsModal = ({
 
   const modalRef = useRef(null);
 
-  useLayoutEffect(() =>
-  {
+  useLayoutEffect(() => {
     if (!position || !modalRef.current) return;
 
-    modalRef.current.style.setProperty("--options-modal-top", `${position.top}px`);
-    modalRef.current.style.setProperty("--options-modal-left", `${position.left}px`);
+    modalRef.current.style.setProperty(
+      "--options-modal-top",
+      `${position.top}px`,
+    );
+    modalRef.current.style.setProperty(
+      "--options-modal-left",
+      `${position.left}px`,
+    );
   }, [position]);
 
-  useEffect(() =>
-  {
-    const handleClickOutside = (e) =>
-    {
+  useEffect(() => {
+    const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
         showOptions(false);
         clear(null);
@@ -52,8 +60,7 @@ const OptionsModal = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [clear, showOptions]);
 
-  const handleDelete = async () =>
-  {
+  const handleDelete = async () => {
     try {
       await deleteConversation();
 
@@ -62,18 +69,16 @@ const OptionsModal = ({
       toast.error(error?.message || "Deletion failed");
     }
   };
-
+  if (isPending) return <RiLoader2Fill className="size-5 animate-spin" />;
   return (
     <div
       ref={modalRef}
       className={`options-modal ${position ? "options-modal-floating" : ""}`}
-      onMouseLeave={() =>
-      {
+      onMouseLeave={() => {
         showOptions(false);
         clear(null);
       }}
-      onBlur={() =>
-      {
+      onBlur={() => {
         console.log("BLURRRR");
         showOptions(false);
         clear(null);
@@ -83,8 +88,7 @@ const OptionsModal = ({
         <li>
           <Button
             className="options-modal-button"
-            onClick={() =>
-            {
+            onClick={() => {
               setEditingId(conversation.conversation_id);
               setEditingValue(conversation.conversation_title);
               showOptions(false);
@@ -105,17 +109,19 @@ const OptionsModal = ({
           </Button>
         </li>
 
-        {fullOptions && (
-          <li>
-            <Button
-              className="options-modal-button"
-              onClick={() => setShowFilesModal(true)}
-            >
-              <GiFiles className="options-modal-icon options-modal-icon-large" />
-              Files attached
-            </Button>
-          </li>
-        )}
+        {fullOptions &&
+          (data?.user_files?.length > 0 ||
+            data?.assistant_files?.length > 0) && (
+            <li>
+              <Button
+                className="options-modal-button"
+                onClick={() => setShowFilesModal(true)}
+              >
+                <GiFiles className="options-modal-icon options-modal-icon-large" />
+                Files attached
+              </Button>
+            </li>
+          )}
       </ul>
     </div>
   );
