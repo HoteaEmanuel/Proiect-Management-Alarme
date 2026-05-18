@@ -2,29 +2,46 @@
 
     width: 100%;
     height: 100%;
+    min-height: 6.25rem;
 
     padding: 1rem;
 
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    justify-content: flex-start;
+    gap: 0.45rem;
 
     border: 1px solid rgba(129, 140, 248, 0.3);
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
 
     transition: box-shadow 0.3s ease;
+
     &:hover {
 
         box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
     }
 }
 
+.stat-card-label-row {
+
+    min-height: 2rem;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
 .stat-card-label {
 
+    margin: 0;
+
+    color: var(--color-text);
     font-size: var(--fs-2xs);
+    font-weight: var(--fw-medium);
     text-transform: uppercase;
     letter-spacing: 0.12em;
+    line-height: 1.35;
 }
 
 .stat-card-value-row {
@@ -36,7 +53,6 @@
 
 .stat-card-value {
 
-    /* font-size: 2.25rem; */
     font-size: var(--fs-xl);
     font-weight: var(--fw-bold);
     line-height: 1;
@@ -46,4 +62,85 @@
 
     color: #a5b4fc;
     font-size: var(--fs-sm);
+    line-height: 1.2;
+}
+
+.stat-card-active-status {
+
+    position: relative;
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+    margin-top: 2px;
+
+    display: inline-flex;
+}
+
+.stat-card-active-pulse {
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    border-radius: 999px;
+    background-color: #4ade80;
+    opacity: 0.75;
+
+    animation: stat-card-active-pulse 1.4s ease-out infinite;
+}
+
+.stat-card-active-dot {
+
+    position: relative;
+    width: 12px;
+    height: 12px;
+
+    border-radius: 999px;
+    background-color: var(--color-success);
+}
+
+@keyframes stat-card-active-pulse {
+
+    0% {
+
+        transform: scale(0.9);
+        opacity: 0.75;
+    }
+
+    70% {
+
+        transform: scale(1.8);
+        opacity: 0;
+    }
+
+    100% {
+
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+@media(max-width: 480px) {
+
+    .stat-card {
+
+        min-height: 5.75rem;
+        padding: 0.9rem;
+        gap: 0.75rem;
+    }
+
+    .stat-card-label-row {
+
+        min-height: 1.75rem;
+    }
+
+    .stat-card-value {
+
+        font-size: 1.45rem;
+    }
+
+    .stat-card-unit {
+
+        font-size: var(--fs-xs);
+    }
 }

@@ -228,24 +228,11 @@ export const Statistics = () => {
                             value={statistics.General.Total}
                         />
 
-                        <div className="statistics-active-card">
-                            <div className="statistics-active-header">
-                                <span className="statistics-active-label">
-                                    Active alarms
-                                </span>
-
-                                <span className="statistics-active-status">
-                                    <span className="statistics-active-pulse"></span>
-                                    <span className="statistics-active-dot"></span>
-                                </span>
-                            </div>
-
-                            <div className="statistics-active-value-row">
-                                <span className="statistics-active-value">
-                                    {statistics.Status.Active}
-                                </span>
-                            </div>
-                        </div>
+                        <StatCard
+                            label={"Active alarms"}
+                            value={statistics.Status.Active}
+                            active={true}
+                        />
 
                         <StatCard
                             label={"Average Resolution Time"}
