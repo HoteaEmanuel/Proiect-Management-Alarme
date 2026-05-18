@@ -72,13 +72,25 @@
 
 .alarm-details-close-button {
 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+
     border: 1px solid #334155;
     border-radius: 8px;
     background-color: transparent;
     color: #e5e7eb;
-    padding: 8px 14px;
-    font-weight: 700;
+
     cursor: pointer;
+}
+.alarm-details-close-icon {
+
+    width: 20px;
+    height: 20px;
 }
 
 .alarm-details-close-button:hover {
@@ -269,7 +281,8 @@
 
     .alarm-details-header {
 
-        flex-direction: column;
+        flex-direction: row;
+        align-items: flex-start;
     }
 
     .alarm-details-title-group {
@@ -280,5 +293,41 @@
     .alarm-details-grid {
 
         grid-template-columns: 1fr;
+    }
+
+    .alarm-details-title {
+
+        font-size: 19px;
+    }
+
+    .alarm-details-subtitle {
+
+        font-size: 13px;
+    }
+
+    .alarm-details-icon-wrapper {
+
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+
+    .alarm-details-icon {
+
+        width: 21px;
+        height: 21px;
+    }
+
+    .alarm-details-close-button {
+
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .alarm-details-close-icon {
+
+        width: 19px;
+        height: 19px;
     }
 }
