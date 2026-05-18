@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Modal } from "@mui/material";
-import { FiAlertTriangle } from "react-icons/fi";
+import { FiAlertTriangle, FiX } from "react-icons/fi";
 import "@styles/features/dashboard/components/AlarmDetailsModal.css";
 
 const AlarmDetailsModal = ({ open, alarm, onClose }) => {
@@ -58,8 +58,9 @@ const AlarmDetailsModal = ({ open, alarm, onClose }) => {
                         type="button"
                         className="alarm-details-close-button"
                         onClick={onClose}
+                        aria-label="Close alarm details"
                     >
-                        Close
+                        <FiX className="alarm-details-close-icon" />
                     </button>
                 </div>
 

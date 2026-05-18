@@ -6,7 +6,7 @@ import {
 import { AlarmsTable } from "@features/dashboard/components/Table";
 import { useState } from "react";
 import { alarmsApi } from "@features/dashboard/api/alarms.api";
-import { CiExport, CiPlug1 } from "react-icons/ci";
+import { CiExport, CiFilter } from "react-icons/ci";
 import { useSearchParams } from "react-router-dom";
 import "@styles/pages/Dashboard.css";
 import { RiLoader2Fill } from "react-icons/ri";
@@ -44,6 +44,7 @@ const Dashboard = () => {
   useGetFilteredAlarms;
   // Alarma selectata pentru pop up
   const [selectedAlarm, setSelectedAlarm] = useState(null);
+  const [hasFiltersOpen, setHasFiltersOpen] = useState(false);
 
   // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
   useEffect(() => {
@@ -119,7 +120,26 @@ const Dashboard = () => {
         </Tooltip>
       </div>
 
-      <div className="dashboard-filters">
+      <div className="dashboard-filter-toggle-tooltip">
+        <Tooltip text={hasFiltersOpen ? "Hide filters" : "Show filters"}>
+          <Button
+            type="button"
+            className="dashboard-filter-toggle"
+            onClick={() => setHasFiltersOpen((current) => !current)}
+            aria-expanded={hasFiltersOpen}
+            aria-controls="dashboard-filters"
+          >
+            <CiFilter className="dashboard-filter-toggle-icon" />
+
+            <span>{hasFiltersOpen ? "Hide filters" : "Filters"}</span>
+          </Button>
+        </Tooltip>
+      </div>
+
+      <div 
+         id="dashboard-filters"
+         className={`dashboard-filters ${hasFiltersOpen ? "dashboard-filters-open" : ""}`}
+      >
         <div className="dashboard-filter">
           <label className="dashboard-filter-label">Start date</label>
           <input
