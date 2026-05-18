@@ -318,12 +318,32 @@
 
     .dashboard-filter-toggle-tooltip {
 
-        display: block;
+        display: inline-block;
+        width: fit-content;
+        align-self: flex-start;
     }
 
     .dashboard-filter-toggle-tooltip .tooltip {
 
-        width: 100%;
+        width: auto;
+    }
+
+    .dashboard-filter-toggle {
+
+        width: auto;
+        min-height: 2.25rem;
+        margin-bottom: 0.75rem;
+        padding: 0.45rem 0.7rem;
+        gap: 0.4rem;
+
+        font-size: var(--fs-xs);
+        border-radius: var(--radius-md);
+    }
+
+    .dashboard-filter-toggle-icon {
+
+        width: 1rem;
+        height: 1rem;
     }
 
     .dashboard-filters {
