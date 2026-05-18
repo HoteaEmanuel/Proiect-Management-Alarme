@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useReadChatResponse } from "../api/chatBot.api";
 import { toast } from "sonner";
-const VITE_ELEVENLABS_KEY = import.meta.env.VITE_ELEVENLABS_KEY;
 const useSpeechSynthesis = () => {
   const [speaking, setSpeaking] = useState(false);
   const audioRef = useRef(null);

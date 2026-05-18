@@ -12,7 +12,7 @@ const Header = ({ onToggle,isSideBarOpen }) => {
     <header className="header">
 
       {/* <h2 className="font-sans font-bold text-2xl">Noxy</h2> */}
-       <img src="/images/logo-idee-1.png" alt="logo-image" className="object-cover w-fit h-8 drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"/>
+       <img src="/images/logo-alb-2.png" alt="logo-image" className="object-cover w-fit h-7 drop-shadow-[0_0_0px_rgba(255,255,255,0.8)]"/>
       <Button className="cursor-pointer hover:scale-105 menuBtn"  onClick={onToggle} aria-expanded={isSideBarOpen}>
         <IoIosMenu className="size-7" />
       </Button>
