@@ -39,7 +39,14 @@
   transform: translateX(0);
   transition: opacity 1s ease, transform 1s ease; 
 }
-
+.files-wrapper{
+  display: flex;
+  gap:1;
+  margin-top: 1rem;
+}
+.suggestions-wrapper{
+  margin-top: 1rem;
+}
 .chat-response-chart-wrapper {
   width: 100%;
   max-width: 100%;
