@@ -33,6 +33,7 @@ import File from "./File";
 
 import "@styles/features/ai/components/ChatResponse.css";
 import useChatStore from "@store/chatStore";
+import useScrollAnimation from "@hooks/useScrollAnimation.js";
 
 const COLORS = [
   "#6366f1",
@@ -187,11 +188,13 @@ const Chart = ({ content }) => {
 };
 
 const ChatSuggestions = ({ suggestions }) => {
+  const ref=useRef(null);
+  useScrollAnimation(ref);
   const { setMessage } = useChatStore();
+  console.log("suggestions", suggestions);
   if (suggestions === null || suggestions?.length == 0) return null;
   return (
-    <div className="w-full mt-10">
-      <p className="font-semibold w-full mb-5">Suggestions: </p>
+    <div className="slide-hidden mt-10" ref={ref}> 
       <ul className="flex flex-col md:flex-row gap-2 ">
         {suggestions.map((item) => (
           <li
@@ -302,12 +305,11 @@ const ChatResponse = ({
               )}
             </div>
           )}
-
-          {smart_replies && last_message && (
-            <ChatSuggestions suggestions={smart_replies} />
-          )}
         </div>
       ))}
+      {smart_replies && last_message && (
+        <ChatSuggestions suggestions={smart_replies} />
+      )}
     </div>
   );
 };

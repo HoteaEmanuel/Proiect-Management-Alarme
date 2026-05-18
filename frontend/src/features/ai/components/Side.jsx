@@ -19,8 +19,8 @@ import OptionsModal from "./OptionsModal";
 import Input from "@components/Input";
 import { BsCloudFogFill } from "react-icons/bs";
 import ChatSkeleton from "./Skeletons/ChatSkeleton";
-import ConversationSideList from "./ConversationSideList";
-import ConversationListSkeleton from "./Skeletons/ConversationListSkeleton";
+import ChatsSideList from "./ChatsSideList";
+import ChatsListSkeleton from "./Skeletons/ChatsListSkeleton";
 
 const Side = ({ isOpen, onNavigate }) =>
 {
@@ -75,8 +75,8 @@ const Side = ({ isOpen, onNavigate }) =>
 
         <hr />
         <h1 className="chat-side-recents-title">Recents</h1>
-        <Suspense fallback={<ConversationListSkeleton />}>
-          <ConversationSideList onNavigate={onNavigate} />
+        <Suspense fallback={<ChatsListSkeleton />}>
+          <ChatsSideList onNavigate={onNavigate} />
         </Suspense>
 
         {showOptions && (

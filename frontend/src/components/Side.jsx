@@ -14,6 +14,7 @@ const Side = ({ isOpen, onNavigate}) => {
   return (
     <aside className={`side ${isOpen ? 'open':''}`}>
       <h1 className="side-title">Alarm Manager</h1>
+           
 
       <nav className="side-nav">
         <NavLink
