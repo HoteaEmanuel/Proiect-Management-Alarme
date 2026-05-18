@@ -18,6 +18,7 @@
     font-weight: var(--fw-medium);
 }
 
+/* Scroll bar functionabil */
 .conversation-side-list {
 
     min-height: 0;
@@ -33,11 +34,19 @@
     overflow-y: auto;
     overflow-x: hidden;
 
+    scrollbar-width: none;
+
     color: var(--color-text);
     font-size: var(--fs-xs);
 
     list-style: none;
 }
+
+.conversation-side-list::-webkit-scrollbar {
+
+    display: none;
+}
+/* Scroll bar functionabil */
 
 .conversation-side-title {
 
