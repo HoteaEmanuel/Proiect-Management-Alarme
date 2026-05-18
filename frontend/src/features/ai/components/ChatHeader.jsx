@@ -14,6 +14,7 @@ import Input from "@components/Input";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { RiLoader2Fill } from "react-icons/ri";
 import { IoIosMenu } from "react-icons/io";
+import useHeaderVisibile from "@hooks/useHeaderVisible";
 const ChatHeader = () => {
   const { conversation, setConversation } = useChatStore();
   console.log("SHOW THIS");
@@ -28,6 +29,7 @@ const ChatHeader = () => {
   const [showFilesModal, setShowFilesModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const { id } = useParams();
+  const {headerVisible}= useHeaderVisibile();
   const { data: conversationData, isPending } = useGetConversationBaseData(id, {
     enabled: !!id,
   });
@@ -71,9 +73,11 @@ const ChatHeader = () => {
   };
   // console.log(showOptionsButton);
   console.log("EDITING ID", editingId);
+  console.log("CHAT HEADER VISIBILITY");
+  console.log(headerVisible);
     return (
     <header
-      className="chat-header"
+      className={`chat-header ${headerVisible ? 'header-visible': 'header-hidden'}`}
       // onMouseEnter={() => setShowOptionsButton(true)}
       // onMouseLeave={() => setShowOptionsButton(false)}
     >

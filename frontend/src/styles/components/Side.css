@@ -112,6 +112,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
   opacity: 0.5;
+  overflow-y: auto;
 }
 
 @media (max-width: 1023px) {

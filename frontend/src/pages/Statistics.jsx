@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     ResponsiveContainer,
     Tooltip,
@@ -16,8 +16,11 @@ import GraficBara from "@features/dashboard/components/statistics/GraficBara";
 import GraficPie from "@features/dashboard/components/statistics/GraficPie";
 import { useSearchParams } from "react-router-dom";
 import ChartDetailsModal from "@features/dashboard/components/statistics/ChartDetailsModal";
+import useHeaderVisible from "@hooks/useHeaderVisible";
 
 export const Statistics = () => {
+    const containerRef=useRef(null);
+    const {headerVisible} = useHeaderVisible(containerRef);
     const year = new Date().getFullYear();
     const firstDay = `${year}-01-01`;
     const lastDay = `${year}-12-31`;
@@ -178,7 +181,7 @@ export const Statistics = () => {
         }));
 
     return (
-        <div className="statistics-page">
+        <div className="statistics-page" ref={containerRef}>
             <div className="statistics-page-header">
                 <h1 className="statistics-title">KPI Statistics</h1>
 
