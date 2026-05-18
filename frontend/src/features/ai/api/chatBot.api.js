@@ -86,8 +86,8 @@ export const useGetUserConversations = () => {
       const response = await api.get(`${VITE_URL_APP}/api/conversations`);
       console.log("CALLING API CHATS");
       console.log(response);
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      await delay(1000);
+      // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      // await delay(1000);
       return response.data.conversations;
     },
     queryKey: ["conversations", user.user_id],

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
-import { FaArrowUp } from "react-icons/fa";
+import { FaArrowUp, FaStop } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
 import LoadingCircle from "../../../components/LoadingCircle";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import useVoiceToText from "../hooks/useVoiceToText.js";
 import useAuthStore from "@store/authStore.js";
 import { api } from "@lib/axios";
 import "@styles/features/ai/components/ChatInput.css";
+import axios from "axios";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -24,6 +25,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ChatInput = ({ placeholder, chatEnd }) => {
   const input = useRef();
   const fileInput = useRef();
+  const abortControllerRef = useRef(null);
 
   const {
     message,
@@ -31,13 +33,13 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     isAwaitingResponse,
     setIsAwaiting,
     conversation,
-    addMessage,
+    addMessage
   } = useChatStore();
 
   const [files, setFiles] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const { user } = useAuthStore();
-  const timeOutId=useRef();
+  const timeOutId = useRef();
   const { recording, start, stop, clear, transcript, isSpeaking } =
     useVoiceToText();
 
@@ -72,6 +74,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     if (isAwaitingResponse) return;
 
     setIsAwaiting(true);
+    abortControllerRef.current = new AbortController();
     try {
       addMessage({
         conversation_id: conversation.conversation_id,
@@ -110,24 +113,42 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       setFiles([]);
       clear();
 
-      timeOutId.current=setTimeout(() => {
+      timeOutId.current = setTimeout(() => {
         chatEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
 
-      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
-        headers: {
-          "Content-Type": "multipart/formdata",
+      const response = await api.post(
+        `${VITE_URL_APP}/api/chatbot`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/formdata",
+            signal:abortControllerRef.current.signal
+          },
         },
-      });
-
+      );
       addMessage({ role: "assistant", blocks: response.data.blocks });
     } catch (e) {
+      if(axios.Cancel(e) || e?.name==="CanceledError")
+        return;
       toast.error(e.message);
     } finally {
       setIsAwaiting(false);
     }
 
-    return ()=>clearTimeout(timeOutId.current);
+    return () => clearTimeout(timeOutId.current);
+  };
+
+  const stopResponse = () => {
+    abortControllerRef.current?.abort();
+    setIsAwaiting(false);
+    addMessage(({
+      role:'assistant', blocks: [{
+        type:'text',
+        content: 'This response was stopped!',
+        stopped:true
+      }]
+    }));
   };
 
   const handleInput = (e) => {
@@ -273,7 +294,14 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             </Button>
           )}
 
-          {isAwaitingResponse && <LoadingCircle />}
+          {isAwaitingResponse && (
+            <Button
+              className="cursor-pointer hover:scale-105"
+              onClick={stopResponse}
+            >
+              <FaStop className="size-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

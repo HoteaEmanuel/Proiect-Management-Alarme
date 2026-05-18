@@ -188,13 +188,13 @@ const Chart = ({ content }) => {
 };
 
 const ChatSuggestions = ({ suggestions }) => {
-  const ref=useRef(null);
+  const ref = useRef(null);
   useScrollAnimation(ref);
   const { setMessage } = useChatStore();
   console.log("suggestions", suggestions);
   if (suggestions === null || suggestions?.length == 0) return null;
   return (
-    <div className="slide-hidden mt-10" ref={ref}> 
+    <div className="slide-hidden mt-10" ref={ref}>
       <ul className="flex flex-col md:flex-row gap-2 ">
         {suggestions.map((item) => (
           <li
@@ -221,7 +221,8 @@ const ChatResponse = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const { speaking, speak, stop } = useSpeechSynthesis();
-
+  console.log("BLOCKS");
+  console.log(blocks);
   console.log(copied);
 
   const handleFileClick = (file) => {
@@ -258,9 +259,15 @@ const ChatResponse = ({
           ) : (
             <div className="chat-response-markdown">
               <div className="chat-response-markdown-content">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {block.content}
-                </ReactMarkdown>
+                {block?.stopped ? (
+                  <p className="whitespace-pre-wrap text-red-500">
+                    {block.content}
+                  </p>
+                ) : (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {block.content}
+                  </ReactMarkdown>
+                )}
               </div>
               {showOptions && (
                 <div className="chat-response-options">
