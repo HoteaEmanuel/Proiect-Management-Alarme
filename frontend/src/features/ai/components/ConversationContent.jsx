@@ -84,7 +84,7 @@ const ConversationContent = ({
               ) : (
                 <ChatResponse
                   blocks={message?.blocks}
-                  file={message?.file}
+                  files={message?.files}
                   smart_replies={message?.smart_replies}
                   previewFile={previewFile}
                   onFileClick={setPreviewFile}
