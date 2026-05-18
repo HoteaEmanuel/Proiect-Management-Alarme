@@ -188,21 +188,27 @@ const Chart = ({ content }) => {
 };
 
 const ChatSuggestions = ({ suggestions }) => {
+
   const ref = useRef(null);
   useScrollAnimation(ref);
+
   const { setMessage } = useChatStore();
-  console.log("suggestions", suggestions);
-  if (suggestions === null || suggestions?.length == 0) return null;
+
+  if (suggestions === null || suggestions?.length === 0) return null;
+
   return (
-    <div className="slide-hidden mt-10" ref={ref}>
-      <ul className="flex flex-col md:flex-row gap-2 ">
+    
+    <div className="chat-suggestions-wrapper slide-hidden" ref={ref}>
+      <ul className="chat-suggestions-list">
         {suggestions.map((item) => (
-          <li
-            key={crypto.randomUUID()}
-            className="chat-suggestion-card "
-            onClick={() => setMessage(item)}
-          >
-            {item}
+          <li key={item} className="chat-suggestions-item">
+            <button
+              type="button"
+              className="chat-suggestions-button"
+              onClick={() => setMessage(item)}
+            >
+              {item}
+            </button>
           </li>
         ))}
       </ul>
@@ -314,7 +320,7 @@ const ChatResponse = ({
       ))}
 
       {files && (
-        <ul className="flex flex-col gap-1 mt-5">
+        <ul className="files-wrapper">
           {files.map((file) => (
             <li key={file?.public_id}>
               <File file={file} onClick={handleFileClick} />

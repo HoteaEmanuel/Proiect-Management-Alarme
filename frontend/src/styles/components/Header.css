@@ -10,7 +10,14 @@
 
   padding: 0.45rem 1.25rem;
 }
+.header-visible {
+  transform: translateY(0);
+}
 
+.header-hidden {
+  transform: translateY(-100%); /* slides up out of view */
+  display: none;
+}
 .header-welcome {
   color: var(--color-text);
   font-size: var(--fs-sm);
