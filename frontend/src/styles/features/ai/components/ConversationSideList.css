@@ -2,6 +2,11 @@
 
     min-height: 0;
     flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
 }
 
 .conversation-side-empty {
@@ -22,7 +27,11 @@
     flex-direction: column;
     gap: 0.5rem;
 
+    margin: 0;
+    padding: 0;
+
     overflow-y: auto;
+    overflow-x: hidden;
 
     color: var(--color-text);
     font-size: var(--fs-xs);
