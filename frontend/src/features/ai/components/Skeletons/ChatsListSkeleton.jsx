@@ -1,6 +1,6 @@
 import React from "react";
 import "@styles/features/chatbot/components/Skeletons/ConversationListSkeleton.css";
-const ConversationListSkeleton = () => {
+const ChatsListSkeleton = () => {
   return (
     <div className="conversation-skeleton">
       <div className="skel lg w-30" />
@@ -29,4 +29,4 @@ const ConversationListSkeleton = () => {
   );
 };
 
-export default ConversationListSkeleton;
+export default ChatsListSkeleton;

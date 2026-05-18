@@ -28,10 +28,22 @@
   transform: scale(1.05);
 }
 
+.slide-hidden {
+  opacity: 0;
+  transform: translateX(-4rem);
+}
+
+.slide-visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 1s ease, transform 1s ease; 
+}
+
 .chat-response-chart-wrapper {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
+  margin-top: 2rem;
 }
 
 .chat-response-chart-card {

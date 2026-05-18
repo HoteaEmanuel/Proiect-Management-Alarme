@@ -9,7 +9,7 @@ import { SlOptions } from "react-icons/sl";
 import Input from "@components/Input";
 import "@styles/features/ai/components/ConversationSideList.css";
 
-const ConversationSideList = ({ onNavigate }) =>
+const ChatsSideList = ({ onNavigate }) =>
 {
   const { id } = useParams();
   console.log("NAVIGATE");
@@ -130,4 +130,4 @@ const ConversationSideList = ({ onNavigate }) =>
   );
 };
 
-export default ConversationSideList;
+export default ChatsSideList;

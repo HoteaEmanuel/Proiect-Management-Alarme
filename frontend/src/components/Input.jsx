@@ -12,7 +12,6 @@ const Input = ({
   handleBlur,
   ...rest
 }) => {
-  console.log(handleChange, handleKeyDown, handleBlur);
   return (
     <input
       placeholder={placeholder}
