@@ -4,8 +4,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    
     width: min(78rem, 78vw);
-    max-height: 82vh;
+    max-height: calc(100dvh - 32px);
+
+    display: flex;
+    flex-direction: column;
+
     overflow: hidden;
     background-color: #0f172a;
     border: 1px solid #24324a;
@@ -191,7 +196,10 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-    max-height: 58vh;
+
+    flex: 1;
+    min-height: 0;
+
     overflow-y: auto;
     padding-right: 6px;
     scrollbar-width: thin;
@@ -255,6 +263,7 @@
     .alarm-details-modal {
 
         width: 92vw;
+        max-height: calc(100dvh - 24px);
         padding: 18px;
     }
 
@@ -271,6 +280,5 @@
     .alarm-details-grid {
 
         grid-template-columns: 1fr;
-        max-height: 56vh;
     }
 }

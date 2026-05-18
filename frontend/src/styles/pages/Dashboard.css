@@ -79,7 +79,6 @@
 
 .dashboard-title {
 
-    /* margin: 0 0 1.5rem; */
     color: var(--color-text);
     font-size: var(--fs-xl);
     font-weight: var(--fw-bold);
@@ -96,23 +95,49 @@
     margin-bottom: 1rem;
 }
 
-/* Filters */
-/* .dashboard-filters {
+.dashboard-filter-toggle-tooltip {
 
-    display: grid;
-    grid-template-columns: repeat(1);
-    flex-wrap: wrap;
-    gap: 0.75rem 1rem;
-    padding: 0.25rem 0.5rem 0.5rem;
-    margin-bottom: 0.75rem;
-} */
+    width: 100%;
+    display: none;
+}
+
+.dashboard-filter-toggle {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+
+    width: 100%;
+    min-height: 2.6rem;
+    margin-bottom: 0.9rem;
+    padding: 0.55rem 0.85rem;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background-color: var(--color-surface);
+    color: var(--color-text);
+
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+
+    cursor: pointer;
+}
+
+.dashboard-filter-toggle-icon {
+
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+}
+
 .dashboard-filters {
 
     width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     justify-content: start;
-    /* align-items: center;  */
     gap: 0.75rem 1rem;
     padding: 0.25rem 0.5rem 0.5rem;
     margin-bottom: 0.75rem;
@@ -145,6 +170,7 @@
 @media (min-width: 930px) {
 
     .dashboard-filters {
+
         grid-template-columns: repeat(6, 1fr);
     }
 }
@@ -152,6 +178,7 @@
 @media (min-width: 1024px) {
 
     .dashboard-filters {
+
         grid-template-columns: repeat(7, 1fr);
     }
 }
@@ -159,6 +186,7 @@
 @media (min-width: 1200px) {
 
     .dashboard-filters {
+
         grid-template-columns: repeat(8, 1fr);
     }
 }
@@ -216,8 +244,6 @@
 
     border-color: var(--color-accent);
 }
-/* Filters */
-
 
 .dashboard-pagination-info {
 
@@ -274,4 +300,47 @@
 .dashboard-page-size-select:focus {
   
     border-color: var(--color-accent);
+}
+
+@media (max-width: 480px) {
+
+    .dashboard-page {
+
+        padding: 1rem;
+    }
+
+    .dashboard-header {
+
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .dashboard-filter-toggle-tooltip {
+
+        display: block;
+    }
+
+    .dashboard-filter-toggle-tooltip .tooltip {
+
+        width: 100%;
+    }
+
+    .dashboard-filters {
+
+        display: none;
+        grid-template-columns: 1fr;
+        padding: 0;
+        margin-bottom: 0.9rem;
+    }
+
+    .dashboard-filters-open {
+
+        display: grid;
+    }
+
+    .dashboard-pagination-info {
+
+        justify-content: flex-start;
+    }
 }
