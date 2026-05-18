@@ -194,7 +194,7 @@ const ChatSuggestions = ({ suggestions }) => {
   console.log("suggestions", suggestions);
   if (suggestions === null || suggestions?.length == 0) return null;
   return (
-    <div className="slide-hidden mt-10" ref={ref}>
+    <div className="suggestions-wrapper slide-hidden " ref={ref}>
       <ul className="flex flex-col md:flex-row gap-2 ">
         {suggestions.map((item) => (
           <li
@@ -314,7 +314,7 @@ const ChatResponse = ({
       ))}
 
       {files && (
-        <ul className="flex flex-col gap-1 mt-5">
+        <ul className="files-wrapper">
           {files.map((file) => (
             <li key={file?.public_id}>
               <File file={file} onClick={handleFileClick} />
