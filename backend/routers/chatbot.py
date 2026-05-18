@@ -16,7 +16,7 @@ router = APIRouter(
 
 # Processes a user message and uploaded files, forwards them to the AI orchestrator, and returns the assistant's response
 @router.post("/chatbot", response_model=AssistantMessage)
-async def send_message_to_chatbot(
+def send_message_to_chatbot(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
     conversation_id: str | None = Form(None), 
