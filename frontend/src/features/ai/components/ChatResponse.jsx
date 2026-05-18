@@ -217,7 +217,7 @@ const ChatResponse = ({
   previewFile,
   smart_replies,
   last_message,
-  file = null,
+  files = null,
 }) => {
   const [copied, setCopied] = useState(false);
   const { speaking, speak, stop } = useSpeechSynthesis();
@@ -248,8 +248,6 @@ const ChatResponse = ({
 
   return (
     <div className="chat-response">
-      {file && <File file={file} onClick={handleFileClick} />}
-
       {blocks.map((block, index) => (
         <div key={index} className="chat-response-block">
           {block.type === "chart" ? (
@@ -314,6 +312,17 @@ const ChatResponse = ({
           )}
         </div>
       ))}
+
+      {files && (
+        <ul className="flex flex-col gap-1 mt-5">
+          {files.map((file) => (
+            <li key={file?.public_id}>
+              <File file={file} onClick={handleFileClick} />
+            </li>
+          ))}
+        </ul>
+      )}
+
       {smart_replies && last_message && (
         <ChatSuggestions suggestions={smart_replies} />
       )}
