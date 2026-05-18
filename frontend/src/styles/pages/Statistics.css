@@ -353,3 +353,80 @@
     }
 }
 
+@media(max-width: 480px) {
+
+    .statistics-page {
+
+        padding: 16px 12px 24px;
+        gap: 16px;
+    }
+
+    .statistics-page-header {
+
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .statistics-title {
+
+        font-size: var(--fs-lg);
+    }
+
+    .statistics-date-filters {
+
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0;
+    }
+
+    .statistics-date-filter {
+
+        width: 100%;
+        min-width: 0;
+    }
+
+    .statistics-date-filter-input {
+
+        width: 100%;
+        min-width: 0;
+    }
+
+    .statistics-kpi-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .statistics-two-columns {
+
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 1.25rem;
+    }
+
+    .statistics-three-columns {
+
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 1.25rem;
+    }
+
+    .statistics-chart-card {
+
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .statistics-large-chart {
+
+        min-height: 320px;
+        height: auto;
+    }
+
+    .statistics-large-chart-body {
+
+        min-height: 300px;
+    }
+}
