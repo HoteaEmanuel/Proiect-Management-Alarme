@@ -274,60 +274,93 @@
 
     .alarm-details-modal {
 
-        width: 92vw;
-        max-height: calc(100dvh - 24px);
-        padding: 18px;
+        width: min(28rem, calc(100vw - 32px));
+        max-height: min(78dvh, 40rem);
+        padding: 14px;
     }
 
     .alarm-details-header {
 
         flex-direction: row;
         align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
     }
 
     .alarm-details-title-group {
 
         align-items: flex-start;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .alarm-details-title {
+
+        font-size: 18px;
+    }
+
+    .alarm-details-subtitle {
+
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    .alarm-details-icon-wrapper {
+
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+    }
+
+    .alarm-details-icon {
+
+        width: 19px;
+        height: 19px;
+    }
+
+    .alarm-details-close-button {
+
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+    }
+
+    .alarm-details-close-icon {
+
+        width: 18px;
+        height: 18px;
+    }
+
+    .alarm-details-badges {
+
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .alarm-details-badge {
+
+        padding: 4px 8px;
+        font-size: 12px;
     }
 
     .alarm-details-grid {
 
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 
-    .alarm-details-title {
+    .alarm-details-field {
 
-        font-size: 19px;
+        padding: 10px;
     }
 
-    .alarm-details-subtitle {
+    .alarm-details-label {
 
-        font-size: 13px;
+        font-size: 12px;
     }
 
-    .alarm-details-icon-wrapper {
+    .alarm-details-value {
 
-        width: 38px;
-        height: 38px;
-        flex-basis: 38px;
-    }
-
-    .alarm-details-icon {
-
-        width: 21px;
-        height: 21px;
-    }
-
-    .alarm-details-close-button {
-
-        width: 36px;
-        height: 36px;
-        flex-basis: 36px;
-    }
-
-    .alarm-details-close-icon {
-
-        width: 19px;
-        height: 19px;
+        font-size: 14px;
     }
 }
