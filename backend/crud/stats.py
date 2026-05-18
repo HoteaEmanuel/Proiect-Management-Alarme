@@ -9,7 +9,7 @@ import io
 import logging
 
 from core import InvalidInputError
-from schemas import ChartCategoryFilters
+from schemas import ChartCategoryFilters, TrendFilters, TrendGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ def get_raw_alarms_by_category(db: Session, filters: ChartCategoryFilters):
             raise InvalidInputError("Start date cannot be strictly greater than the end date.")
         raise
 
-#Export alarm data to excel file
+# Export alarm data to excel file
 def export_data_to_excel(
         raw_data: list[dict[str, Any]],
         filename: str = "export.xlsx",
@@ -100,3 +100,59 @@ def export_data_to_excel(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=statistics_export.xlsx"}
     )
+    
+# Fetches alarm trend data and formats it based on granularity
+def get_alarm_trend(db: Session, filters: TrendFilters) -> dict:
+    query = text("""
+        EXEC dbo.GetAlarmTrend
+            @granularity = :granularity,
+            @group_by = :group_by,
+            @live_limit = :live_limit;
+    """)
+    params = {
+        "granularity" : filters.granularity.value,
+        "group_by" : filters.group_by.value,
+        "live_limit" : filters.live_limit,
+    }
+    
+    try:
+        result = db.execute(query, params).mappings().all()
+    except (ProgrammingError, OperationalError) as e:
+        db.rollback()
+        if "invalid granularity" in str(e).lower():
+            raise InvalidInputError("Invalid granularity. Accepted values: monthly, weekly, daily, hourly, live.")
+        if "invalid group_by" in str(e).lower():
+            raise InvalidInputError("Invalid group_by. Accepted values: severity, status, company.")
+        logger.error(f"Database error while fetching alarm trend: {str(e)}")
+        raise
+    
+    if not result:
+        return {"granularity": filters.granularity.value, "buckets" : [], "live_alarms": []}
+    if filters.granularity == TrendGranularity.live:
+        return{
+            "granularity" : filters.granularity.value,
+            "buckets": [],
+            "live_alarms": [
+                {
+                    "alarm_number": str(row["alarm_number"]),
+                    "status": str(row["status"]),
+                    "group_label": str(row["group_label"]),
+                    "summary": str(row["summary"]),
+                    "server_name": str(row["server_name"]),
+                    "first_occurence_datetime": row["first_occurence_datetime"],
+                }
+                for row in result
+            ],
+        }
+    return{
+        "granularity": filters.granularity.value,
+        "buckets": [
+            {
+                "time_bucket": str(row["time_bucket"]),
+                "group_label": str(row["group_label"]),
+                "alarm_count": int(row["alarm_count"]),
+            }
+            for row in result
+        ],
+        "live_alarms": []
+    }

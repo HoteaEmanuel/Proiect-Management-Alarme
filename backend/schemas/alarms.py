@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from pydantic import BaseModel, model_validator
 from datetime import datetime
 from core import InvalidInputError
+from enum import Enum
 
 class SeverityResponse(BaseModel):
     id: int
@@ -113,3 +114,39 @@ class ChartCategoryFilters(BaseModel):
     
 class RecentAlarmsFilters(BaseModel):
     limit: int = 10
+    
+    
+class TrendGranularity(str, Enum):
+    monthly = "monthly"
+    weekly = "weekly"
+    daily = "daily"
+    hourly = "hourly"
+    live = "live"
+
+class TrendGroupBy(str, Enum):
+    severity = "severity"
+    status = "status"
+    company = "company"
+    
+class TrendFilters(BaseModel):
+    granularity: TrendGranularity = TrendGranularity.weekly
+    group_by: TrendGroupBy = TrendGroupBy.severity
+    live_limit: int = 50
+    
+class TrendBucketItem(BaseModel):
+    time_bucket: str
+    group_label: str
+    alarm_count: int
+    
+class LiveAlarmItem(BaseModel):
+    alarm_number: str
+    status: str
+    group_label: str
+    summary: str
+    server_name: str
+    first_occurence_datetime: datetime
+    
+class TrendResponse(BaseModel):
+    granularity: str
+    buckets: list[TrendBucketItem] = []
+    live_alarms: list[LiveAlarmItem] = []

@@ -4,8 +4,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 
-from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters, RecentAlarmsFilters
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated, get_alarms_for_export
+from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters, RecentAlarmsFilters, TrendFilters, TrendResponse
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated, get_alarms_for_export, get_alarm_trend
 from models import Alarm
 from database import get_db
 from auth_utils import get_current_user
@@ -90,3 +90,7 @@ def get_recent_alarms(filters: RecentAlarmsFilters = Depends(), db: Session = De
         "alarms": alarms_list
     }
     
+# Retrieves alarm trend data grouped by a specified dimension (severity, status, company)
+@router.get("/stats/alarm-trend", response_model=TrendResponse)
+def read_alarm_trend(filters: TrendFilters=Depends(), db: Session=Depends(get_db)) -> TrendResponse:
+    return get_alarm_trend(db, filters)
