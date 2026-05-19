@@ -34,6 +34,7 @@ import File from "./File";
 import "@styles/features/ai/components/ChatResponse.css";
 import useChatStore from "@store/chatStore";
 import useScrollAnimation from "@hooks/useScrollAnimation.js";
+import { useFilePreview } from "@store/filePreviewStore";
 
 const COLORS = [
   "#6366f1",
@@ -219,8 +220,6 @@ const ChatSuggestions = ({ suggestions }) => {
 const ChatResponse = ({
   blocks,
   showOptions,
-  onFileClick,
-  previewFile,
   smart_replies,
   last_message,
   files = null,
@@ -230,10 +229,10 @@ const ChatResponse = ({
   console.log("BLOCKS");
   console.log(blocks);
   console.log(copied);
-
-  const handleFileClick = (file) => {
-    if (previewFile) onFileClick(null);
-    else onFileClick(file);
+  const { file, setFile } = useFilePreview();
+  const handleFileClick = (fileToPreview) => {
+    if (file) setFile(null);
+    else setFile(fileToPreview);
   };
 
   const handleCopy = async (message) => {

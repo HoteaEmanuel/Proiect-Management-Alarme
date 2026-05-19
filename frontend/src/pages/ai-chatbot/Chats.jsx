@@ -8,10 +8,11 @@ import "@styles/pages/ai-chatbot/Chats.css";
 import { Skeleton } from "@mui/material";
 import ChatsList from "@features/ai/components/ChatsList.jsx";
 import ChatsListSkeleton from "@features/ai/components/Skeletons/ChatsListSkeleton.jsx";
+import { usePageTitle } from "@hooks/usePageTitle.js";
 
 const Chats = () => {
   
-
+  usePageTitle('Chats');
   const [search, setSearch] = useState("");
 
   return (

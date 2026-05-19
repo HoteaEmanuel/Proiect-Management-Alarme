@@ -22,8 +22,6 @@ const Skeleton = () =>
 
 const ConversationContent = ({
   setShowCopy,
-  setPreviewFile,
-  previewFile,
   showCopy,
   chatEnd,
 }) =>
@@ -48,7 +46,6 @@ const ConversationContent = ({
   }, [data,chatEnd]);
 
   if (isPending) return <Skeleton />;
-
   console.log("MESSAGES");
   console.log(messages);
 
@@ -77,8 +74,6 @@ const ConversationContent = ({
               {message.role === "user" ? (
                 <UserMessage
                   message={message}
-                  onFileClick={setPreviewFile}
-                  previewFile={previewFile}
                   showOptions={showCopy === index}
                 />
               ) : (
@@ -86,8 +81,6 @@ const ConversationContent = ({
                   blocks={message?.blocks}
                   files={message?.files}
                   smart_replies={message?.smart_replies}
-                  previewFile={previewFile}
-                  onFileClick={setPreviewFile}
                   showOptions={showCopy === index}
                   last_message={index===messages.length-1}
                 />

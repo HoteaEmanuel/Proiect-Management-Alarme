@@ -9,6 +9,7 @@ import Button from "@components/Button";
 import FilePreview from "./FilePreview";
 
 import "@styles/features/ai/components/FilesModal.css";
+import { useFilePreview } from "@store/filePreviewStore";
 
 const FileIcon = ({ type }) => {
   console.log("TYPE");
@@ -35,12 +36,12 @@ const fileTypeColor = (fileType) => {
 };
 
 const FilesModal = ({ close }) => {
-  const modalRef1 = useRef();
   console.log("FILES MODAL Active");
 
   const { conversation } = useChatStore();
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewFile, setPreviewFile] = useState(null);
+  // const [selectedFile, setSelectedFile] = useState(null);
+  const { setFile } = useFilePreview();
+  // const [previewFile, setPreviewFile] = useState(null);
 
   const { data, isPending } = useGetConversationFiles(
     conversation.conversation_id,
@@ -49,12 +50,12 @@ const FilesModal = ({ close }) => {
   if (isPending) return <RiLoader2Fill className="files-modal-loader" />;
 
   return (
-    <div ref={modalRef1} className="files-modal">
+    <div className="files-modal">
       <Button className="files-modal-close-button" onClick={close}>
         <CiCircleRemove className="files-modal-close-icon" />
       </Button>
 
-      {data.user_files === 0 && data.assistant_files === 0 && (
+      {data.user_files?.length === 0 && data.assistant_files?.length === 0 && (
         <div className="files-modal-empty">
           <h2 className="files-modal-empty-title">No files attached</h2>
           <div className="files-modal-empty-content">
@@ -66,12 +67,12 @@ const FilesModal = ({ close }) => {
         </div>
       )}
       { /* Verificare in caz de siguranta  */}
-      {data.user_files.length === 0 && data.assistant_files.length === 0 && (
+      {/* {data.user_files.length === 0 && data.assistant_files.length === 0 && (
         <div className="files-modal-header">
           <p className="font-semibold">No files found</p>
           <CiFileOff className="size-4"/>
         </div>
-      )}
+      )} */}
       {(data.user_files.length > 0 || data.assistant_files.length > 0) && (
         <>
           <div className="files-modal-header">
@@ -86,9 +87,9 @@ const FilesModal = ({ close }) => {
                   <li
                     key={file?.url}
                     className="files-modal-item"
-                    onMouseOver={() => setSelectedFile(file.filename)}
-                    onMouseLeave={() => setSelectedFile(null)}
-                    onClick={() => setPreviewFile(file)}
+                    // onMouseOver={() => setSelectedFile(file.filename)}
+                    // onMouseLeave={() => setSelectedFile(null)}
+                    onClick={() => setFile(file)}
                   >
                     <div
                       className={`files-modal-type ${fileTypeColor(file.filename.split(".").pop())}`}
@@ -116,9 +117,9 @@ const FilesModal = ({ close }) => {
                   <li
                     key={file?.url}
                     className="files-modal-item"
-                    onMouseOver={() => setSelectedFile(file.filename)}
-                    onMouseLeave={() => setSelectedFile(null)}
-                    onClick={() => setPreviewFile(file)}
+                    // onMouseOver={() => setSelectedFile(file.filename)}
+                    // onMouseLeave={() => setSelectedFile(null)}
+                    onClick={() => setFile(file)}
                   >
                     <div
                       className={`files-modal-type ${fileTypeColor(file.filename.split(".").pop())}`}
@@ -143,9 +144,9 @@ const FilesModal = ({ close }) => {
         </>
       )}
 
-      {previewFile && (
+      {/* {previewFile && (
         <FilePreview file={previewFile} onClose={() => setPreviewFile(null)} />
-      )}
+      )} */}
     </div>
   );
 };

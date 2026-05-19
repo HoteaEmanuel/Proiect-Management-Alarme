@@ -10,6 +10,7 @@ import { FaFileCsv } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 
 import "@styles/features/ai/components/FileList.css";
+import { useFilePreview } from "@store/filePreviewStore";
 
 const FileIcon = ({ type }) => {
   console.log("TYPE");
@@ -35,8 +36,9 @@ const fileTypeColor = (fileType) => {
   }
 };
 
-const FileList = ({ files, setFiles, setPreviewFile }) => {
+const FileList = ({ files, setFiles }) => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const {setFile} = useFilePreview();
   const handleRemoveFile = (e, file) => {
     e.stopPropagation();
     setFiles((prev) => prev.filter((f) => f.file.name !== file.file.name));
@@ -55,7 +57,7 @@ const FileList = ({ files, setFiles, setPreviewFile }) => {
             className="file-list-item"
             onMouseOver={() => setSelectedFile(item.file.name)}
             onMouseLeave={() => setSelectedFile(null)}
-            onClick={() => setPreviewFile(item)}
+            onClick={() => setFile(item)}
           >
             {selectedFile === item.file.name && (
               <button

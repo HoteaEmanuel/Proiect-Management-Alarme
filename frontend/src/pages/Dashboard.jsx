@@ -20,8 +20,10 @@ import {
 import Button from "@components/Button";
 import Tooltip from "@components/ToolTip";
 import AlarmDetailsModal from "@features/dashboard/components/AlarmDetailsModal";
+import { usePageTitle } from "@hooks/usePageTitle";
 
 const Dashboard = () => {
+  usePageTitle('Dashboard')
   const [searchParams, setSearchParams] = useSearchParams({ replace: false });
   const [isExporting, startExporting] = useTransition();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();

@@ -2,10 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { FaArrowUp, FaStop } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
-import LoadingCircle from "../../../components/LoadingCircle";
 import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
-import FilePreview from "./FilePreview";
 import FileList from "./FileList";
 import Button from "@components/Button";
 import useChatStore from "@store/chatStore.js";
@@ -37,7 +35,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   } = useChatStore();
 
   const [files, setFiles] = useState([]);
-  const [previewFile, setPreviewFile] = useState(null);
   const { user } = useAuthStore();
   const timeOutId = useRef();
   const { recording, start, stop, clear, transcript, isSpeaking } =
@@ -222,12 +219,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         <FileList
           files={files}
           setFiles={setFiles}
-          setPreviewFile={setPreviewFile}
         />
-      )}
-
-      {previewFile && (
-        <FilePreview file={previewFile} onClose={() => setPreviewFile(null)} />
       )}
 
       <div className="chat-input-row">

@@ -3,9 +3,10 @@ import { IoAlertSharp } from "react-icons/io5";
 import Button from '@components/Button';
 import { useNavigate } from 'react-router-dom';
 import '@styles/pages/Home.css'
+import { usePageTitle } from '@hooks/usePageTitle';
 
 const Home = () => {
-
+  usePageTitle('Noxy')
   const navigate=useNavigate();
   return (
     <div className="home-page">

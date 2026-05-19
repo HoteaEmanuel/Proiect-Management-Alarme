@@ -12,33 +12,36 @@ import ConversationContent from "@features/ai/components/ConversationContent.jsx
 import useChatStore from "@store/chatStore.js";
 
 import "@styles/pages/ai-chatbot/ChatWindow.css";
+import { useFilePreview } from "@store/filePreviewStore";
+import { usePageTitle } from "@hooks/usePageTitle";
 
-const ChatWindow = () =>
-{
+const ChatWindow = () => {
   const { id } = useParams();
+  const { conversation } = useChatStore();
+  usePageTitle('Conversation - ' + id);
 
   const conversationRef = useRef(null);
   const chatEnd = useRef(null);
-
-  const [previewFile, setPreviewFile] = useState(null);
+  const { file } = useFilePreview();
   const [showCopy, setShowCopy] = useState(null);
+  
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   const { isAwaitingResponse } = useChatStore();
 
-  const handleScrollDown = () =>
-  {
+  const handleScrollDown = () => {
     chatEnd.current?.scrollIntoView({ behavior: "smooth" });
   };
-
-  useEffect(() =>
-  {
+  useEffect(() => {
+    if (!conversation) return;
+    document.title = conversation.conversation_title;
+  }, [conversation]);
+  useEffect(() => {
     const el = conversationRef.current;
 
     if (!el) return;
-
-    const handleScroll = () =>
-    {
+    // Calculeaza distanta de la fundul conversatiei comparativ cu top ul si updateaza stateul afisarii butonul de scroll corespunzator
+    const handleScroll = () => {
       const distanceFromBottom =
         el.scrollHeight - el.scrollTop - el.clientHeight;
 
@@ -47,8 +50,7 @@ const ChatWindow = () =>
 
     el.addEventListener("scroll", handleScroll);
 
-    return () =>
-    {
+    return () => {
       el.removeEventListener("scroll", handleScroll);
     };
   }, [id]);
@@ -59,20 +61,20 @@ const ChatWindow = () =>
 
       <section className="chat-window-content">
         <ConversationContent
-          previewFile={previewFile}
-          setPreviewFile={setPreviewFile}
           setShowCopy={setShowCopy}
           showCopy={showCopy}
           key={id}
           chatEnd={chatEnd}
         />
 
-        {previewFile && (
+        {/* {previewFile && (
           <FilePreview
             file={previewFile}
             onClose={() => setPreviewFile(null)}
           />
-        )}
+        )} */}
+
+        {file && <FilePreview />}
       </section>
 
       <div className="chat-window-footer">

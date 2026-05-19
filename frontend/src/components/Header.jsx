@@ -4,11 +4,13 @@ import "@styles/components/Header.css";
 import Button from "./Button";
 import { IoIosMenu } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import useHeaderVisibile from "@hooks/useHeaderVisible";
+import { useHeaderStore } from "@store/headerStore";
 
 const Header = ({ onToggle,isSideBarOpen }) => {
   const { user } = useAuthStore();
-  const {headerVisible} = useHeaderVisibile();
+  const headerVisible = useHeaderStore(
+  (state) => state.headerVisible
+);
   console.log("HEADER VISIBLE");
   console.log(headerVisible);
   const navigate=useNavigate();

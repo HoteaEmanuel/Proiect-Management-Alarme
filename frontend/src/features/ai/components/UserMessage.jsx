@@ -12,8 +12,9 @@ import File from "./File";
 import { MdExpandMore } from "react-icons/md";
 
 import "@styles/features/ai/components/UserMessage.css";
+import { useFilePreview } from "@store/filePreviewStore";
 
-const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
+const UserMessage = ({ message, showOptions }) => {
   const MESSAGE_HEIGHT = 300;
   const hasFiles = message.files?.length > 0;
   const hasText = message?.content.trim().length > 0;
@@ -22,6 +23,7 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
   const [isClamped, setIsClamped] = useState(false);
   const contentRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const {file,setFile} = useFilePreview();
 
   useEffect(() => {
     const el = contentRef.current;
@@ -47,9 +49,9 @@ const UserMessage = ({ message, onFileClick, previewFile, showOptions }) => {
   console.log("CLAMPED");
   console.log(isClamped);
 
-  const handleFileClick = (file) => {
-    if (previewFile) onFileClick(null);
-    else onFileClick(file);
+  const handleFileClick = (f) => {
+    if (file) setFile(null);
+    else setFile(f);
   };
 
   return (
