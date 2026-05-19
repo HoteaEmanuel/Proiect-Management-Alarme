@@ -3,7 +3,7 @@ import json
 import logging
 from fastapi import UploadFile, File, Form
 
-from core import ExternalServiceError, EntityNotFoundError, FileProcessingError
+from core import ExternalServiceError, EntityNotFoundError, FileProcessingError, InvalidInputError
 from schemas import MessageRequest, MessageCreate, AssistantMessage, AgentContext, OutputBlock, RawFileAttachment
 from models import MessageModel
 from crud import get_conversation_history, save_message_to_db, get_user_conversations
@@ -113,6 +113,9 @@ def upload_and_save_user_preserve_files(
 
 # Manages user-agent conversations from the chat interface, acting as the main entry point
 def user_chat_request(db: Session, request: MessageRequest) -> AssistantMessage:
+
+    if request.message is None or request.message == '' or request.message.isspace():
+        raise InvalidInputError("User sent empty message.")
 
     request.conversation_id, user_message_id, context_history = prepare_conversation(db=db, request=request)
     
