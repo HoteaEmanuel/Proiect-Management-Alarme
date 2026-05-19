@@ -34,6 +34,7 @@ class UpdateTitleRequest(BaseModel):
 class MessageRequest(BaseModel):
     user_id: str | None = None
     conversation_id: str | None = None
+    request_id: str
     message: str | None = None
     new_chat: bool = False
     files: list[RawFileAttachment] = []
@@ -64,6 +65,7 @@ class UserMessage(BaseModel):
 
 class AssistantMessage(BaseModel):
     conversation_id: str | None = None
+    request_id: str
     role: Literal["assistant"] = "assistant"
     blocks: list[OutputBlock]
     smart_replies: list[str] | None = None

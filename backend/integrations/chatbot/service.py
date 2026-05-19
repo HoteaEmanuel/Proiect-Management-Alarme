@@ -129,6 +129,7 @@ def user_chat_request(db: Session, request: MessageRequest) -> AssistantMessage:
 
     return AssistantMessage(
         conversation_id=request.conversation_id,
+        request_id=request.request_id,
         blocks=output_blocks,
         smart_replies=agent_context.smart_replies,
         files=[agent_context.file_export] if agent_context.file_export else []

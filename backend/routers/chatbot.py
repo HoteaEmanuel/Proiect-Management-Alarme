@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-
-from database import get_db
 from sqlalchemy.orm import Session
 from typing import List
 
+from database import get_db, redis_client
 from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment 
 from schemas import UpdateTitleRequest, CloudinaryFileAttachment, ConversationResponse, ConversationFileList
 from integrations.chatbot import user_chat_request, parse_raw_files
@@ -20,6 +19,7 @@ def send_message_to_chatbot(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
     conversation_id: str | None = Form(None), 
+    request_id: str = Form(...),
     message: str = Form(''),
     new_chat: bool = Form(False),
     raw_files: list[RawFileAttachment] = Depends(parse_raw_files),
@@ -27,12 +27,18 @@ def send_message_to_chatbot(
     request = MessageRequest(
             user_id=user_id["id"],
             conversation_id=conversation_id,
+            request_id=request_id,
             message=message,
             new_chat=new_chat,
             files=raw_files
         )
     
     return user_chat_request(db=db, request=request)
+
+@router.post("/chatbot/cancel/{request_id}")
+def cancel_request(request_id: str):
+    redis_client.set(name=f"cancel:{request_id}", value="true", ex=3600)
+    return {"detail": "Cancel request sent"}
 
 # Retrieves a list of all chat conversations associated with the current user
 @router.get("/conversations", response_model=ConversationListresponse)
