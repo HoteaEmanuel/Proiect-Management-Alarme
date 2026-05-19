@@ -19,7 +19,7 @@ const Header = ({ onToggle,isSideBarOpen }) => {
     <header className={`header ${headerVisible ? 'header-visible' : 'header-hidden'}`}>
 
       {/* <h2 className="font-sans font-bold text-2xl">Noxy</h2> */}
-       <img src="/images/logo-alb-2.png" alt="logo-image" className="object-cover w-fit h-6  brightness-85 hover:brightness-90 cursor-pointer" onClick={()=>navigate('/dashboard')}/>
+       <img src="/images/logo-alb-2.png" alt="logo-image" id="logo-image" className="object-cover w-fit h-6  brightness-85 hover:brightness-90 cursor-pointer" onClick={()=>navigate('/dashboard')}/>
       <Button className="cursor-pointer hover:scale-105 menuBtn"  onClick={onToggle} aria-expanded={isSideBarOpen}>
         <IoIosMenu className="size-7" />
       </Button>
