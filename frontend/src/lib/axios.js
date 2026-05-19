@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import useAuthStore from "@store/authStore";
+import { toast } from "sonner";
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
@@ -46,6 +47,7 @@ api.interceptors.response.use(
       } catch (err) {
         // Refresh failed => log the user out
         // Refresh token expired or other problem
+        toast.error(err?.message || "Eroare la intercept");
         useAuthStore.getState().clearAuth();
       }
     }

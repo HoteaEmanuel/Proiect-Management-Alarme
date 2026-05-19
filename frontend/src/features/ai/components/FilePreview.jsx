@@ -3,9 +3,11 @@ import { IoClose } from "react-icons/io5";
 import XlsxPreview from "./XlsxPreview";
 
 import "@styles/features/ai/components/FilePreview.css";
+import { useFilePreview } from "@store/filePreviewStore";
 
-const FilePreview = ({ file, onClose, ...props }) =>
+const FilePreview = ({ ...props }) =>
 {
+  const {file,setFile} = useFilePreview();
   console.log("FILE HERE");
   console.log(file);
   const fileItem = file?.file;
@@ -16,16 +18,16 @@ const FilePreview = ({ file, onClose, ...props }) =>
     type.toLowerCase() === "xlsx";
 
   console.log("FILE TYPE", type);
-
+  const handleClose=()=>setFile(null);
   return createPortal(
     <div
       className="file-preview-backdrop"
-      onClick={onClose}
+      onClick={handleClose}
       {...props}
     >
       <button
         className="file-preview-close-button"
-        onClick={onClose}
+        onClick={handleClose}
         aria-label="Close preview"
       >
         <IoClose className="file-preview-close-icon" />

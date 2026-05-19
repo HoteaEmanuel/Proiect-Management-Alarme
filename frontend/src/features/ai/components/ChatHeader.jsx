@@ -13,8 +13,7 @@ import FilesModal from "./FilesModal";
 import Input from "@components/Input";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { RiLoader2Fill } from "react-icons/ri";
-import { IoIosMenu } from "react-icons/io";
-import useHeaderVisibile from "@hooks/useHeaderVisible";
+import { useHeaderStore } from "@store/headerStore";
 const ChatHeader = () => {
   const { conversation, setConversation } = useChatStore();
   console.log("SHOW THIS");
@@ -29,7 +28,7 @@ const ChatHeader = () => {
   const [showFilesModal, setShowFilesModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const { id } = useParams();
-  const {headerVisible}= useHeaderVisibile();
+  const { headerVisible} =useHeaderStore();
   const { data: conversationData, isPending } = useGetConversationBaseData(id, {
     enabled: !!id,
   });

@@ -5,34 +5,56 @@ import { MdKeyboardVoice } from "react-icons/md";
 import LoadingCircle from "../../../components/LoadingCircle";
 import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
-import FilePreview from "./FilePreview";
 import FileList from "./FileList";
 import Button from "@components/Button";
 import "@styles/features/ai/components/ChatInput.css";
+import { useCreateConversation } from "../api/chatBot.api";
+import useAuthStore from "@store/authStore";
+import useChatStore from "@store/chatStore";
+import useVoiceToText from "../hooks/useVoiceToText";
 
 const MESSAGE_LIMIT = 5000;
 const MAX_HEIGHT = 200;
 const MAX_ALLOWED_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const ChatInputNewChat = ({
-  onSubmit,
-  message,
-  files,
-  disabled,
-  loading,
-  placeholder,
-  setMessage,
-  setFiles,
-  startRecording,
-  stopRecording,
-  recording,
-  isSpeaking,
-}) => {
+const ChatInputNewChat = ({ placeholder }) => {
+  const { user } = useAuthStore();
   const input = useRef();
   const fileInput = useRef();
+  const { message, setMessage } = useChatStore();
+  const { isAwaitingResponse, setIsAwaiting } = useChatStore();
+  const [files, setFiles] = useState([]);
 
-  const [previewFile, setPreviewFile] = useState(null);
+  const { recording, start, stop, clear, transcript, isSpeaking } =
+    useVoiceToText();
+  const { mutateAsync: sendMessage, isPending } = useCreateConversation();
+
+  const onSubmit = async () => {
+    try {
+      if (isPending) return;
+      setIsAwaiting(true);
+      const filesToSend = files.map((item) => item.file);
+      const filesPreserveStatus = files.map((item) => item.persist);
+
+      const mesaj = {
+        user_id: user.user_id,
+        message: message,
+        files: filesToSend,
+        file_preserve_flags: filesPreserveStatus,
+      };
+
+      setFiles([]);
+      setMessage("");
+      clear();
+
+      await sendMessage(mesaj);
+    } catch (e) {
+      toast.error(e?.message || "Could not send message");
+    } finally {
+      setIsAwaiting(false);
+    }
+  };
 
   const resizeInput = (element) => {
     element.style.height = "auto";
@@ -58,6 +80,12 @@ const ChatInputNewChat = ({
   };
 
   useEffect(() => {
+    if (recording && transcript) {
+      setMessage(transcript);
+    }
+  }, [recording, transcript, setMessage]);
+
+  useEffect(() => {
     const element = input.current;
 
     if (!element) return;
@@ -69,7 +97,7 @@ const ChatInputNewChat = ({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      if (disabled || loading) return;
+      if (isAwaitingResponse) return;
 
       onSubmit();
       input.current.value = "";
@@ -108,104 +136,79 @@ const ChatInputNewChat = ({
     });
   };
 
-  const handleStartRecording = () => {
-    if (!startRecording) return;
-
-    startRecording();
-  };
-
-  const handleStopRecording = () => {
-    if (!stopRecording) return;
-
-    stopRecording();
-  };
-
   return (
-  <div className="chat-input">
-    {files?.length > 0 && (
-      <FileList
-        files={files}
-        setFiles={setFiles}
-        setPreviewFile={setPreviewFile}
-      />
-    )}
+    <div className="chat-input">
+      {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
 
-    {previewFile && (
-      <FilePreview file={previewFile} onClose={() => setPreviewFile(null)} />
-    )}
+      <div className="chat-input-row">
+        <input
+          type="file"
+          ref={fileInput}
+          onChange={handleFilesUpload}
+          className="chat-input-file"
+          multiple="yes"
+          accept=".pdf,.xlsx,.csv"
+        />
 
-    <div className="chat-input-row">
-      <input
-        type="file"
-        ref={fileInput}
-        onChange={handleFilesUpload}
-        className="chat-input-file"
-        multiple="yes"
-        accept=".pdf,.xlsx,.csv"
-      />
+        <Tooltip text={"Add files"}>
+          <Button
+            className="chat-input-icon-button chat-input-add-button"
+            onClick={() => fileInput.current.click()}
+          >
+            <IoAdd className="chat-input-icon" />
+          </Button>
+        </Tooltip>
 
-      <Tooltip text={"Add files"}>
-        <Button
-          className="chat-input-icon-button chat-input-add-button"
-          onClick={() => fileInput.current.click()}
-        >
-          <IoAdd className="chat-input-icon" />
-        </Button>
-      </Tooltip>
+        <textarea
+          placeholder={placeholder}
+          value={message}
+          ref={input}
+          onChange={(e) => setMessage(e.target.value)}
+          rows={1}
+          maxLength={MESSAGE_LIMIT}
+          onKeyDown={handleKeyDown}
+          onInput={handleInput}
+          onChangeCapture={handleInput}
+          className="chat-input-textarea"
+        />
 
-      <textarea
-        placeholder={placeholder}
-        value={message}
-        ref={input}
-        onChange={(e) => setMessage(e.target.value)}
-        rows={1}
-        maxLength={MESSAGE_LIMIT}
-        onKeyDown={handleKeyDown}
-        onInput={handleInput}
-        onChangeCapture={handleInput}
-        className="chat-input-textarea"
-      />
-
-      <div className="chat-input-actions-right">
-        {!recording && message === "" ? (
-          <Tooltip text={"Dictate"}>
-            <Button
-              className="chat-input-icon-button"
-              onClick={handleStartRecording}
-            >
-              <MdKeyboardVoice className="chat-input-icon" />
-            </Button>
-          </Tooltip>
-        ) : (
-          recording && (
-            <Tooltip text={"Stop recording"}>
-              <Button
-                className={`chat-input-icon-button ${
-                  isSpeaking ? "chat-input-icon-button-speaking" : ""
-                }`}
-                onClick={handleStopRecording}
-              >
+        <div className="chat-input-actions-right">
+          {!recording && message === "" ? (
+            <Tooltip text={"Dictate"}>
+              <Button className="chat-input-icon-button" onClick={start}>
                 <MdKeyboardVoice className="chat-input-icon" />
               </Button>
             </Tooltip>
-          )
-        )}
+          ) : (
+            recording && (
+              <Tooltip text={"Stop recording"}>
+                <Button
+                  className={`chat-input-icon-button ${
+                    isSpeaking ? "chat-input-icon-button-speaking" : ""
+                  }`}
+                  onClick={stop}
+                >
+                  <MdKeyboardVoice className="chat-input-icon" />
+                </Button>
+              </Tooltip>
+            )
+          )}
 
-        {!loading && (
-          <Button
-            className="chat-input-send-button"
-            onClick={onSubmit}
-            disabled={message.length === 0 && files.length === 0}
-          >
-            <FaArrowUp className="chat-input-send-icon" />
-          </Button>
-        )}
+          {!isAwaitingResponse && (
+            <Button
+              className="chat-input-send-button"
+              onClick={onSubmit}
+              disabled={message.length === 0 && files.length === 0}
+            >
+              <FaArrowUp className="chat-input-send-icon" />
+            </Button>
+          )}
 
-        {loading && <LoadingCircle />}
+          {isAwaitingResponse && <LoadingCircle />}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default ChatInputNewChat;
