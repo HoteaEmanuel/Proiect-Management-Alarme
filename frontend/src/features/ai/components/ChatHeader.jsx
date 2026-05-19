@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "@styles/features/chatbot/components/ChatHeader.css";
 import useChatStore from "@store/chatStore";
-import { SlOptions } from "react-icons/sl";
 import OptionsModal from "./OptionsModal";
 import {
   useGetConversationBaseData,
@@ -13,7 +12,7 @@ import FilesModal from "./FilesModal";
 import Input from "@components/Input";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { RiLoader2Fill } from "react-icons/ri";
-import { useHeaderStore } from "@store/headerStore";
+import { toast } from "sonner";
 const ChatHeader = () => {
   const { conversation, setConversation } = useChatStore();
   console.log("SHOW THIS");
@@ -46,8 +45,13 @@ const ChatHeader = () => {
   if (isPending) return <RiLoader2Fill className="chat-header-loader" />;
 
   console.log("SHOW OPTIONS");
-  console.log(showOptionsModal)
+  console.log(showOptionsModal);
+
   const handleRename = async (e) => {
+    if (editValue === "" || editValue?.trim()?.length === 0) {
+      toast.error("Invalid title");
+      return;
+    }
     if (e.key === "Enter") {
       await renameConversation({
         conversationId: editingId,
@@ -62,17 +66,25 @@ const ChatHeader = () => {
 
   const handleBlur = async () => {
     console.log("BLURING");
-    console.log(editingId, editValue);
+    console.log(editValue);
+    const newTitle =
+      editValue.trim().length !== 0
+        ? editValue
+        : conversation.conversation_title;
+    if (newTitle.trim() === conversation.conversation_title.trim()) {
+      console.log("STOP THE REQUEST");
+      setEditingId(null);
+      setEditValue("");
+      return;
+    }
     await renameConversation({
       conversationId: editingId,
-      new_title: editValue,
+      new_title: newTitle,
     });
     setEditingId(null);
   };
-  // console.log(showOptionsButton);
-  console.log("EDITING ID", editingId);
 
-    return (
+  return (
     <header
       className="chat-header"
       // onMouseEnter={() => setShowOptionsButton(true)}
@@ -103,8 +115,7 @@ const ChatHeader = () => {
             >
               <MdExpandMore
                 className="chat-header-options-icon"
-                onClick={(e) =>
-                {
+                onClick={(e) => {
                   e.stopPropagation();
                   setShowOptionsModal(true);
                 }}
@@ -117,8 +128,7 @@ const ChatHeader = () => {
             >
               <MdExpandLess
                 className="chat-header-options-icon"
-                onClick={(e) =>
-                {
+                onClick={(e) => {
                   e.stopPropagation();
                   setShowOptionsModal(false);
                 }}
@@ -143,7 +153,6 @@ const ChatHeader = () => {
       {showFilesModal && <FilesModal close={() => setShowFilesModal(false)} />}
     </header>
   );
-
 };
 
 export default ChatHeader;

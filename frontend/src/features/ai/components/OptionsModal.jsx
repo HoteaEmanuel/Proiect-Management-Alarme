@@ -81,7 +81,10 @@ const OptionsModal = ({
       onBlur={() => {
         console.log("BLURRRR");
         showOptions(false);
-        clear(null);
+        const timeOut = setTimeout(() => {
+          clear(null);
+        }, 1000);
+        return () => clearTimeout(timeOut);
       }}
     >
       <ul className="options-modal-list">
