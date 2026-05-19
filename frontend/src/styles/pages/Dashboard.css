@@ -76,6 +76,7 @@
     flex-direction: column;
     padding: 1.25rem;
     overflow-y:auto;
+    min-height: fit-content;
 }
 
 .dashboard-title {

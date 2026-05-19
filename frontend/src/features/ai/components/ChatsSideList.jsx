@@ -8,12 +8,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SlOptions } from "react-icons/sl";
 import Input from "@components/Input";
 import "@styles/features/ai/components/ConversationSideList.css";
+import { toast } from "sonner";
+import useChatStore from "@store/chatStore";
 
-const ChatsSideList = ({ onNavigate }) =>
-{
+const ChatsSideList = ({ onNavigate }) => {
   const { id } = useParams();
   console.log("NAVIGATE");
   console.log(onNavigate);
+  const { conversation } = useChatStore();
   const { data: conversations } = useGetUserConversations();
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -23,8 +25,13 @@ const ChatsSideList = ({ onNavigate }) =>
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const navigate = useNavigate();
 
-  const handleRename = async (e) =>
-  {
+  const handleRename = async (e) => {
+    console.log("RENAMING HERE");
+    console.log(editValue);
+    if (editValue === "" || editValue?.trim()?.length === 0) {
+      toast.error("Invalid title");
+      return;
+    }
     if (e.key === "Enter") {
       await renameConversation({
         conversationId: editingId,
@@ -37,14 +44,26 @@ const ChatsSideList = ({ onNavigate }) =>
     }
   };
 
-  const handleBlur = async () =>
-  {
-    await renameConversation(editingId, editValue);
+  const handleBlur = async () => {
+    const newTitle =
+      editValue.trim().length !== 0
+        ? editValue
+        : conversation.conversation_title;
+    if (newTitle.trim() === conversation.conversation_title.trim()) {
+      console.log("STOP THE REQUEST");
+      setEditingId(null);
+      setEditValue("");
+      return;
+    }
+    console.log(editingId, editValue);
+    await renameConversation({
+      conversationId: editingId,
+      new_title: newTitle,
+    });
     setEditingId(null);
   };
 
-  const handleNavigateToConversation = (conversation) =>
-  {
+  const handleNavigateToConversation = (conversation) => {
     console.log("NAVIGATIN");
     console.log(conversation);
     onNavigate();
@@ -52,8 +71,7 @@ const ChatsSideList = ({ onNavigate }) =>
     return navigate(`/chat/${conversation.conversation_id}`);
   };
 
-  const handleOpenOptions = (e, conversation) =>
-  {
+  const handleOpenOptions = (e, conversation) => {
     e.stopPropagation();
 
     const rect = e.currentTarget.getBoundingClientRect();

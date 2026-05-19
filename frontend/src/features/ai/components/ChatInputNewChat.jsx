@@ -198,7 +198,7 @@ const ChatInputNewChat = ({ placeholder }) => {
             <Button
               className="chat-input-send-button"
               onClick={onSubmit}
-              disabled={message.length === 0 && files.length === 0}
+              disabled={message.trim().length === 0 && files.length === 0}
             >
               <FaArrowUp className="chat-input-send-icon" />
             </Button>

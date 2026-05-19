@@ -12,6 +12,9 @@ import useAuthStore from "@store/authStore.js";
 import { api } from "@lib/axios";
 import "@styles/features/ai/components/ChatInput.css";
 import axios from "axios";
+import Loading from "./Loading";
+import { RiLoader2Fill } from "react-icons/ri";
+import LoadingCircle from "@components/LoadingCircle";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -31,7 +34,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     isAwaitingResponse,
     setIsAwaiting,
     conversation,
-    addMessage
+    addMessage,
   } = useChatStore();
 
   const [files, setFiles] = useState([]);
@@ -114,20 +117,19 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         chatEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
 
-      const response = await api.post(
-        `${VITE_URL_APP}/api/chatbot`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/formdata",
-            signal:abortControllerRef.current.signal
-          },
+      const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
+        headers: {
+          "Content-Type": "multipart/formdata",
+          signal: abortControllerRef.current.signal,
         },
-      );
-      addMessage({ role: "assistant", blocks: response.data.blocks });
+      });
+      addMessage({
+        role: "assistant",
+        blocks: response.data.blocks,
+        smart_replies: response.data.smart_replies,
+      });
     } catch (e) {
-      if(axios.Cancel(e) || e?.name==="CanceledError")
-        return;
+      if (axios.Cancel(e) || e?.name === "CanceledError") return;
       toast.error(e.message);
     } finally {
       setIsAwaiting(false);
@@ -139,13 +141,16 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const stopResponse = () => {
     abortControllerRef.current?.abort();
     setIsAwaiting(false);
-    addMessage(({
-      role:'assistant', blocks: [{
-        type:'text',
-        content: 'This response was stopped!',
-        stopped:true
-      }]
-    }));
+    addMessage({
+      role: "assistant",
+      blocks: [
+        {
+          type: "text",
+          content: "This response was stopped!",
+          stopped: true,
+        },
+      ],
+    });
   };
 
   const handleInput = (e) => {
@@ -215,12 +220,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
 
   return (
     <div className="chat-input">
-      {files?.length > 0 && (
-        <FileList
-          files={files}
-          setFiles={setFiles}
-        />
-      )}
+      {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
 
       <div className="chat-input-row">
         <input
@@ -280,7 +280,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             <Button
               className="chat-input-send-button"
               onClick={handleSubmit}
-              disabled={message.length === 0 && files.length === 0}
+              disabled={message.trim().length === 0 && files.length === 0}
             >
               <FaArrowUp className="chat-input-send-icon" />
             </Button>
@@ -289,9 +289,9 @@ const ChatInput = ({ placeholder, chatEnd }) => {
           {isAwaitingResponse && (
             <Button
               className="cursor-pointer hover:scale-105"
-              onClick={stopResponse}
+              // onClick={stopResponse}
             >
-              <FaStop className="size-4" />
+              <LoadingCircle className="size-4 animate-spin" />
             </Button>
           )}
         </div>
