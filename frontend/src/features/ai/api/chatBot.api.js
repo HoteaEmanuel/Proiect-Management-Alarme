@@ -171,21 +171,24 @@ export const useDeleteConversation = (conversationId) => {
   });
 };
 
-export const useGetConversationFiles = (conversationId) => {
+export const useGetConversationFiles = (conversationId, options = {}) => {
   return useQuery({
     queryFn: async () => {
       try {
         const response = await api.get(
           `${VITE_URL_APP}/api/conversations/${conversationId}/files`,
         );
+
         return response.data;
       } catch (error) {
         toast.error(error?.message || "Could not get the attached files");
       }
     },
     queryKey: ["conversationFiles", conversationId],
+    enabled: !!conversationId && (options.enabled ?? true),
   });
 };
+
 export const useReadChatResponse = () => {
   return useMutation({
     mutationFn: async ({ text }) => {

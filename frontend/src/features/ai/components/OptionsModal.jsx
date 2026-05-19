@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { MdEdit } from "react-icons/md";
 import { RiDeleteBin5Fill, RiLoader2Fill } from "react-icons/ri";
 import {
@@ -27,26 +27,16 @@ const OptionsModal = ({
     conversation.conversation_id,
   );
   const { data, isPending } = useGetConversationFiles(
-    conversation.conversation_id,
-  );
+  conversation.conversation_id,
+  {
+    enabled: fullOptions,
+  },
+);
 
   console.log("CONVERSATION TO BE");
   console.log(conversation);
 
   const modalRef = useRef(null);
-
-  useLayoutEffect(() => {
-    if (!position || !modalRef.current) return;
-
-    modalRef.current.style.setProperty(
-      "--options-modal-top",
-      `${position.top}px`,
-    );
-    modalRef.current.style.setProperty(
-      "--options-modal-left",
-      `${position.left}px`,
-    );
-  }, [position]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -69,20 +59,19 @@ const OptionsModal = ({
       toast.error(error?.message || "Deletion failed");
     }
   };
-  if (isPending) return <RiLoader2Fill className="size-5 animate-spin" />;
+  if (fullOptions && isPending) return <RiLoader2Fill className="size-5 animate-spin" />;
   return (
     <div
-      ref={modalRef}
+     ref={modalRef}
       className={`options-modal ${position ? "options-modal-floating" : ""}`}
-      onMouseLeave={() => {
-        showOptions(false);
-        clear(null);
-      }}
-      onBlur={() => {
-        console.log("BLURRRR");
-        showOptions(false);
-        clear(null);
-      }}
+      style={
+        position
+          ? {
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+            }
+          : undefined
+      }
     >
       <ul className="options-modal-list">
         <li>
