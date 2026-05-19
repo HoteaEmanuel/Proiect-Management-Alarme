@@ -24,6 +24,6 @@ def get_sql_agent_response(db: Session, context: AgentContext, call: AgentCall) 
             context.sql_query_text = query
             context.sql_result = run_llm_query(db, query)
     
-    print(f"[SQL] {context.sql_result}")
+    print(f"[SQL] Result length: {len(context.sql_result)}")
 
     return context

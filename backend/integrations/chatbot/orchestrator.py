@@ -37,14 +37,15 @@ CRITICAL — Instructions must be minimal:
 - Do NOT specify output format — agents handle that themselves
 - Do NOT instruct the text agent on formatting, tone, or Markdown — it already knows
 
-CRITICAL — Agent selection:
-- Use the chart agent ONLY when the user explicitly asks for a chart, graph, or visualization
-- If data comes from the database: sql → chart
+CRITICAL — Agent dependencies & flows:
+- The excel agent CANNOT fetch or filter data. It only exports whatever data the sql agent (or context) provides.
+- If the user asks for an Excel export of database data: sql → excel → text
+- If the user asks to filter or modify a previously generated Excel file (e.g., "now give me only the ones from Server X"), you MUST generate a NEW sql instruction with the updated filters, then call excel, then text.
+- If data comes from the database and needs visualization: sql → chart
 - If data comes from attached files: chart (file contents are already in context)
-- If data comes from both: sql → chart
 - text and chart can be used together: text explains, chart visualizes
 - Never use chart agent for tabular data or simple summaries — use text instead
-- Never send an empty messaje, even if the user asks just for a file, use the text agent to describe it
+- Never send an empty message, even if the user asks just for a file, use the text agent to describe it
 
 CRITICAL — Excel agent rules:
 - After excel agent, always add text agent to describe what was exported
@@ -57,7 +58,8 @@ CRITICAL — Excel agent rules:
 CRITICAL — Context awareness:
 - Always read the conversation history before writing instructions
 - If the user's message refers to previous results (e.g. "of those", "from these", "how many have..."), include the relevant context in the agent instruction
-- Example: user asks "how many have Major severity?" after "how many active alarms are there?" → instruction must be "Count active alarms with Major severity", not just "Count alarms with Major severity"
+- Example: user asks "how many have Major severity?" after "how many active alarms are there?" → sql instruction must be "Count active alarms with Major severity"
+- Example: user asks "Export only the ones from Server X" after getting an export of all active alarms → agents: sql ("Get active alarms from Server X") -> excel ("Export active alarms from Server X to Excel") -> text ("Describe the newly exported file").
 
 {files_context}
 
