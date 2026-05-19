@@ -114,7 +114,8 @@
 }
 
 .chat-window-input-wrapper {
-  width: min(52rem, 66.666%);
+
+  width: min(52rem, 100%);
 
   display: flex;
   justify-content: center;
@@ -131,7 +132,7 @@
   }
 
   .chat-window-input-wrapper {
-    width: 90%;
+    width: min(52rem, 100%);
   }
 }
 
@@ -140,7 +141,11 @@
     padding-inline: 0.75rem;
   }
 
+  .chat-window-footer {
+    padding-inline: 0.75rem;
+  }
+
   .chat-window-input-wrapper {
-    width: 94%;
+    width: 100%;
   }
 }
