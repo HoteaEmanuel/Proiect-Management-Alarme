@@ -81,7 +81,13 @@
 
     overflow-y: auto;
 
+    scrollbar-width: none;
+
     list-style: none;
+}
+.chats-list::-webkit-scrollbar {
+
+    display: none;
 }
 
 .chats-list-item {
