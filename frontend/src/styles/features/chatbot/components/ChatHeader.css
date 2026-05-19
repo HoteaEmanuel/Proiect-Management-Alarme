@@ -37,6 +37,7 @@
 
     width: fit-content;
     max-width: 100%;
+    min-width: 0;
 
     display: flex;
     align-items: center;
@@ -45,7 +46,8 @@
 
 .chat-header-title {
 
-    max-width: min(30rem, 70%);
+    max-width: calc(100vw - 30rem);
+    min-width: 0;
 
     overflow: hidden;
 
@@ -134,7 +136,7 @@
 
     .chat-header-title {
 
-        max-width: 70%;
+        max-width: calc(100vw - 12rem);
     }
 }
 
@@ -148,7 +150,7 @@
 
     .chat-header-title {
 
-        max-width: 12rem;
+        max-width: calc(100vw - 8rem);
         font-size: var(--fs-xs);
     }
 
