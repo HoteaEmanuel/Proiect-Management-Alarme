@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import "@styles/features/dashboard/components/AlarmChart.css"
+import "@styles/features/dashboard/components/AlarmChart.css";
 
 const COLORS = {
   Critical: "#ef4444",
@@ -37,6 +37,7 @@ const AlarmChart = ({ data }) => {
 
   return (
     <div className="alarm-chart-wrapper">
+      <p className="font-semibold text-lg ">Alarms in the last month</p>
       <ResponsiveContainer width="100%" height={"100%"}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#333" />

@@ -132,9 +132,6 @@ const Dashboard = () => {
         </Tooltip>
       </div>
 
-      <p className="font-semibold text-lg ">Alarms in the last month</p>
-      <AlarmChart data={data.buckets} />
-
       <div className="dashboard-filter-toggle-tooltip">
         <Tooltip text={hasFiltersOpen ? "Hide filters" : "Show filters"}>
           <Button
@@ -351,6 +348,9 @@ const Dashboard = () => {
           ))}
         </select>
       </div>
+
+     
+      <AlarmChart data={data.buckets} />
     </div>
   );
 };
