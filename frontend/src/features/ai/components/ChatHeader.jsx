@@ -28,7 +28,6 @@ const ChatHeader = () => {
   const [showFilesModal, setShowFilesModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const { id } = useParams();
-  const { headerVisible} =useHeaderStore();
   const { data: conversationData, isPending } = useGetConversationBaseData(id, {
     enabled: !!id,
   });
@@ -72,11 +71,10 @@ const ChatHeader = () => {
   };
   // console.log(showOptionsButton);
   console.log("EDITING ID", editingId);
-  console.log("CHAT HEADER VISIBILITY");
-  console.log(headerVisible);
+
     return (
     <header
-      className={`chat-header ${headerVisible ? 'header-visible': 'header-hidden'}`}
+      className="chat-header"
       // onMouseEnter={() => setShowOptionsButton(true)}
       // onMouseLeave={() => setShowOptionsButton(false)}
     >
