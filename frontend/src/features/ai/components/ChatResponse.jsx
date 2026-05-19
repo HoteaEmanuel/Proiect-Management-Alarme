@@ -77,7 +77,7 @@ const Chart = ({ content }) => {
 
   const commonProps = {
     data,
-    margin: { top: 10, right: 20, left: 0, bottom: 0 },
+    margin: { top: 20, right: 24, left: 0, bottom: 32 },
   };
 
   const renderLines = () =>
@@ -133,39 +133,93 @@ const Chart = ({ content }) => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend
+                align="center"
+                verticalAlign="bottom"
+                wrapperStyle={{
+                  width: "100%",
+                  left: 0,
+                  paddingTop: "1.35rem",
+                  textAlign: "center",
+                }}
+              />
             </PieChart>
           ) : chart_type === "bar" ? (
             <BarChart {...commonProps}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <XAxis
+                dataKey={x_key}
+                tick={{ fill: "#9ca3af", fontSize: 12 }}
+                tickMargin={12}
+                height={44}
+                minTickGap={18}
+              />
               <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
               <Tooltip
                 contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
               />
-              <Legend />
+              <Legend
+                align="center"
+                verticalAlign="bottom"
+                wrapperStyle={{
+                  width: "100%",
+                  left: 0,
+                  paddingTop: "1.35rem",
+                  textAlign: "center",
+                }}
+              />
               {renderLines()}
             </BarChart>
           ) : chart_type === "line" ? (
             <LineChart {...commonProps}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <XAxis
+                dataKey={x_key}
+                tick={{ fill: "#9ca3af", fontSize: 12 }}
+                tickMargin={12}
+                height={44}
+                minTickGap={18}
+              />
               <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
               <Tooltip
                 contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
               />
-              <Legend />
+              <Legend
+                align="center"
+                verticalAlign="bottom"
+                wrapperStyle={{
+                  width: "100%",
+                  left: 0,
+                  paddingTop: "1.35rem",
+                  textAlign: "center",
+                }}
+              />
               {renderLines()}
             </LineChart>
           ) : (
             <AreaChart {...commonProps}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey={x_key} tick={{ fill: "#9ca3af", fontSize: 12 }} />
+              <XAxis
+                dataKey={x_key}
+                tick={{ fill: "#9ca3af", fontSize: 12 }}
+                tickMargin={12}
+                height={44}
+                minTickGap={18}
+              />
               <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} />
               <Tooltip
                 contentStyle={{ backgroundColor: "#1f2937", border: "none" }}
               />
-              <Legend />
+              <Legend
+                align="center"
+                verticalAlign="bottom"
+                wrapperStyle={{
+                  width: "100%",
+                  left: 0,
+                  paddingTop: "1.35rem",
+                  textAlign: "center",
+                }}
+              />
               {renderLines()}
             </AreaChart>
           )}
