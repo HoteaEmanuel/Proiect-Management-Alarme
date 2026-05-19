@@ -18,10 +18,11 @@ CREATE TABLE Messages (
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     
     CONSTRAINT FK_Messages_Response FOREIGN KEY (response_id)
-    	REFERENCES Messages(id),
+        REFERENCES Messages(id),
 
     CONSTRAINT FK_Messages_Conversations FOREIGN KEY (conversation_id) 
-        REFERENCES Conversations(conversation_id),
+        REFERENCES Conversations(conversation_id)
+        ON DELETE CASCADE,
 
     CONSTRAINT CHK_Message_Role 
         CHECK (role IN ('user', 'assistant', 'system')),

@@ -14,7 +14,12 @@ class ConversationModel(Base):
     conversation_title: Mapped[str] = mapped_column(String(50), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
-    messages = relationship("MessageModel", cascade="all, delete-orphan", back_populates="conversation", lazy="noload")
+    messages = relationship(
+        "MessageModel", 
+        back_populates="conversation", 
+        cascade="all, delete", 
+        passive_deletes=True
+    )
 
 class MessageModel(Base):
     __tablename__ = "Messages"
