@@ -1,14 +1,15 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-// hook pentru voice to text
+// hook pentru voce -> text
 const useVoiceToText = () => {
-  const [transcript, setTranscript] = useState("");
+  // const [transcript, setTranscript] = useState("");
+  const transcriptRef=useRef("");
   const [recording, setRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef(null);
   const silenceTimer = useRef(null);
 
-  const start = () => {
+  const start = (onTranscript) => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -24,7 +25,9 @@ const useVoiceToText = () => {
       const text = Array.from(e.results)
         .map((r) => r[0].transcript)
         .join("");
-      setTranscript(text);
+      // setTranscript(text);
+      transcriptRef.current=text;
+      onTranscript(text);
 
       setIsSpeaking(true);
       clearTimeout(silenceTimer.current);
@@ -42,9 +45,9 @@ const useVoiceToText = () => {
     setIsSpeaking(false);
   };
 
-  const clear = () => setTranscript("");
+  const clear = () =>transcriptRef.current='';
 
-  return { transcript, recording, isSpeaking, start, stop, clear };
+  return { transcriptRef, recording, isSpeaking, start, stop, clear };
 };
 
 export default useVoiceToText;
