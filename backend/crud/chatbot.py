@@ -294,7 +294,8 @@ def save_message_to_db(db: Session, message_data: MessageCreate) -> MessageModel
         content=message_data.content,
         smart_replies=message_data.smart_replies,
         has_sql_query=message_data.has_sql_query,
-        sql_query=message_data.sql_query
+        sql_query=message_data.sql_query,
+        is_stopped=message_data.is_stopped
     )
     
     try:
