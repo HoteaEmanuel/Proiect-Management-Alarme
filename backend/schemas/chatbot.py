@@ -43,6 +43,7 @@ class MessageCreate(BaseModel):
     user_id: str
     conversation_id: str
     role: str
+    is_stopped: bool | None = None
     has_sql_query: bool = False
     content: str
     smart_replies: list[str] | None = None
