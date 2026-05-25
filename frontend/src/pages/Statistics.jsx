@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ResponsiveContainer,
   Tooltip,
@@ -28,10 +28,10 @@ export const Statistics = () => {
   const lastDay = `${year}-12-31`;
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const filters = {
+  const filters =useMemo(()=> ( {
     start_date: searchParams.get("start_date") ?? firstDay,
     end_date: searchParams.get("end_date") ?? lastDay,
-  };
+  }),[searchParams,firstDay,lastDay]);
 
   const COLORS = ["#378ADD", "#E24B4A", "#EF9F27", "#1D9E75", "#7F77DD"];
 
@@ -103,7 +103,7 @@ export const Statistics = () => {
     }
 
     fetchStatistics();
-  }, [searchParams]);
+  }, [searchParams,filters]);
 
   // Updateaza URL cu noul filtru, adaugandu l la URL
   const handleFilterChange = (key, value) => {

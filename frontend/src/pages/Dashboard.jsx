@@ -1,4 +1,4 @@
-import React, { useEffect, useTransition } from "react";
+import React, { useEffect, useMemo, useTransition } from "react";
 import {
   useGetAlarmsTrend,
   useGetAllAlarms,
@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [isExporting, startExporting] = useTransition();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
   // const [filters, setFilters] = useState(undefined);
-  const filters = {
+  const filters = useMemo(()=>({
     startDate: searchParams.get("startDate"),
     endDate: searchParams.get("endDate"),
     status: searchParams.get("status") ?? "All",
@@ -43,7 +43,7 @@ const Dashboard = () => {
     pageSize: Number(searchParams.get("pageSize") ?? 10),
     sort: searchParams.get("sort") ?? "alarm_number",
     order: searchParams.get("order") ?? "desc",
-  };
+  }),[searchParams]);
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
   // Alarma selectata pentru pop up
@@ -60,7 +60,7 @@ const Dashboard = () => {
     };
 
     fetchAlarms();
-  }, [searchParams]);
+  }, [searchParams,filters]);
 
   const { data, isPending } = useGetAlarmsTrend({
     granularity: "monthly",
@@ -69,6 +69,7 @@ const Dashboard = () => {
 
   // Updateaza URL cu noul filtru, adaugandu l la URL
   const handleFilterChange = (key, value) => {
+    
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set(key, value);
@@ -349,7 +350,6 @@ const Dashboard = () => {
         </select>
       </div>
 
-     
       <AlarmChart data={data.buckets} />
     </div>
   );
