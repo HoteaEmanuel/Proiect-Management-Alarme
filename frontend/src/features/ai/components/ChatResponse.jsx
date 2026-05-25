@@ -189,7 +189,6 @@ const Chart = ({ content }) => {
 };
 
 const ChatSuggestions = ({ suggestions }) => {
-
   const ref = useRef(null);
   useScrollAnimation(ref);
 
@@ -198,7 +197,6 @@ const ChatSuggestions = ({ suggestions }) => {
   if (suggestions === null || suggestions?.length === 0) return null;
 
   return (
-    
     <div className="chat-suggestions-wrapper slide-hidden" ref={ref}>
       <ul className="chat-suggestions-list">
         {suggestions.map((item) => (
@@ -219,6 +217,7 @@ const ChatSuggestions = ({ suggestions }) => {
 
 const ChatResponse = ({
   blocks,
+  is_stopped,
   showOptions,
   smart_replies,
   last_message,
@@ -228,7 +227,8 @@ const ChatResponse = ({
   const { speaking, speak, stop } = useSpeechSynthesis();
   console.log("BLOCKS");
   console.log(blocks);
-  console.log(copied);
+  console.log(smart_replies);
+  console.log(last_message);
   const { file, setFile } = useFilePreview();
   const handleFileClick = (fileToPreview) => {
     if (file) setFile(null);
@@ -253,6 +253,9 @@ const ChatResponse = ({
 
   return (
     <div className="chat-response">
+      {is_stopped && (
+        <p className="whitespace-pre-wrap text-red-500">Stopped</p>
+      )}
       {blocks.map((block, index) => (
         <div key={index} className="chat-response-block">
           {block.type === "chart" ? (
@@ -262,15 +265,9 @@ const ChatResponse = ({
           ) : (
             <div className="chat-response-markdown">
               <div className="chat-response-markdown-content">
-                {block?.stopped ? (
-                  <p className="whitespace-pre-wrap text-red-500">
-                    {block.content}
-                  </p>
-                ) : (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {block.content}
-                  </ReactMarkdown>
-                )}
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {block.content}
+                </ReactMarkdown>
               </div>
               {showOptions && (
                 <div className="chat-response-options">

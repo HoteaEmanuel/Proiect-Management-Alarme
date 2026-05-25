@@ -82,6 +82,8 @@ const ConversationContent = ({
                   files={message?.files}
                   smart_replies={message?.smart_replies}
                   showOptions={showCopy === index}
+                  is_stopped={message?.is_stopped}
+                  index={index}
                   last_message={index===messages.length-1}
                 />
               )}

@@ -9,6 +9,7 @@ import useAuthStore from "@store/authStore.js";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import removeMarkdown from "remove-markdown";
+import axios from "axios";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const useCreateConversation = () => {
   const navigate = useNavigate();
@@ -192,16 +193,28 @@ export const useReadChatResponse = () => {
       console.log("TEXT TO READ");
       const cleanText = removeMarkdown(text);
       console.log(cleanText);
-      const response = await api.post(`${VITE_URL_APP}/audio/speak`, {
-        text: cleanText,
-      }, {
-         responseType:'arraybuffer'
-      });
+      const response = await api.post(
+        `${VITE_URL_APP}/audio/speak`,
+        {
+          text: cleanText,
+        },
+        {
+          responseType: "arraybuffer",
+        },
+      );
       return response;
     },
     mutationKey: ["read-chat-response"],
   });
 };
+
+export const stopRequest = async (requestId) => {
+  const response = await api.post(
+    `${VITE_URL_APP}/api/chatbot/cancel/${requestId}`,
+  );
+  return response.data;
+};
+
 // export const useReadResponse=()=>{
 //   return useMutation({
 //     mutationFn:async()=>{

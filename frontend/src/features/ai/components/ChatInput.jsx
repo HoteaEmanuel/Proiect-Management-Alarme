@@ -12,6 +12,7 @@ import useAuthStore from "@store/authStore.js";
 import { api } from "@lib/axios";
 import "@styles/features/ai/components/ChatInput.css";
 import axios from "axios";
+import { stopRequest } from "../api/chatBot.api";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -39,6 +40,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const [files, setFiles] = useState([]);
   const { user } = useAuthStore();
   const timeOutId = useRef();
+  const { requests } = useChatStore();
   const { recording, start, stop, clear, transcript, isSpeaking } =
     useVoiceToText();
 
@@ -117,15 +119,23 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       timeOutId.current = setTimeout(() => {
         chatEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
-      addActiveRequest(newRequestId);
+      addActiveRequest({
+        conversationId: conversation?.conversation_id,
+        requestId: newRequestId,
+      });
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
         headers: {
           "Content-Type": "multipart/formdata",
           signal: abortControllerRef.current.signal,
         },
       });
-      deleteRequest(newRequestId);
-      addMessage({ role: "assistant", blocks: response.data.blocks });
+      deleteRequest(conversation?.conversation_id);
+      addMessage({
+        role: "assistant",
+        blocks: response.data.blocks,
+        smart_replies: response.data.smart_replies,
+        is_stopped: response.data?.is_stopped,
+      });
     } catch (e) {
       if (axios.Cancel(e) || e?.name === "CanceledError") return;
       toast.error(e.message);
@@ -136,19 +146,18 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     return () => clearTimeout(timeOutId.current);
   };
 
-  const stopResponse = () => {
-    abortControllerRef.current?.abort();
-    setIsAwaiting(false);
-    addMessage({
-      role: "assistant",
-      blocks: [
-        {
-          type: "text",
-          content: "This response was stopped!",
-          stopped: true,
-        },
-      ],
-    });
+  const stopResponse = async () => {
+    console.log("REQUEST STOPPED");
+    try {
+      const requestId = requests.get(conversation?.conversation_id);
+      console.log("TO STOP REQUEST");
+      console.log(requestId);
+      if (!requestId) throw new Error("Invalid request");
+      deleteRequest(conversation?.conversation_id);
+      stopRequest(requestId);
+    } catch (error) {
+      toast.error(error?.message || "Request can not be stopped");
+    }
   };
 
   const handleInput = (e) => {
@@ -216,6 +225,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     });
   };
 
+  const isLoading = requests.has(conversation?.conversation_id);
   return (
     <div className="chat-input">
       {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
@@ -284,7 +294,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             </Button>
           )}
 
-          {isAwaitingResponse && (
+          {isLoading && (
             <Button
               className="cursor-pointer hover:scale-105"
               onClick={stopResponse}
