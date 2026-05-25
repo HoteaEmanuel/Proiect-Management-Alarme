@@ -12,7 +12,7 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/8")
 engine=create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 
-redis_client = redis.from_url(REDIS_URL, decode_response=True)
+redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
 class Base(DeclarativeBase):
     pass
