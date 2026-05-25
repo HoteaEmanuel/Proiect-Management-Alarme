@@ -423,6 +423,10 @@ def delete_conversation(db: Session, user_id: str, conversation_id: str) -> None
 
 # Modifies the title of an existing conversation
 def update_conversation_title(db: Session, user_id: str, conversation_id: str, new_title: str) -> None:
+
+    if new_title is None or new_title == '' or new_title.isspace():
+        return
+
     conversation = db.execute(
         select(ConversationModel)
         .where(
@@ -439,8 +443,6 @@ def update_conversation_title(db: Session, user_id: str, conversation_id: str, n
     try:
         db.commit()
         db.refresh(conversation)
-
-        return conversation
     
     except IntegrityError as e:
         db.rollback()

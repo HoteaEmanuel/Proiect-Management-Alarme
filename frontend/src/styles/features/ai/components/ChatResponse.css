@@ -97,20 +97,26 @@
 .chat-response-chart-wrapper {
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
   margin-top: 2rem;
+
+  display: flex;
+  justify-content: center;
+
+  overflow: visible;
 }
 
 .chat-response-chart-card {
   width: min(50rem, 100%);
-  min-width: 38rem;
-  height: 31.25rem;
+  min-width: 0;
+  height: 34rem;
   padding: 1rem;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
+
+  overflow: visible;
 
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -128,18 +134,21 @@
 
 .chat-response-chart {
   width: 100%;
-  height: 100%;
+  flex: 1;
   min-height: 0;
+
+  overflow: visible;
 }
 
 .chat-response-chart-container {
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .chat-response-chart-actions {
   position: relative;
 
   width: 100%;
+  min-height: 1.5rem;
 }
 
 .chat-response-chart-actions-inner {
@@ -195,7 +204,7 @@
 
 .chat-response-markdown-content p,
 .chat-response-markdown-content li {
-  font-size: var(--fs-sm);
+  font-size: clamp(0.75rem, 0.85rem + 0.2vw, 1rem);
   line-height: 1.65;
 }
 
@@ -289,8 +298,10 @@
 @media (max-width: 768px) {
   
   .chat-response-chart-card {
-    min-width: 34rem;
-    height: 26rem;
+    width: 100%;
+    min-width: 0;
+    height: 29rem;
+    padding: 0.75rem;
   }
   
   .chat-suggestions-wrapper {
@@ -320,8 +331,9 @@
   }
 
   .chat-response-chart-card {
-    min-width: 30rem;
-    height: 24rem;
+    width: 100%;
+    min-width: 0;
+    height: 29rem;
     padding: 0.75rem;
   }
 }

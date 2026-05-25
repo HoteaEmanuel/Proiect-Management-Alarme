@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { FaArrowUp } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
@@ -10,7 +10,6 @@ import Button from "@components/Button";
 import "@styles/features/ai/components/ChatInput.css";
 import { useCreateConversation } from "../api/chatBot.api";
 import useAuthStore from "@store/authStore";
-import useChatStore from "@store/chatStore";
 import useVoiceToText from "../hooks/useVoiceToText";
 
 const MESSAGE_LIMIT = 5000;
@@ -19,40 +18,34 @@ const MAX_ALLOWED_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const ChatInputNewChat = ({ placeholder }) => {
+  console.log("NEW CHAT INPUT RENDERED");
   const { user } = useAuthStore();
   const input = useRef();
+  const [isEmpty, setIsEmpty] = useState(true);
   const fileInput = useRef();
-  const { message, setMessage } = useChatStore();
-  const { requests } = useChatStore();
   const [files, setFiles] = useState([]);
 
-  const { recording, start, stop, clear, transcript, isSpeaking } =
-    useVoiceToText();
+  const { recording, start, stop, clear, isSpeaking } = useVoiceToText();
   const { mutateAsync: sendMessage, isPending } = useCreateConversation();
 
   const onSubmit = async () => {
     try {
       if (isPending) return;
-      // setIsAwaiting(true);
-      //  addActiveRequest({
-      //   conversationId: conversation?.conversation_id,
-      //   requestId: newRequestId,
-      // });
       const filesToSend = files.map((item) => item.file);
       const filesPreserveStatus = files.map((item) => item.persist);
 
       const mesaj = {
         user_id: user.user_id,
-        message: message,
+        message: input.current.value.trim(),
         files: filesToSend,
         file_preserve_flags: filesPreserveStatus,
         request_id: crypto.randomUUID(),
       };
 
       setFiles([]);
-      setMessage("");
+      // setMessage("");
       clear();
-
+      input.current.value = "";
       await sendMessage(mesaj);
     } catch (e) {
       toast.error(e?.message || "Could not send message");
@@ -71,30 +64,25 @@ const ChatInputNewChat = ({ placeholder }) => {
 
     element.classList.remove("chat-input-textarea-scrollable");
   };
-
-  const handleInput = (e) => {
-    const inputSize = e.target.value.length;
-
+  const handleInput = useCallback(() => {
+    const inputSize = input.current.value.trim().length;
     if (inputSize >= MESSAGE_LIMIT) {
       toast.error(`Maximum ${MESSAGE_LIMIT} characters allowed`);
+      return;
     }
+    const empty = inputSize === 0;
+    setIsEmpty((prev) => (prev === empty ? prev : empty));
 
-    resizeInput(e.target);
-  };
+    resizeInput(input.current);
+  }, []);
 
-  useEffect(() => {
-    if (recording && transcript) {
-      setMessage(transcript);
-    }
-  }, [recording, transcript, setMessage]);
-
-  useEffect(() => {
-    const element = input.current;
-
-    if (!element) return;
-
-    resizeInput(element);
-  }, [message]);
+  const handleStart = useCallback(() => {
+    start((text) => {
+      input.current.value = text;
+      setIsEmpty(text.trim().length === 0);
+      resizeInput(input.current);
+    });
+  }, [start]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -164,21 +152,18 @@ const ChatInputNewChat = ({ placeholder }) => {
 
         <textarea
           placeholder={placeholder}
-          value={message}
           ref={input}
-          onChange={(e) => setMessage(e.target.value)}
           rows={1}
           maxLength={MESSAGE_LIMIT}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          onChangeCapture={handleInput}
           className="chat-input-textarea"
         />
 
         <div className="chat-input-actions-right">
-          {!recording && message === "" ? (
+          {!recording && isEmpty ? (
             <Tooltip text={"Dictate"}>
-              <Button className="chat-input-icon-button" onClick={start}>
+              <Button className="chat-input-icon-button" onClick={handleStart}>
                 <MdKeyboardVoice className="chat-input-icon" />
               </Button>
             </Tooltip>
@@ -201,7 +186,7 @@ const ChatInputNewChat = ({ placeholder }) => {
             <Button
               className="chat-input-send-button"
               onClick={onSubmit}
-              disabled={message.length === 0 && files.length === 0}
+              disabled={isEmpty && files.length === 0}
             >
               <FaArrowUp className="chat-input-send-icon" />
             </Button>

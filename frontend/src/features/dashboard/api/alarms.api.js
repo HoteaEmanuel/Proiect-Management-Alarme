@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { api } from "../../../lib/axios.js";
+import { useQuery } from "@tanstack/react-query";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
 export const alarmsApi = {
@@ -89,31 +90,44 @@ export const alarmsApi = {
       });
       return response.data;
     } catch (e) {
-      toast.error("Could not export");
+      toast.error(e?.message || "Could not export");
       throw new Error(e);
     }
   },
 
   // cere lista de alarme de la o o bucata din grafic, format json, pt popup
   getChartDetails: async ({ category, label, start_date, end_date }) => {
-    const response = await api.get(
-      `${VITE_URL_APP}/alarms/chart-details`,
-      {
-        params: { category, label, start_date, end_date }
-      }
-    );
+    const response = await api.get(`${VITE_URL_APP}/alarms/chart-details`, {
+      params: { category, label, start_date, end_date },
+    });
     return response.data;
   },
   // la fel dar Excel, pt descarcare
   exportChartDetails: async ({ category, label, start_date, end_date }) => {
-    const response = await api.get(
-      `${VITE_URL_APP}/alarms/chart-details`,
-      {
-        params: { category, label, start_date, end_date, export: true },
-        responseType: "arraybuffer"
-      }
-    );
+    const response = await api.get(`${VITE_URL_APP}/alarms/chart-details`, {
+      params: { category, label, start_date, end_date, export: true },
+      responseType: "arraybuffer",
+    });
     return response.data;
   },
 
+  getAlarmsTrend: async (filters) => {
+    console.log("FILTERES HERE BABY");
+    console.log(filters.granularity);
+    console.log(filters.group_by);
+    try {
+      const response = await api.get(
+        `${VITE_URL_APP}/alarms/stats/alarm-trend`,
+        {
+          params: {
+            granularity: "monthly",
+            group_by: filters.group_by,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      toast.error(error?.message || "Fetching alarms failed");
+    }
+  },
 };

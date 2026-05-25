@@ -22,6 +22,7 @@ const MAX_ALLOWED_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const ChatInput = ({ placeholder, chatEnd }) => {
+  console.log("CHAT INPUT RENDERED");
   const input = useRef();
   const fileInput = useRef();
   const [isEmpty, setIsEmpty] = useState(true);
@@ -42,6 +43,11 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     resizeInput(input.current);
   }, [conversation]);
 
+  useEffect(() => {
+    input.current.value = "";
+    setIsEmpty(true);
+    resizeInput(input.current);
+  }, [conversation]);
   const resizeInput = (element) => {
     element.style.height = "auto";
     element.style.height = element.scrollHeight + "px";

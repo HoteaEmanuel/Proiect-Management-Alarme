@@ -1,5 +1,6 @@
-import React, { useEffect, useTransition } from "react";
+import React, { useEffect, useMemo, useTransition } from "react";
 import {
+  useGetAlarmsTrend,
   useGetAllAlarms,
   useGetFilteredAlarms,
 } from "@features/dashboard/hooks/alarms.queries";
@@ -21,14 +22,15 @@ import Button from "@components/Button";
 import Tooltip from "@components/ToolTip";
 import AlarmDetailsModal from "@features/dashboard/components/AlarmDetailsModal";
 import { usePageTitle } from "@hooks/usePageTitle";
+import AlarmChart from "@features/dashboard/components/statistics/AlarmChart";
 
 const Dashboard = () => {
-  usePageTitle('Dashboard')
+  usePageTitle("Dashboard");
   const [searchParams, setSearchParams] = useSearchParams({ replace: false });
   const [isExporting, startExporting] = useTransition();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
   // const [filters, setFilters] = useState(undefined);
-  const filters = {
+  const filters = useMemo(()=>({
     startDate: searchParams.get("startDate"),
     endDate: searchParams.get("endDate"),
     status: searchParams.get("status") ?? "All",
@@ -41,7 +43,7 @@ const Dashboard = () => {
     pageSize: Number(searchParams.get("pageSize") ?? 10),
     sort: searchParams.get("sort") ?? "alarm_number",
     order: searchParams.get("order") ?? "desc",
-  };
+  }),[searchParams]);
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
   // Alarma selectata pentru pop up
@@ -58,10 +60,16 @@ const Dashboard = () => {
     };
 
     fetchAlarms();
-  }, [searchParams]);
+  }, [searchParams,filters]);
+
+  const { data, isPending } = useGetAlarmsTrend({
+    granularity: "monthly",
+    group_by: "severity",
+  });
 
   // Updateaza URL cu noul filtru, adaugandu l la URL
   const handleFilterChange = (key, value) => {
+    
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set(key, value);
@@ -70,8 +78,11 @@ const Dashboard = () => {
       return next;
     });
   };
-  if (isPendingAlarms)
+  if (isPendingAlarms || isPending)
     return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
+
+  console.log("RECENT ALARMS");
+  console.log(data);
 
   const handleExport = async () => {
     try {
@@ -137,10 +148,9 @@ const Dashboard = () => {
           </Button>
         </Tooltip>
       </div>
-
-      <div 
-         id="dashboard-filters"
-         className={`dashboard-filters ${hasFiltersOpen ? "dashboard-filters-open" : ""}`}
+      <div
+        id="dashboard-filters"
+        className={`dashboard-filters ${hasFiltersOpen ? "dashboard-filters-open" : ""}`}
       >
         <div className="dashboard-filter">
           <label className="dashboard-filter-label">Start date</label>
@@ -250,7 +260,6 @@ const Dashboard = () => {
           />
         </div>
       </div>
-
       <AlarmsTable
         data={filteredAlarms?.alarms || []}
         totalCount={filteredAlarms?.total_alarms}
@@ -340,6 +349,8 @@ const Dashboard = () => {
           ))}
         </select>
       </div>
+
+      <AlarmChart data={data.buckets} />
     </div>
   );
 };

@@ -9,7 +9,6 @@ import useAuthStore from "@store/authStore.js";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import removeMarkdown from "remove-markdown";
-import axios from "axios";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const useCreateConversation = () => {
   const navigate = useNavigate();
@@ -174,21 +173,24 @@ export const useDeleteConversation = (conversationId) => {
   });
 };
 
-export const useGetConversationFiles = (conversationId) => {
+export const useGetConversationFiles = (conversationId, options = {}) => {
   return useQuery({
     queryFn: async () => {
       try {
         const response = await api.get(
           `${VITE_URL_APP}/api/conversations/${conversationId}/files`,
         );
+
         return response.data;
       } catch (error) {
         toast.error(error?.message || "Could not get the attached files");
       }
     },
     queryKey: ["conversationFiles", conversationId],
+    enabled: !!conversationId && (options.enabled ?? true),
   });
 };
+
 export const useReadChatResponse = () => {
   return useMutation({
     mutationFn: async ({ text }) => {
@@ -216,21 +218,3 @@ export const stopRequest = async (requestId) => {
   );
   return response.data;
 };
-
-// export const useReadResponse=()=>{
-//   return useMutation({
-//     mutationFn:async()=>{
-//       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/VOICE_ID", {
-//   method: "POST",
-//   headers: {
-//     "xi-api-key": პროცეს.env.ELEVENLABS_API_KEY,
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify({
-//     text: "Hello, this sounds very human.",
-//     model_id: "eleven_multilingual_v2",
-//   }),
-// });
-//     }
-//   })
-// }
