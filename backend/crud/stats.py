@@ -178,14 +178,14 @@ def get_alarm_heatmap(db: Session, filters: HeatmapFilters) -> HeatmapResponse:
             "end_date": filters.end_date,
         }
         try:
-            result=db.execute(query, params)
+            result=db.execute(query, params).mappings().all()
         except (ProgrammingError, OperationalError) as e:
             db.rollback()
             logger.error(f"Database error while fetching heatmap: {str(e)}")
             raise
         
         for row in result:
-            dt = row["first_occurence_datetime"]
+            dt = row["FIRST_OCCURENCE_DATETIME"]
             if dt:
                 key = (dt.isoweekday(), dt.hour)
                 counts[key] += 1
