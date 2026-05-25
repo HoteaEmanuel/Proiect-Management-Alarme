@@ -12,7 +12,6 @@ import ConversationContent from "@features/ai/components/ConversationContent.jsx
 import useChatStore from "@store/chatStore.js";
 
 import "@styles/pages/ai-chatbot/ChatWindow.css";
-import { useFilePreview } from "@store/filePreviewStore";
 import { usePageTitle } from "@hooks/usePageTitle";
 
 const ChatWindow = () => {
@@ -22,12 +21,9 @@ const ChatWindow = () => {
 
   const conversationRef = useRef(null);
   const chatEnd = useRef(null);
-  const { file } = useFilePreview();
   const [showCopy, setShowCopy] = useState(null);
 
   const [showScrollBtn, setShowScrollBtn] = useState(false);
-
-  const { isAwaitingResponse } = useChatStore();
 
   const handleScrollDown = () => {
     chatEnd.current?.scrollIntoView({ behavior: "smooth" });
@@ -74,15 +70,7 @@ const ChatWindow = () => {
           key={id}
           chatEnd={chatEnd}
         />
-
-        {/* {previewFile && (
-          <FilePreview
-            file={previewFile}
-            onClose={() => setPreviewFile(null)}
-          />
-        )} */}
-
-        {file && <FilePreview />}
+        <FilePreview />
       </section>
 
       <div className="chat-window-footer">
