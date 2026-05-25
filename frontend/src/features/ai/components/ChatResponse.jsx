@@ -234,7 +234,6 @@ const ChatResponse = ({
     if (file) setFile(null);
     else setFile(fileToPreview);
   };
-
   const handleCopy = async (message) => {
     try {
       const text = removeMarkdown(message); // Copiez mesajul eliminand markdown ul
@@ -250,7 +249,6 @@ const ChatResponse = ({
       toast.error(err?.message || "Failed to copy");
     }
   };
-
   return (
     <div className="chat-response">
       {is_stopped && (

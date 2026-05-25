@@ -27,10 +27,23 @@ const useChatStore = create((set) => ({
 
   setShowFiles: (state) => set({ showFiles: state }),
 
-  addActiveRequest: ({conversationId,requestId}) =>
+  addActiveRequest: ({ conversationId, requestId }) =>
     set((state) => ({
-      requests: new Map(state.requests).set(conversationId, requestId),
+      requests: new Map(state.requests).set(conversationId, {
+        requestId: requestId,
+        status: "loading",
+      }),
     })),
+
+  stopActiveRequest: (conversationId) =>
+    set((state) => {
+      const newMap = new Map(state.requests);
+      newMap.set(conversationId, {
+        ...newMap.get(conversationId),
+        status: "stopping",
+      });
+      return { requests: newMap };
+    }),
 
   deleteRequest: (conversationId) =>
     set((state) => {

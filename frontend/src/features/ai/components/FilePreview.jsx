@@ -5,26 +5,23 @@ import XlsxPreview from "./XlsxPreview";
 import "@styles/features/ai/components/FilePreview.css";
 import { useFilePreview } from "@store/filePreviewStore";
 
-const FilePreview = ({ ...props }) =>
-{
-  const {file,setFile} = useFilePreview();
+const FilePreview = ({ ...props }) => {
+  const { file, setFile } = useFilePreview();
+  if (!file) return null;
   console.log("FILE HERE");
   console.log(file);
   const fileItem = file?.file;
   console.log(file);
   const type = fileItem?.type || file.file_format;
   const isXlsx =
-    type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     type.toLowerCase() === "xlsx";
 
   console.log("FILE TYPE", type);
-  const handleClose=()=>setFile(null);
+  const handleClose = () => setFile(null);
   return createPortal(
-    <div
-      className="file-preview-backdrop"
-      onClick={handleClose}
-      {...props}
-    >
+    <div className="file-preview-backdrop" onClick={handleClose} {...props}>
       <button
         className="file-preview-close-button"
         onClick={handleClose}
@@ -38,10 +35,7 @@ const FilePreview = ({ ...props }) =>
         onClick={(e) => e.stopPropagation()}
       >
         {type.includes("image") && (
-          <img
-            src={file?.url}
-            className="file-preview-image"
-          />
+          <img src={file?.url} className="file-preview-image" />
         )}
 
         {type.includes("pdf") && (
@@ -52,9 +46,7 @@ const FilePreview = ({ ...props }) =>
           />
         )}
 
-        {isXlsx && (
-          <XlsxPreview file={file?.file} url={file?.url} />
-        )}
+        {isXlsx && <XlsxPreview file={file?.file} url={file?.url} />}
 
         {type.includes("video") && (
           <video
@@ -65,7 +57,7 @@ const FilePreview = ({ ...props }) =>
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

@@ -31,6 +31,8 @@ export const useCreateConversation = () => {
         formData.append("file_preserve_flags", String(persist === true));
       });
 
+      formData.append("request_id", message?.request_id);
+
       console.log("FORM DATA NEW");
       console.log(...formData.entries());
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {

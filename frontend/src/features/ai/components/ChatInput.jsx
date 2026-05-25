@@ -29,8 +29,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const {
     message,
     setMessage,
-    isAwaitingResponse,
-    setIsAwaiting,
     conversation,
     addMessage,
     addActiveRequest,
@@ -40,7 +38,9 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const [files, setFiles] = useState([]);
   const { user } = useAuthStore();
   const timeOutId = useRef();
-  const { requests } = useChatStore();
+  // const { requests, stopActiveRequest } = useChatStore();
+  const requests = useChatStore((state) => state.requests);
+  const stopActiveRequest = useChatStore((state) => state.stopActiveRequest);
   const { recording, start, stop, clear, transcript, isSpeaking } =
     useVoiceToText();
 
@@ -72,9 +72,9 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   }, [message]);
 
   const handleSubmit = async () => {
-    if (isAwaitingResponse) return;
+    if (requests.has(conversation?.conversation_id)) return;
 
-    setIsAwaiting(true);
+    // setIsAwaiting(true);
     abortControllerRef.current = new AbortController();
     try {
       addMessage({
@@ -139,8 +139,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     } catch (e) {
       if (axios.Cancel(e) || e?.name === "CanceledError") return;
       toast.error(e.message);
-    } finally {
-      setIsAwaiting(false);
     }
 
     return () => clearTimeout(timeOutId.current);
@@ -149,11 +147,12 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const stopResponse = async () => {
     console.log("REQUEST STOPPED");
     try {
-      const requestId = requests.get(conversation?.conversation_id);
-      console.log("TO STOP REQUEST");
-      console.log(requestId);
+      const requestId = requests.get(conversation?.conversation_id).requestId;
       if (!requestId) throw new Error("Invalid request");
-      deleteRequest(conversation?.conversation_id);
+      stopActiveRequest(conversation?.conversation_id);
+
+      console.log("ACTIVE REQUESTS");
+      console.log(requests);
       stopRequest(requestId);
     } catch (error) {
       toast.error(error?.message || "Request can not be stopped");
@@ -186,7 +185,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      if (isAwaitingResponse) return;
+      if (requests.has(conversation?.conversation_id)) return;
 
       handleSubmit();
       input.current.value = "";
@@ -225,7 +224,10 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     });
   };
 
-  const isLoading = requests.has(conversation?.conversation_id);
+  const isLoading =
+    requests.get(conversation?.conversation_id)?.status === "loading";
+  console.log("IS LOADING RESPONSE");
+  console.log(isLoading);
   return (
     <div className="chat-input">
       {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
@@ -284,7 +286,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             )
           )}
 
-          {!isAwaitingResponse && (
+          {!isLoading && (
             <Button
               className="chat-input-send-button"
               onClick={handleSubmit}
@@ -295,12 +297,14 @@ const ChatInput = ({ placeholder, chatEnd }) => {
           )}
 
           {isLoading && (
-            <Button
-              className="cursor-pointer hover:scale-105"
-              onClick={stopResponse}
-            >
-              <FaStop className="size-4" />
-            </Button>
+            <Tooltip text={"Stop"}>
+              <Button
+                className="cursor-pointer hover:scale-105"
+                onClick={stopResponse}
+              >
+                <FaStop className="size-4" />
+              </Button>
+            </Tooltip>
           )}
         </div>
       </div>

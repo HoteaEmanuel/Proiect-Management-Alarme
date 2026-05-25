@@ -55,9 +55,13 @@ const ChatWindow = () => {
     };
   }, [id]);
 
-  const isLoading = requests.has(conversation?.conversation_id);
+  console.log("REQUESTS");
+  console.log(requests);
 
-  console.log("IS LOADING RESPONSE: ", isLoading);  
+  const isLoading =
+    requests.get(conversation?.conversation_id)?.status === "loading";
+
+  console.log("IS LOADING RESPONSE: ", isLoading);
   console.log("REQUESTS: ", requests);
   return (
     <div className="chat-window" ref={conversationRef}>
