@@ -3,10 +3,11 @@ import { create } from "zustand";
 const useChatStore = create((set) => ({
   message: "",
   messages: [],
-  isAwaitingResponse:false,
+  isAwaitingResponse: false,
   conversationId: "",
-  showFiles:false,
-  conversation:null,
+  showFiles: false,
+  conversation: null,
+  requests: new Map(),
 
   setMessage: (message) => set({ message }),
 
@@ -16,16 +17,27 @@ const useChatStore = create((set) => ({
     })),
 
   setMessages: (messages) => set({ messages }),
-  setIsAwaiting:(state)=>set({isAwaitingResponse:state}),
-  
+  setIsAwaiting: (state) => set({ isAwaitingResponse: state }),
+
   setConversationId: (conversationId) => set({ conversationId }),
 
-  setConversation:(conversation)=>set({conversation}),
+  setConversation: (conversation) => set({ conversation }),
 
   clearMessage: () => set({ message: "" }),
 
+  setShowFiles: (state) => set({ showFiles: state }),
 
-  setShowFiles:(state)=>set({showFiles:state})
+  addActiveRequest: ({conversationId,requestId}) =>
+    set((state) => ({
+      requests: new Map(state.requests).set(conversationId, requestId),
+    })),
+
+  deleteRequest: (conversationId) =>
+    set((state) => {
+      const newMap = new Map(state.requests);
+      newMap.delete(conversationId);
+      return { requests: newMap };
+    }),
 }));
 
 export default useChatStore;

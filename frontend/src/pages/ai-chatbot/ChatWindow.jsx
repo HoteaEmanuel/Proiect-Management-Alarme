@@ -17,14 +17,14 @@ import { usePageTitle } from "@hooks/usePageTitle";
 
 const ChatWindow = () => {
   const { id } = useParams();
-  const { conversation } = useChatStore();
-  usePageTitle('Conversation - ' + id);
+  const { conversation, requests } = useChatStore();
+  usePageTitle("Conversation - " + id);
 
   const conversationRef = useRef(null);
   const chatEnd = useRef(null);
   const { file } = useFilePreview();
   const [showCopy, setShowCopy] = useState(null);
-  
+
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   const { isAwaitingResponse } = useChatStore();
@@ -55,6 +55,9 @@ const ChatWindow = () => {
     };
   }, [id]);
 
+  const isLoading = requests.has(conversation?.conversation_id);
+
+  console.log("IS LOADING RESPONSE: ", isLoading);  
   return (
     <div className="chat-window" ref={conversationRef}>
       <ChatHeader />
@@ -78,7 +81,7 @@ const ChatWindow = () => {
       </section>
 
       <div className="chat-window-footer">
-        {isAwaitingResponse && (
+        {isLoading && (
           <div className="chat-window-loading-wrapper">
             <Button
               className="chat-window-loading-button"
@@ -89,7 +92,7 @@ const ChatWindow = () => {
           </div>
         )}
 
-        {showScrollBtn && !isAwaitingResponse && (
+        {showScrollBtn && !isLoading && (
           <Button
             onClick={handleScrollDown}
             className="chat-window-scroll-button"
