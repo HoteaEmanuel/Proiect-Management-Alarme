@@ -1,9 +1,53 @@
-.alarm-chart-wrapper{
+.alarm-chart-wrapper {
+    --alarm-chart-left-offset: 60px;
+
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap:1rem;
-    padding:5%;
+    gap: 0.5rem;
+    padding: 5% 3%;
     margin-top: 5rem;
+}
+
+.alarm-chart-title {
+    margin-left: var(--alarm-chart-left-offset);
+    color: var(--color-text);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    line-height: 1.2;
+}
+
+.alarm-chart-container {
+    flex: 1;
+    min-height: 0;
+}
+
+.alarm-chart-axis .recharts-cartesian-axis-tick-value {
+    fill: var(--color-text-muted);
+    font-size: var(--fs-xs);
+}
+
+.alarm-chart-x-axis .recharts-cartesian-axis-tick-value {
+    font-size: 0.15rem;
+}
+
+.alarm-chart-tooltip .recharts-default-tooltip {
+    background-color: #1e1e1e !important;
+    border: none !important;
+    border-radius: var(--radius-sm);
+}
+
+.alarm-chart-tooltip .recharts-tooltip-label,
+.alarm-chart-tooltip .recharts-tooltip-item {
+    color: var(--color-text) !important;
+}
+
+.alarm-chart-wrapper .recharts-legend-wrapper {
+    padding-top: 1.5rem;
+}
+
+.alarm-chart-wrapper .recharts-legend-item-text {
+    color: var(--color-text) !important;
+    font-size: var(--fs-sm);
 }
