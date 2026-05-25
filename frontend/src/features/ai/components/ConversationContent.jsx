@@ -1,4 +1,4 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useGetConversation } from "../api/chatBot.api";
 import useChatStore from "@store/chatStore";
@@ -9,9 +9,9 @@ import ChatInput from "./ChatInput";
 import ChatSkeleton from "./Skeletons/ChatSkeleton";
 
 import "@styles/features/ai/components/ConversationContent.css";
+import StopRequest from "./StopRequest";
 
-const Skeleton = () =>
-{
+const Skeleton = () => {
   return (
     <div className="conversation-content-skeleton">
       {/* <ChatHeader /> */}
@@ -20,35 +20,30 @@ const Skeleton = () =>
   );
 };
 
-const ConversationContent = ({
-  setShowCopy,
-  showCopy,
-  chatEnd,
-}) =>
-{
+const ConversationContent = ({ setShowCopy, showCopy, chatEnd }) => {
   const { id } = useParams();
   const { data, isPending } = useGetConversation(id);
-  const { messages, setMessages } = useChatStore();
+  // const { messages, setMessages } = useChatStore();
 
-  useEffect(() =>
-  {
+  const messages = useChatStore((state) => state.messages);
+  const setMessages = useChatStore((state) => state.setMessages);
+
+  useEffect(() => {
     setMessages(data?.messages);
   }, [setMessages, data]);
 
   // La deschiderea chat ului va da automat scroll la finalul conversatiei
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!data) return;
-   const timeOutId= setTimeout(() => {
+    const timeOutId = setTimeout(() => {
       chatEnd.current?.scrollIntoView({ behavior: "instant" });
     }, 0);
-    return ()=>clearTimeout(timeOutId);
-  }, [data,chatEnd]);
+    return () => clearTimeout(timeOutId);
+  }, [data, chatEnd]);
 
   if (isPending) return <Skeleton />;
   console.log("MESSAGES");
   console.log(messages);
-
   return (
     <ol className="conversation-content-list">
       {messages?.length > 0 &&
@@ -61,7 +56,7 @@ const ConversationContent = ({
                 : "conversation-content-item-user"
             }`}
             onMouseLeave={() => setShowCopy(undefined)}
-            onMouseEnter={()=>setShowCopy(index)}
+            onMouseEnter={() => setShowCopy(index)}
           >
             <div
               className={`conversation-content-message ${
@@ -82,13 +77,16 @@ const ConversationContent = ({
                   files={message?.files}
                   smart_replies={message?.smart_replies}
                   showOptions={showCopy === index}
-                  last_message={index===messages.length-1}
+                  is_stopped={message?.is_stopped}
+                  index={index}
+                  last_message={index === messages.length - 1}
                 />
               )}
             </div>
           </li>
         ))}
-      
+
+      <StopRequest />
     </ol>
   );
 };

@@ -12,22 +12,18 @@ import ConversationContent from "@features/ai/components/ConversationContent.jsx
 import useChatStore from "@store/chatStore.js";
 
 import "@styles/pages/ai-chatbot/ChatWindow.css";
-import { useFilePreview } from "@store/filePreviewStore";
 import { usePageTitle } from "@hooks/usePageTitle";
 
 const ChatWindow = () => {
   const { id } = useParams();
-  const { conversation } = useChatStore();
-  usePageTitle('Conversation - ' + id);
+  const { conversation, requests } = useChatStore();
+  usePageTitle("Conversation - " + id);
 
   const conversationRef = useRef(null);
   const chatEnd = useRef(null);
-  const { file } = useFilePreview();
   const [showCopy, setShowCopy] = useState(null);
-  
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
-  const { isAwaitingResponse } = useChatStore();
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   const handleScrollDown = () => {
     chatEnd.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,6 +51,14 @@ const ChatWindow = () => {
     };
   }, [id]);
 
+  console.log("REQUESTS");
+  console.log(requests);
+
+  const isLoading =
+    requests.get(conversation?.conversation_id)?.status === "loading";
+
+  console.log("IS LOADING RESPONSE: ", isLoading);
+  console.log("REQUESTS: ", requests);
   return (
     <div className="chat-window" ref={conversationRef}>
       <ChatHeader />
@@ -66,19 +70,11 @@ const ChatWindow = () => {
           key={id}
           chatEnd={chatEnd}
         />
-
-        {/* {previewFile && (
-          <FilePreview
-            file={previewFile}
-            onClose={() => setPreviewFile(null)}
-          />
-        )} */}
-
-        {file && <FilePreview />}
+        <FilePreview />
       </section>
 
       <div className="chat-window-footer">
-        {isAwaitingResponse && (
+        {isLoading && (
           <div className="chat-window-loading-wrapper">
             <Button
               className="chat-window-loading-button"
@@ -89,7 +85,7 @@ const ChatWindow = () => {
           </div>
         )}
 
-        {showScrollBtn && !isAwaitingResponse && (
+        {showScrollBtn && !isLoading && (
           <Button
             onClick={handleScrollDown}
             className="chat-window-scroll-button"

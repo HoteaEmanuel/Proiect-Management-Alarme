@@ -12,7 +12,7 @@ import useAuthStore from "@store/authStore.js";
 import { api } from "@lib/axios";
 import "@styles/features/ai/components/ChatInput.css";
 import axios from "axios";
-import LoadingCircle from "@components/LoadingCircle";
+import { stopRequest } from "../api/chatBot.api";
 
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 
@@ -25,20 +25,23 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   console.log("CHAT INPUT RENDERED");
   const input = useRef();
   const fileInput = useRef();
-  const abortControllerRef = useRef(null);
   const [isEmpty, setIsEmpty] = useState(true);
-  const {
-    message,
-    isAwaitingResponse,
-    setIsAwaiting,
-    conversation,
-    addMessage,
-  } = useChatStore();
+  const { message, conversation, addMessage, addActiveRequest, deleteRequest } =
+    useChatStore();
+
+  const requests = useChatStore((state) => state.requests);
+  const stopActiveRequest = useChatStore((state) => state.stopActiveRequest);
 
   const [files, setFiles] = useState([]);
   const { user } = useAuthStore();
   const timeOutId = useRef();
   const { recording, start, stop, clear, isSpeaking } = useVoiceToText();
+
+  useEffect(() => {
+    input.current.value = "";
+    setIsEmpty(true);
+    resizeInput(input.current);
+  }, [conversation]);
 
   useEffect(() => {
     input.current.value = "";
@@ -74,25 +77,19 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     }
     const empty = inputSize === 0;
     setIsEmpty((prev) => (prev === empty ? prev : empty));
-
     resizeInput(input.current);
   }, []);
 
   useEffect(() => {
     const element = input.current;
-
     if (!element) return;
     input.current.value = message;
     setIsEmpty(message.trim().length === 0);
-
     resizeInput(element);
   }, [message]);
 
   const handleSubmit = async () => {
-    if (isAwaitingResponse) return;
-
-    setIsAwaiting(true);
-    abortControllerRef.current = new AbortController();
+    if (requests.has(conversation?.conversation_id)) return;
     try {
       addMessage({
         conversation_id: conversation.conversation_id,
@@ -118,6 +115,8 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       formData.append("message", mesaj.message);
       formData.append("new_chat", String(mesaj.new_chat ?? false));
       formData.append("conversation_id", conversation.conversation_id);
+      const newRequestId = crypto.randomUUID();
+      formData.append("request_id", newRequestId);
 
       mesaj.files.forEach((file) => {
         formData.append("files", file);
@@ -127,70 +126,66 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         formData.append("file_preserve_flags", String(persist === true));
       });
 
-      // setMessage("");
       setFiles([]);
       clear();
+      input.current.value = "";
+      setIsEmpty(true);
 
       timeOutId.current = setTimeout(() => {
         chatEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
-      input.current.value='';
+
+      addActiveRequest({
+        conversationId: conversation?.conversation_id,
+        requestId: newRequestId,
+      });
+
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
         headers: {
           "Content-Type": "multipart/formdata",
-          signal: abortControllerRef.current.signal,
         },
       });
+
+      deleteRequest(conversation?.conversation_id);
       addMessage({
         role: "assistant",
         blocks: response.data.blocks,
         smart_replies: response.data.smart_replies,
+        is_stopped: response.data?.is_stopped,
       });
     } catch (e) {
       if (axios.Cancel(e) || e?.name === "CanceledError") return;
       toast.error(e.message);
-    } finally {
-      setIsAwaiting(false);
     }
 
     return () => clearTimeout(timeOutId.current);
   };
 
-  const stopResponse = () => {
-    abortControllerRef.current?.abort();
-    setIsAwaiting(false);
-    addMessage({
-      role: "assistant",
-      blocks: [
-        {
-          type: "text",
-          content: "This response was stopped!",
-          stopped: true,
-        },
-      ],
-    });
+  const stopResponse = async () => {
+    try {
+      const requestId = requests.get(conversation?.conversation_id)?.requestId;
+      console.log("REQUESTUL ACTIV ", requestId);
+      if (!requestId) throw new Error("Invalid request");
+      stopActiveRequest(conversation?.conversation_id);
+      stopRequest(requestId);
+    } catch (error) {
+      toast.error(error?.message || "Request can not be stopped");
+    }
   };
 
   const handleOnChange = (e) => {
     const inputSize = e.target.value.length;
-
     if (inputSize >= MESSAGE_LIMIT) {
       toast.error(`Maximum ${MESSAGE_LIMIT} characters allowed`);
       return;
     }
-
-    // setMessage(e.target.value);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-
-      if (isAwaitingResponse) return;
-
+      if (requests.has(conversation?.conversation_id)) return;
       handleSubmit();
-      input.current.value = "";
-      input.current.style.height = "auto";
     }
   };
 
@@ -202,7 +197,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         );
         return false;
       }
-
       return true;
     });
 
@@ -220,10 +214,12 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     setFiles((prev) => {
       const existingNames = new Set(prev.map((f) => f.file.name));
       const unique = tempFiles.filter((f) => !existingNames.has(f.file.name));
-
       return [...prev, ...unique];
     });
   };
+
+  const isLoading =
+    requests.get(conversation?.conversation_id)?.status === "loading";
 
   return (
     <div className="chat-input">
@@ -256,7 +252,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
           maxLength={MESSAGE_LIMIT}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          // onChangeCapture={handleInput}
           className="chat-input-textarea"
         />
 
@@ -282,7 +277,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             )
           )}
 
-          {!isAwaitingResponse && (
+          {!isLoading && (
             <Button
               className="chat-input-send-button"
               onClick={handleSubmit}
@@ -292,13 +287,15 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             </Button>
           )}
 
-          {isAwaitingResponse && (
-            <Button
-              className="cursor-pointer hover:scale-105"
-              // onClick={stopResponse}
-            >
-              <LoadingCircle className="size-4 animate-spin" />
-            </Button>
+          {isLoading && (
+            <Tooltip text={"Stop"}>
+              <Button
+                className="cursor-pointer hover:scale-105"
+                onClick={stopResponse}
+              >
+                <FaStop className="size-4" />
+              </Button>
+            </Tooltip>
           )}
         </div>
       </div>

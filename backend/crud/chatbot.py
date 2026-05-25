@@ -254,6 +254,7 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
             entry = {
                 "role": msg.role,
                 "blocks": _parse_assistant_blocks(msg.content),
+                "is_stopped": msg.is_stopped,
                 "smart_replies": msg.smart_replies
             }
         else:
@@ -294,7 +295,8 @@ def save_message_to_db(db: Session, message_data: MessageCreate) -> MessageModel
         content=message_data.content,
         smart_replies=message_data.smart_replies,
         has_sql_query=message_data.has_sql_query,
-        sql_query=message_data.sql_query
+        sql_query=message_data.sql_query,
+        is_stopped=message_data.is_stopped
     )
     
     try:
