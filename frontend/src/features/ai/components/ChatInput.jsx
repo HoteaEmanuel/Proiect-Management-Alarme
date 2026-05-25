@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
 import { FaArrowUp, FaStop } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
@@ -24,25 +24,23 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ChatInput = ({ placeholder, chatEnd }) => {
   const input = useRef();
   const fileInput = useRef();
-  const abortControllerRef = useRef(null);
+  const [isEmpty, setIsEmpty] = useState(true);
+  const { message, conversation, addMessage, addActiveRequest, deleteRequest } =
+    useChatStore();
 
-  const {
-    message,
-    setMessage,
-    conversation,
-    addMessage,
-    addActiveRequest,
-    deleteRequest,
-  } = useChatStore();
+  const requests = useChatStore((state) => state.requests);
+  const stopActiveRequest = useChatStore((state) => state.stopActiveRequest);
 
   const [files, setFiles] = useState([]);
   const { user } = useAuthStore();
   const timeOutId = useRef();
-  // const { requests, stopActiveRequest } = useChatStore();
-  const requests = useChatStore((state) => state.requests);
-  const stopActiveRequest = useChatStore((state) => state.stopActiveRequest);
-  const { recording, start, stop, clear, transcript, isSpeaking } =
-    useVoiceToText();
+  const { recording, start, stop, clear, isSpeaking } = useVoiceToText();
+
+  useEffect(() => {
+    input.current.value = "";
+    setIsEmpty(true);
+    resizeInput(input.current);
+  }, [conversation]);
 
   const resizeInput = (element) => {
     element.style.height = "auto";
@@ -57,32 +55,42 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     element.classList.remove("chat-input-textarea-scrollable");
   };
 
-  useEffect(() => {
-    if (recording && transcript) {
-      setMessage(transcript);
+  const handleStart = useCallback(() => {
+    start((text) => {
+      input.current.value = text;
+      setIsEmpty(text.trim().length === 0);
+      resizeInput(input.current);
+    });
+  }, [start]);
+
+  const handleInput = useCallback(() => {
+    const inputSize = input.current.value.trim().length;
+    if (inputSize >= MESSAGE_LIMIT) {
+      toast.error(`Maximum ${MESSAGE_LIMIT} characters allowed`);
+      return;
     }
-  }, [recording, transcript, setMessage]);
+    const empty = inputSize === 0;
+    setIsEmpty((prev) => (prev === empty ? prev : empty));
+    resizeInput(input.current);
+  }, []);
 
   useEffect(() => {
     const element = input.current;
-
     if (!element) return;
-
+    input.current.value = message;
+    setIsEmpty(message.trim().length === 0);
     resizeInput(element);
   }, [message]);
 
   const handleSubmit = async () => {
     if (requests.has(conversation?.conversation_id)) return;
-
-    // setIsAwaiting(true);
-    abortControllerRef.current = new AbortController();
     try {
       addMessage({
         conversation_id: conversation.conversation_id,
         user_id: user._id,
         role: "user",
         has_sql_query: false,
-        content: message,
+        content: input.current.value.trim(),
         files: files,
       });
 
@@ -92,7 +100,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       const mesaj = {
         user_id: user.user_id,
         conversation_id: conversation.conversation_id,
-        message: message,
+        message: input.current.value.trim(),
         files: filesToSend,
         file_preserve_flags: filesPreserveStatus,
       };
@@ -112,23 +120,26 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         formData.append("file_preserve_flags", String(persist === true));
       });
 
-      setMessage("");
       setFiles([]);
       clear();
+      input.current.value = "";
+      setIsEmpty(true);
 
       timeOutId.current = setTimeout(() => {
         chatEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
+
       addActiveRequest({
         conversationId: conversation?.conversation_id,
         requestId: newRequestId,
       });
+
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
         headers: {
           "Content-Type": "multipart/formdata",
-          signal: abortControllerRef.current.signal,
         },
       });
+
       deleteRequest(conversation?.conversation_id);
       addMessage({
         role: "assistant",
@@ -145,51 +156,30 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   };
 
   const stopResponse = async () => {
-    console.log("REQUEST STOPPED");
     try {
-      const requestId = requests.get(conversation?.conversation_id).requestId;
+      const requestId = requests.get(conversation?.conversation_id)?.requestId;
+      console.log("REQUESTUL ACTIV ", requestId);
       if (!requestId) throw new Error("Invalid request");
       stopActiveRequest(conversation?.conversation_id);
-
-      console.log("ACTIVE REQUESTS");
-      console.log(requests);
       stopRequest(requestId);
     } catch (error) {
       toast.error(error?.message || "Request can not be stopped");
     }
   };
 
-  const handleInput = (e) => {
-    const inputSize = e.target.value.length;
-
-    if (inputSize >= MESSAGE_LIMIT) {
-      toast.error(`Maximum ${MESSAGE_LIMIT} characters allowed`);
-      return;
-    }
-
-    resizeInput(e.target);
-  };
-
   const handleOnChange = (e) => {
     const inputSize = e.target.value.length;
-
     if (inputSize >= MESSAGE_LIMIT) {
       toast.error(`Maximum ${MESSAGE_LIMIT} characters allowed`);
       return;
     }
-
-    setMessage(e.target.value);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-
       if (requests.has(conversation?.conversation_id)) return;
-
       handleSubmit();
-      input.current.value = "";
-      input.current.style.height = "auto";
     }
   };
 
@@ -201,7 +191,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         );
         return false;
       }
-
       return true;
     });
 
@@ -219,15 +208,13 @@ const ChatInput = ({ placeholder, chatEnd }) => {
     setFiles((prev) => {
       const existingNames = new Set(prev.map((f) => f.file.name));
       const unique = tempFiles.filter((f) => !existingNames.has(f.file.name));
-
       return [...prev, ...unique];
     });
   };
 
   const isLoading =
     requests.get(conversation?.conversation_id)?.status === "loading";
-  console.log("IS LOADING RESPONSE");
-  console.log(isLoading);
+
   return (
     <div className="chat-input">
       {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
@@ -253,21 +240,19 @@ const ChatInput = ({ placeholder, chatEnd }) => {
 
         <textarea
           placeholder={placeholder}
-          value={message}
           ref={input}
           onChange={handleOnChange}
           rows={1}
           maxLength={MESSAGE_LIMIT}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          onChangeCapture={handleInput}
           className="chat-input-textarea"
         />
 
         <div className="chat-input-actions-right">
-          {!recording && message === "" ? (
+          {!recording && isEmpty ? (
             <Tooltip text={"Dictate"}>
-              <Button className="chat-input-icon-button" onClick={start}>
+              <Button className="chat-input-icon-button" onClick={handleStart}>
                 <MdKeyboardVoice className="chat-input-icon" />
               </Button>
             </Tooltip>
@@ -290,7 +275,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
             <Button
               className="chat-input-send-button"
               onClick={handleSubmit}
-              disabled={message.length === 0 && files.length === 0}
+              disabled={isEmpty && files.length === 0}
             >
               <FaArrowUp className="chat-input-send-icon" />
             </Button>
