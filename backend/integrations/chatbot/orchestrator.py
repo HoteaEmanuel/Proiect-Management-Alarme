@@ -169,6 +169,7 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
         if redis_client.exists(f"cancel:{request.request_id}"):
             logger.warning(f"[RESPONSE CANCELED] ")
             agent_context.text_response = "Response was canceled by the user"
+            agent_context.is_stopped = True
             break
 
         agent = AVAILABLE_AGENTS.get(agent_call.agent)

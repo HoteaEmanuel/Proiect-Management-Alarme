@@ -70,6 +70,7 @@ class AssistantMessage(BaseModel):
     blocks: list[OutputBlock]
     smart_replies: list[str] | None = None
     files: list[CloudinaryFileAttachment] | None = []
+    is_stopped: bool = False
 
 ChatMessage = Annotated[
     Union[UserMessage, AssistantMessage],
@@ -109,6 +110,7 @@ class OrchestratorResponse(BaseModel):
 class AgentContext(BaseModel):
     user_message: str
     conversation_history: list[dict]
+    is_stopped: bool = False
     file_contents: str | None = None
 
     sql_query_text: str | None = None

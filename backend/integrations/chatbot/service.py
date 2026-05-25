@@ -77,7 +77,8 @@ def save_bot_response(db: Session, request: MessageCreate, output_blocks: list[O
         content=json.dumps([block.model_dump() for block in output_blocks], ensure_ascii=False),
         smart_replies=agent_context.smart_replies,
         has_sql_query=True if agent_context.sql_query_text is not None else False,
-        sql_query=agent_context.sql_query_text
+        sql_query=agent_context.sql_query_text,
+        is_stopped=agent_context.is_stopped
     )
     bot_message_data = save_message_to_db(db=db, message_data=bot_message_data)
 
@@ -130,6 +131,7 @@ def user_chat_request(db: Session, request: MessageRequest) -> AssistantMessage:
     return AssistantMessage(
         conversation_id=request.conversation_id,
         request_id=request.request_id,
+        is_stopped=agent_context.is_stopped,
         blocks=output_blocks,
         smart_replies=agent_context.smart_replies,
         files=[agent_context.file_export] if agent_context.file_export else []

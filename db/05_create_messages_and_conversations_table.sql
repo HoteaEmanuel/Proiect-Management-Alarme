@@ -30,3 +30,5 @@ CREATE TABLE Messages (
     CONSTRAINT CHK_Message_SmartReplies_JSON 
         CHECK (smart_replies IS NULL OR ISJSON(smart_replies) = 1)
 );
+
+ALTER TABLE messages ADD is_stopped BIT DEFAULT 0 NOT NULL;
