@@ -165,7 +165,7 @@ def get_alarm_heatmap(db: Session, filters: HeatmapFilters) -> HeatmapResponse:
     counts = defaultdict(int)
     for label in labels:
         query = text("""
-            EXEC dbo.dbo.GetAlarmsByCategory
+            EXEC dbo.GetAlarmsByCategory
                 @category = :category,
                 @label = :label,
                 @start_date = :start_date,
