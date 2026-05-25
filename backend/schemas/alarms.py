@@ -150,3 +150,16 @@ class TrendResponse(BaseModel):
     granularity: str
     buckets: list[TrendBucketItem] = []
     live_alarms: list[LiveAlarmItem] = []
+    
+class HeatmapFilters(BaseModel):
+    severity: str | None = None
+    start_date: datetime = datetime(2026, 1, 1, 0, 0 ,0)
+    end_date: datetime = datetime(2026, 12, 31, 23, 59, 59)
+    
+class HeatmapBucket(BaseModel):
+    day_of_week: int
+    hour_of_day: int
+    alarm_count: int
+    
+class HeatmapResponse(BaseModel):
+    data: list[HeatmapBucket]
