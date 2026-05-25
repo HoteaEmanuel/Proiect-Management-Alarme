@@ -29,6 +29,8 @@ class MessageModel(Base):
     conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("Conversations.conversation_id", ondelete="CASCADE"), nullable=False, index=True)
     
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("Users.id"), nullable=False)
+
+    is_stopped: Mapped[Boolean] = mapped_column(Boolean, default=False, nullable=False)
     
     role: Mapped[str] = mapped_column(String(20), nullable=False)
 
