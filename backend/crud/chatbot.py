@@ -254,6 +254,7 @@ def get_full_conversation(db: Session, user_id: str, conversation_id: str):
             entry = {
                 "role": msg.role,
                 "blocks": _parse_assistant_blocks(msg.content),
+                "is_stopped": msg.is_stopped,
                 "smart_replies": msg.smart_replies
             }
         else:
