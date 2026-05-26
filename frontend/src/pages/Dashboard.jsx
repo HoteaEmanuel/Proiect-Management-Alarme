@@ -50,6 +50,9 @@ const Dashboard = () => {
   const [selectedAlarm, setSelectedAlarm] = useState(null);
   const [hasFiltersOpen, setHasFiltersOpen] = useState(false);
 
+  // pentru selectare weekly daily hourly monthly 
+  const [alarmTrendGranularity, setAlarmTrendGranularity] = useState("monthly");
+
   // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
   useEffect(() => {
     const fetchAlarms = async () => {
@@ -63,7 +66,7 @@ const Dashboard = () => {
   }, [searchParams,filters]);
 
   const { data, isPending } = useGetAlarmsTrend({
-    granularity: "monthly",
+    granularity: alarmTrendGranularity,
     group_by: "severity",
   });
 
@@ -350,7 +353,11 @@ const Dashboard = () => {
         </select>
       </div>
 
-      <AlarmChart data={data.buckets} />
+      <AlarmChart 
+        data={data.buckets} 
+        granularity={alarmTrendGranularity}
+        onGranularityChange={setAlarmTrendGranularity}
+      />
     </div>
   );
 };
