@@ -9,11 +9,12 @@ import { Skeleton } from "@mui/material";
 import ChatsList from "@features/ai/components/ChatsList.jsx";
 import ChatsListSkeleton from "@features/ai/components/Skeletons/ChatsListSkeleton.jsx";
 import { usePageTitle } from "@hooks/usePageTitle.js";
+import useDebounce from "@hooks/useDebounce.js";
 
 const Chats = () => {
-  
-  usePageTitle('Chats');
+  usePageTitle("Chats");
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 250);
 
   return (
     <div className="chats-page">
@@ -34,7 +35,7 @@ const Chats = () => {
           </div>
         </div>
         <Suspense fallback={<ChatsListSkeleton />}>
-          <ChatsList search={search}/>
+          <ChatsList search={debouncedSearch} />
         </Suspense>
       </div>
     </div>

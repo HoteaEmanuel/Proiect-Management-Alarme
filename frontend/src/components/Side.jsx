@@ -7,14 +7,13 @@ import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { RiChatAiFill } from "react-icons/ri";
-import "@styles/components/Side.css"
-const Side = ({ isOpen, onNavigate}) => {
+import "@styles/components/Side.css";
+const Side = ({ isOpen, onNavigate }) => {
   const { pathname } = useLocation();
   console.log("SIDE OPEN? ", isOpen);
   return (
-    <aside className={`side ${isOpen ? 'open':''}`}>
+    <aside className={`side ${isOpen ? "open" : ""}`}>
       <h1 className="side-title">Alarm Manager</h1>
-           
 
       <nav className="side-nav">
         <NavLink
@@ -38,8 +37,18 @@ const Side = ({ isOpen, onNavigate}) => {
           <span className="side-nav-text">Statistics</span>
         </NavLink>
 
-        <NavLink type="button" className="side-nav-item" to={"/chat/new"} onClick={onNavigate}>
-          <RiChatAiFill className="side-nav-icon" />
+        <NavLink
+          type="button"
+          className="side-nav-item"
+          to={"/chat/new"}
+          onClick={onNavigate}
+        >
+          {/* <RiChatAiFill className="side-nav-icon" /> */}
+          <img
+            src="/images/Nyx.png"
+            alt="Assistant image"
+            className="h-5"
+          />
           <span className="side-nav-text">AI Assistant</span>
         </NavLink>
 

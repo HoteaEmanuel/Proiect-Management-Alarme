@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IoAdd } from "react-icons/io5";
-import { FaArrowUp, FaStop } from "react-icons/fa";
+import { FaArrowUp, FaRegStopCircle, FaStop } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
 import { toast } from "sonner";
 import Tooltip from "@components/ToolTip";
@@ -164,7 +164,6 @@ const ChatInput = ({ placeholder, chatEnd }) => {
   const stopResponse = async () => {
     try {
       const requestId = requests.get(conversation?.conversation_id)?.requestId;
-      console.log("REQUESTUL ACTIV ", requestId);
       if (!requestId) throw new Error("Invalid request");
       stopActiveRequest(conversation?.conversation_id);
       stopRequest(requestId);
@@ -232,7 +231,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
           onChange={handleFilesUpload}
           className="chat-input-file"
           multiple="yes"
-          accept=".pdf,.xlsx,.csv"
+          accept=".pdf,.xlsx,.csv,.docx"
         />
 
         <Tooltip text={"Add files"}>
@@ -293,7 +292,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
                 className="cursor-pointer hover:scale-105"
                 onClick={stopResponse}
               >
-                <FaStop className="size-4" />
+                <FaRegStopCircle className="size-5" />
               </Button>
             </Tooltip>
           )}
