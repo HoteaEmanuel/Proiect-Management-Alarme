@@ -46,13 +46,17 @@ export const useCreateConversation = () => {
       toast.error("Could not send the message");
     },
     onSuccess: (response) => {
+      console.log("NEW CHAT RESPONSE");
+      console.log(response);
       // toast.success("Yey");
       queryClient.invalidateQueries({
         queryKey: ["conversations", user.user_id],
       });
-      if (response.conversation_id) {
-        return navigate(`/chat/${response.conversation_id}`);
-      }
+      // if (response.conversation_id) {
+      //   return navigate(`/chat/${response.conversation_id}`);
+      // }
+
+      return response;
     },
   });
 };
@@ -157,17 +161,17 @@ export const useDeleteConversation = (conversationId) => {
   console.log("DELETING HERE");
   console.log(conversationId);
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (conversation_id = conversationId) => {
       console.log("CONV ID HEREE:");
-      console.log(conversationId);
-      await api.delete(`${VITE_URL_APP}/api/conversations/${conversationId}`);
+      console.log(conversation_id);
+      await api.delete(`${VITE_URL_APP}/api/conversations/${conversation_id}`);
     },
     mutationKey: ["conversations", user.user_id],
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["conversations", user.user_id],
       });
-      toast.success("Conversation was deleted");
+      // toast.success("Conversation was deleted");
       navigate("/chat/new");
     },
   });
