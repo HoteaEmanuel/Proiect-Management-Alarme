@@ -77,3 +77,16 @@ async def refresh_token(
         "accessToken": new_access_token,
         "user": user_response
     }
+
+
+# Pentru a deloga un user
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(response: Response) -> dict:
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
+
+    return {"message": "Logged out successfully"}

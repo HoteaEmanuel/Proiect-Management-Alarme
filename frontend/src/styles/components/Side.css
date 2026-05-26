@@ -89,9 +89,11 @@
   font-weight: var(--fw-semibold);
   opacity: 1;
 }
+
 .mini-item.active {
   font-weight: 400;
 }
+
 .side-nav-item:hover {
   background-color: var(--color-surface-muted);
   color: var(--color-accent);
@@ -102,9 +104,106 @@
   height: 1.25rem;
   flex-shrink: 0;
 }
+
 .side-nav-text {
   font-size: var(--fs-md);
   font-weight: var(--fw-medium);
+}
+
+.side-assistant-image {
+  width: auto;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.side-nav-logout {
+  margin-top: auto;
+}
+
+.logout-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.logout-modal {
+  width: min(24rem, 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  padding: 1.25rem;
+
+  color: var(--color-text);
+  box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.35);
+}
+
+.logout-modal-title {
+  margin: 0 0 0.5rem;
+
+  color: var(--color-text);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  line-height: 1.2;
+}
+
+.logout-modal-text {
+  margin: 0;
+
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+}
+
+.logout-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  margin-top: 1.25rem;
+}
+
+.logout-modal-cancel,
+.logout-modal-confirm {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.9rem;
+
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+
+.logout-modal-cancel {
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.logout-modal-cancel:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.logout-modal-confirm {
+  border-color: var(--color-danger);
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.logout-modal-confirm:hover {
+  filter: brightness(1.08);
+}
+
+.chat-side-back-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
 }
 
 @media (max-width: 1023px) {
@@ -119,16 +218,9 @@
     transition: transform 0.3s ease;
   }
 
-  .side.open{
+  .side.open {
     transform: translateX(0);
   }
-
-}
-
-.chat-side-back-icon {
-  width: 1.75rem;
-  height: 1.75rem;
-  flex-shrink: 0;
 }
 
 @media (max-width: 1023px) {
@@ -151,5 +243,14 @@
   .chat-side-back-icon {
     width: 1.5rem;
     height: 1.5rem;
+  }
+
+  .logout-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .logout-modal-cancel,
+  .logout-modal-confirm {
+    width: 100%;
   }
 }

@@ -10,6 +10,10 @@ export const authApi = {
     console.log(response);
     return response.data;
   },
+   logout: async () => {
+    const response = await api.post(`${VITE_URL_APP}/auth/logout`);
+    return response.data;
+  },
   refresh: async () => {
     const response = await api.get(`${VITE_URL_APP}/auth/refresh`);
     console.log(response);
