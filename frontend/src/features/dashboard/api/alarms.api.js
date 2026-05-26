@@ -120,7 +120,7 @@ export const alarmsApi = {
         `${VITE_URL_APP}/alarms/stats/alarm-trend`,
         {
           params: {
-            granularity: "monthly",
+            granularity: filters.granularity,
             group_by: filters.group_by,
           },
         },
