@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from schemas import LoginRequest
 from crud import authenticate_user
 from core import UnauthorizedError
+from database import redis_client
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -19,7 +20,8 @@ http_bearer = HTTPBearer()
 # Verifies the received token, decodes it, and extracts the current user's data
 async def get_current_user(credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)]) -> dict:
     token = credentials.credentials
-
+    if redis_client.get(f"blacklist:{token}"):
+        raise UnauthorizedError("Token has been invalidated. Please log in again.")
     try:
         # Verify if the token is valid
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -45,6 +47,18 @@ def create_jwt_token(username: str, user_id: str, expires_delta: timedelta) -> s
     expires = datetime.now(timezone.utc) + expires_delta
     payload["exp"] = expires
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+# Decodes the token and stores it in Redis blacklist until it naturally expires
+def blacklist_token(token: str) -> None:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        exp: int = payload.get("exp")
+        if exp:
+            ttl = exp - int(datetime.now(timezone.utc).timestamp())
+            if ttl > 0:
+                redis_client.setex(f"blacklist:{token}", ttl, "1")
+    except JWTError:
+        pass
 
 def process_user_login(login_request: LoginRequest, db: Session):
     user = authenticate_user(login_request.username, login_request.password, db)

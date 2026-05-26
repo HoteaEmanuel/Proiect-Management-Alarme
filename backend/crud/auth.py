@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 
 from models import Users
-from schemas import CreateUserRequest
+from schemas import CreateUserRequest, ChangePasswordRequest
 from core import UnauthorizedError, DuplicateResourceError
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -45,4 +45,14 @@ def create_user(create_user_request: CreateUserRequest, db: Session) -> Users:
     except IntegrityError:
         db.rollback()
         raise DuplicateResourceError("Username or email already exists")
+
+# Verifies the current password and updates it with a new hashed one for the given user
+def change_user_password(user_id: str, request: ChangePasswordRequest, db: Session) -> None:
+    user = db.query(Users).filter(Users.id == user_id).first()
+    if not user:
+        raise UnauthorizedError("User not found.")
+    if not bcrypt_context.verify(request.old_password, user.hashed_password):
+        raise UnauthorizedError("Current password is incorrect.")
+    user.hashed_password = bcrypt_context.hash(request.new_password)
+    db.commit()
     
