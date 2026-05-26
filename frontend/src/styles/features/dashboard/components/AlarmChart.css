@@ -13,6 +13,27 @@
     background-color: var(--color-surface);
 }
 
+.alarm-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.alarm-chart-select {
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid #263349;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.alarm-chart-select:focus {
+  border-color: #3b82f6;
+}
+
 .alarm-chart-title {
     margin: 0;
     color: var(--color-text);
@@ -54,4 +75,13 @@
 .alarm-chart-wrapper .recharts-legend-item-text {
     color: var(--color-text) !important;
     font-size: var(--fs-sm);
+}
+
+.alarm-chart-loading {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
 }
