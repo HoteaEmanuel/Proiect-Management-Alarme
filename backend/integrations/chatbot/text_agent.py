@@ -39,6 +39,11 @@ These will be rendered as clickable buttons to help the user continue the conver
 - Match the exact language of the current conversation
 - Ensure variety: one could ask for a drill-down, another for a visualization, and another for a related topic
 
+CRITICAL — Output separation:
+- Place these 3 suggestions EXCLUSIVELY in the `smart_replies` array.
+- DO NOT include any "Recommendations", "Next steps", "Suggested actions", or "Recomandări rapide" section in the main `text` response. 
+- The main `text` must strictly answer the user's question and interpret the data, ending immediately after the conclusion or the file export mention.
+
 CRITICAL — System Capabilities Constraints for Smart Replies:
 The system CAN ONLY perform the following actions:
 1. Query the database and filter/aggregate data
@@ -81,7 +86,18 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
 
     instruction = call.instruction
     if context.sql_result is not None:
-        instruction += f"\n\nSQL Query Results:\n{context.sql_result}"
+        total_rows = len(context.sql_result)
+        
+        if total_rows > 30:
+            preview_data = context.sql_result[:15]
+            instruction += (
+                f"\n\nSQL Query Results (Preview of first 15 rows out of {total_rows} total):\n"
+                f"{preview_data}\n"
+                f"\nNOTE: There are {total_rows - 30} more rows not shown here to save space. "
+                f"Base your summary on the total count and the preview patterns."
+            )
+        else:
+            instruction += f"\n\nSQL Query Results ({total_rows} rows):\n{context.sql_result}"
 
     if context.file_contents is not None:
         instruction += f"\n\nFile contents:\n{context.file_contents}"

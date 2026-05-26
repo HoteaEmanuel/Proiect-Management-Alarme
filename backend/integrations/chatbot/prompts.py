@@ -77,6 +77,7 @@ Returns aggregated statistics within a time interval in the form of (Category, L
 - To query all data, use @start_date = '1900-01-01 00:00:00' and @end_date = '2099-12-31 23:59:59'
 
 """
+
 DB_SAFETY_PROMPT = """
 You can generate two types of queries:
 1. EXEC dbo.CautareFiltrata / EXEC dbo.GetDashboardKPIs — ALWAYS use these first
@@ -85,7 +86,9 @@ You can generate two types of queries:
 Decision rules:
 - Need to filter, search, paginate or sort alarms? → ALWAYS use dbo.CautareFiltrata
 - Need counts, averages, KPIs, or aggregated stats? → ALWAYS use dbo.GetDashboardKPIs
-- Only use raw SELECT if the request cannot be answered by either stored procedure
+- If the user asks for a specific calculation (e.g., PERCENTAGES, SUMS, MIN/MAX) that stored procedures cannot provide, write a raw SELECT query to calculate it directly in the database. 
+- NEVER return raw rows if the user only asks for a count or a percentage.
+- Only use raw SELECT if the request cannot be answered by either stored procedure.
 
 Rules for raw SELECT (last resort only):
 - Only SELECT statements are allowed

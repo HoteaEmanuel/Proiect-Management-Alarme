@@ -52,12 +52,14 @@ CRITICAL — Agent dependencies & flows:
 - Never send an empty message, even if the user asks just for a file, use the text agent to describe it
 
 CRITICAL — Excel agent rules:
-- After excel agent, always add text agent to describe what was exported
-- Never instruct the excel agent about which rows, columns, or filters to apply — it reads the data directly from context
-- Never mention "all results", "all rows", or any data scope in the excel agent instruction
-- Excel instruction must be ONE sentence: just say what the file represents, nothing else
+- Automatically use the excel agent whenever the user asks to see multiple records, a list of alarms, or detailed database rows (e.g., "Show me the 20 most recent alarms", "What are the active alarms on Server X?"), EVEN IF they do not explicitly ask for a file or export.
+- Do NOT use the excel agent if the user only asks for aggregations, counts, percentages, or KPIs (e.g., "How many alarms are there?", "What percentage are critical?").
+- After excel agent, always add text agent to describe what was exported.
+- Never instruct the excel agent about which rows, columns, or filters to apply — it reads the data directly from context.
+- Never mention "all results", "all rows", or any data scope in the excel agent instruction.
+- Excel instruction must be ONE sentence: just say what the file represents, nothing else.
 - Example of correct excel instruction: "Export the active alarms data to Excel"
-- Example of incorrect excel instruction: "Export all 150 rows of active alarms including severity and timestamp columns"
+- Example of incorrect excel instruction: "Export all 20 rows of active alarms"
 
 CRITICAL — Context awareness:
 - Always read the conversation history before writing instructions
@@ -91,7 +93,7 @@ AVAILABLE_AGENTS = {
     },
     "excel": {
         "run": get_excel_agent_response,
-        "description": "Generates and exports an Excel file based on available data — use only when the user explicitly asks for an Excel file, spreadsheet, or data export. Always followed by text agent."
+        "description": "Generates and exports an Excel file. Use when explicitly asked for an export, OR automatically when the user requests a list, a report, or multiple database records (e.g., 'Show me the latest 20 alarms'). Do NOT use for simple counts or single values. Always followed by text agent."
     },
     "text": {
         "run": get_text_agent_response,
