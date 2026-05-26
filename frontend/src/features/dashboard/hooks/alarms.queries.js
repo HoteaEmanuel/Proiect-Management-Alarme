@@ -35,3 +35,11 @@ export const useGetAlarmsTrend = (filters) => {
     queryKey: ["alarms-trend", filters],
   });
 };
+
+export const useGetHeapMap = (filters) => {
+  const { getHeapMeap } = alarmsApi;
+  return useQuery({
+    queryFn: async () => getHeapMeap(filters),
+    queryKey: ["alarms-heapmap", filters],
+  });
+};

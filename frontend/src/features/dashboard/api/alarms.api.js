@@ -130,4 +130,19 @@ export const alarmsApi = {
       toast.error(error?.message || "Fetching alarms failed");
     }
   },
+
+  getHeatMeap: async (filters) => {
+    try {
+      const response = await api.get(`${VITE_URL_APP}/alarms/stats/heatmap`, {
+        params: {
+          start_date: filters.start_date,
+          end_date: filters.end_date,
+          severity: filters.severity || "critical",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      toast.error(error?.message || "Fetching alarms failed");
+    }
+  },
 };

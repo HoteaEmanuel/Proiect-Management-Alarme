@@ -3,6 +3,7 @@ import {
   useGetAlarmsTrend,
   useGetAllAlarms,
   useGetFilteredAlarms,
+  useGetHeapMap,
 } from "@features/dashboard/hooks/alarms.queries";
 import { AlarmsTable } from "@features/dashboard/components/Table";
 import { useState } from "react";
@@ -23,6 +24,8 @@ import Tooltip from "@components/ToolTip";
 import AlarmDetailsModal from "@features/dashboard/components/AlarmDetailsModal";
 import { usePageTitle } from "@hooks/usePageTitle";
 import AlarmChart from "@features/dashboard/components/statistics/AlarmChart";
+import { formatDate } from "@lib/formatDate";
+import { HeatMap } from "@features/dashboard/components/HeatMap";
 
 const Dashboard = () => {
   usePageTitle("Dashboard");
@@ -30,27 +33,30 @@ const Dashboard = () => {
   const [isExporting, startExporting] = useTransition();
   const { data: alarms, isPending: isPendingAlarms } = useGetAllAlarms();
   // const [filters, setFilters] = useState(undefined);
-  const filters = useMemo(()=>({
-    startDate: searchParams.get("startDate"),
-    endDate: searchParams.get("endDate"),
-    status: searchParams.get("status") ?? "All",
-    severity: searchParams.get("severity") ?? "All",
-    type: searchParams.get("type") ?? "All",
-    summary_like: searchParams.get("summary_like") ?? "",
-    server_like: searchParams.get("server_like") ?? "",
-    description_like: searchParams.get("description_like") ?? "",
-    pageIndex: Number(searchParams.get("page") ?? 1) - 1,
-    pageSize: Number(searchParams.get("pageSize") ?? 10),
-    sort: searchParams.get("sort") ?? "alarm_number",
-    order: searchParams.get("order") ?? "desc",
-  }),[searchParams]);
+  const filters = useMemo(
+    () => ({
+      startDate: searchParams.get("startDate"),
+      endDate: searchParams.get("endDate"),
+      status: searchParams.get("status") ?? "All",
+      severity: searchParams.get("severity") ?? "All",
+      type: searchParams.get("type") ?? "All",
+      summary_like: searchParams.get("summary_like") ?? "",
+      server_like: searchParams.get("server_like") ?? "",
+      description_like: searchParams.get("description_like") ?? "",
+      pageIndex: Number(searchParams.get("page") ?? 1) - 1,
+      pageSize: Number(searchParams.get("pageSize") ?? 10),
+      sort: searchParams.get("sort") ?? "alarm_number",
+      order: searchParams.get("order") ?? "desc",
+    }),
+    [searchParams],
+  );
   const [filteredAlarms, setFilteredAlarms] = useState(alarms);
   useGetFilteredAlarms;
   // Alarma selectata pentru pop up
   const [selectedAlarm, setSelectedAlarm] = useState(null);
   const [hasFiltersOpen, setHasFiltersOpen] = useState(false);
 
-  // pentru selectare weekly daily hourly monthly 
+  // pentru selectare weekly daily hourly monthly
   const [alarmTrendGranularity, setAlarmTrendGranularity] = useState("monthly");
 
   // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
@@ -63,16 +69,22 @@ const Dashboard = () => {
     };
 
     fetchAlarms();
-  }, [searchParams,filters]);
+  }, [searchParams, filters]);
 
   const { data, isPending } = useGetAlarmsTrend({
     granularity: alarmTrendGranularity,
     group_by: "severity",
   });
 
+
+  // const { data: heapMapData, isPending: isPendingHeatMap } = useGetHeapMap({
+  //   start_date: formatDate(sevenDaysAgo),
+  //   end_date: formatDate(today),
+  //   severity: "critical",
+  // });
+
   // Updateaza URL cu noul filtru, adaugandu l la URL
   const handleFilterChange = (key, value) => {
-    
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set(key, value);
@@ -81,11 +93,15 @@ const Dashboard = () => {
       return next;
     });
   };
-  if (isPendingAlarms)
+  
+  if (isPendingAlarms || isPending )
     return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
 
   console.log("RECENT ALARMS");
   console.log(data);
+
+  console.log("HEAT MAP DATA");
+  // console.log(heapMapData);
 
   const handleExport = async () => {
     try {
@@ -359,6 +375,8 @@ const Dashboard = () => {
         onGranularityChange={setAlarmTrendGranularity}
         isLoading={isPending}
       />
+
+      <HeatMap/>
     </div>
   );
 };
