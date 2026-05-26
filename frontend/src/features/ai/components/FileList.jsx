@@ -8,6 +8,7 @@ import { CiCircleRemove } from "react-icons/ci";
 import { FaFilePdf, FaRegFileExcel } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
+import { BsFiletypeDocx } from "react-icons/bs";
 
 import "@styles/features/ai/components/FileList.css";
 import { useFilePreview } from "@store/filePreviewStore";
@@ -15,10 +16,19 @@ import { useFilePreview } from "@store/filePreviewStore";
 const FileIcon = ({ type }) => {
   console.log("TYPE");
   console.log(type);
-  if (type.toLowerCase() === "pdf") return <FaFilePdf />;
-  if (type.toLowerCase() === "xlsx") return <FaRegFileExcel />;
-  if (type.toLowerCase() === "csv") return <FaFileCsv />;
-  return <FaFile />;
+  const typeValue = type.toLowerCase();
+  switch (typeValue) {
+    case "pdf":
+      return <FaFilePdf />;
+    case "xlsx":
+      return <FaRegFileExcel />;
+    case "csv":
+      return <FaFileCsv />;
+    case "docx":
+      return <BsFiletypeDocx />;
+    default:
+      return <FaFile />;
+  }
 };
 
 const fileTypeColor = (fileType) => {
@@ -31,6 +41,8 @@ const fileTypeColor = (fileType) => {
       return "file-list-type-xlsx";
     case "CSV":
       return "file-list-type-csv";
+    case "DOCX":
+      return "file-list-type-docx";
     default:
       return "file-list-type-default";
   }
@@ -38,7 +50,7 @@ const fileTypeColor = (fileType) => {
 
 const FileList = ({ files, setFiles }) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const {setFile} = useFilePreview();
+  const { setFile } = useFilePreview();
   const handleRemoveFile = (e, file) => {
     e.stopPropagation();
     setFiles((prev) => prev.filter((f) => f.file.name !== file.file.name));
@@ -90,9 +102,7 @@ const FileList = ({ files, setFiles }) => {
             </div>
 
             <div className="file-list-content">
-              <span className="file-list-name">
-                {item.file.name}
-              </span>
+              <span className="file-list-name">{item.file.name}</span>
               <span className="file-list-extension">
                 {item.file.name.split(".").pop()}
                 {/* File extension */}

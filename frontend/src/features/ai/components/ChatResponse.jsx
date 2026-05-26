@@ -30,7 +30,7 @@ import { FaCheck } from "react-icons/fa";
 import { toast } from "sonner";
 import removeMarkdown from "remove-markdown";
 import File from "./File";
-
+import { TiCancel } from "react-icons/ti";
 import "@styles/features/ai/components/ChatResponse.css";
 import useChatStore from "@store/chatStore";
 import useScrollAnimation from "@hooks/useScrollAnimation.js";
@@ -272,7 +272,6 @@ const ChatSuggestions = ({ suggestions }) => {
 const ChatResponse = ({
   blocks,
   is_stopped,
-  showOptions,
   smart_replies,
   last_message,
   files = null,
@@ -283,6 +282,8 @@ const ChatResponse = ({
   console.log(blocks);
   console.log(smart_replies);
   console.log(last_message);
+
+  const [showCopy, setShowCopy] = useState(null);
   const { file, setFile } = useFilePreview();
   const handleFileClick = (fileToPreview) => {
     if (file) setFile(null);
@@ -304,9 +305,17 @@ const ChatResponse = ({
     }
   };
   return (
-    <div className="chat-response">
+    <div
+      className="chat-response"
+      onMouseEnter={() => setShowCopy(true)}
+      onMouseLeave={() => setShowCopy(false)}
+    >
       {is_stopped && (
-        <p className="whitespace-pre-wrap text-red-500">Stopped</p>
+        <div className="flex gap-2 items-center">
+          {" "}
+          <p className="whitespace-pre-wrap">Stopped</p>
+          <TiCancel className="size-5" />
+        </div>
       )}
       {blocks.map((block, index) => (
         <div key={index} className="chat-response-block">
@@ -321,7 +330,7 @@ const ChatResponse = ({
                   {block.content}
                 </ReactMarkdown>
               </div>
-              {showOptions && (
+              {showCopy && (
                 <div className="chat-response-options">
                   <div className="chat-response-options-inner">
                     <ToolTip text={speaking ? "Stop" : "Read loud"}>

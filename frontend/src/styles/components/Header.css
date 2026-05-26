@@ -45,6 +45,11 @@
   .header-hidden {
     transform: translateY(-100%);
   }
+  #logo-image{
+    object-fit: cover;
+    width: 5rem;
+    height: 1rem;
+  }
 }
 @media (min-width: 1023px) {
   .header {
