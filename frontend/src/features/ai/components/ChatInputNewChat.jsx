@@ -10,7 +10,6 @@ import Button from "@components/Button";
 import "@styles/features/ai/components/ChatInput.css";
 import { useCreateConversation } from "../api/chatBot.api";
 import useAuthStore from "@store/authStore";
-import useChatStore from "@store/chatStore";
 import useVoiceToText from "../hooks/useVoiceToText";
 
 const MESSAGE_LIMIT = 5000;
@@ -24,17 +23,14 @@ const ChatInputNewChat = ({ placeholder }) => {
   const input = useRef();
   const [isEmpty, setIsEmpty] = useState(true);
   const fileInput = useRef();
-  const { isAwaitingResponse, setIsAwaiting } = useChatStore();
   const [files, setFiles] = useState([]);
 
-  const { recording, start, stop, clear, isSpeaking } =
-    useVoiceToText();
+  const { recording, start, stop, clear, isSpeaking } = useVoiceToText();
   const { mutateAsync: sendMessage, isPending } = useCreateConversation();
 
   const onSubmit = async () => {
     try {
       if (isPending) return;
-      setIsAwaiting(true);
       const filesToSend = files.map((item) => item.file);
       const filesPreserveStatus = files.map((item) => item.persist);
 
@@ -43,17 +39,16 @@ const ChatInputNewChat = ({ placeholder }) => {
         message: input.current.value.trim(),
         files: filesToSend,
         file_preserve_flags: filesPreserveStatus,
+        request_id: crypto.randomUUID(),
       };
 
       setFiles([]);
       // setMessage("");
       clear();
-      input.current.value='';
+      input.current.value = "";
       await sendMessage(mesaj);
     } catch (e) {
       toast.error(e?.message || "Could not send message");
-    } finally {
-      setIsAwaiting(false);
     }
   };
 
@@ -93,7 +88,7 @@ const ChatInputNewChat = ({ placeholder }) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      if (isAwaitingResponse) return;
+      if (isPending) return;
 
       onSubmit();
       input.current.value = "";
@@ -187,7 +182,7 @@ const ChatInputNewChat = ({ placeholder }) => {
             )
           )}
 
-          {!isAwaitingResponse && (
+          {!isPending && (
             <Button
               className="chat-input-send-button"
               onClick={onSubmit}
@@ -197,7 +192,7 @@ const ChatInputNewChat = ({ placeholder }) => {
             </Button>
           )}
 
-          {isAwaitingResponse && <LoadingCircle />}
+          {isPending && <LoadingCircle />}
         </div>
       </div>
     </div>

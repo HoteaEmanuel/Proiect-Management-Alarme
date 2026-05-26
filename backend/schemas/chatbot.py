@@ -34,6 +34,7 @@ class UpdateTitleRequest(BaseModel):
 class MessageRequest(BaseModel):
     user_id: str | None = None
     conversation_id: str | None = None
+    request_id: str | None = None
     message: str | None = None
     new_chat: bool = False
     files: list[RawFileAttachment] = []
@@ -42,6 +43,7 @@ class MessageCreate(BaseModel):
     user_id: str
     conversation_id: str
     role: str
+    is_stopped: bool | None = None
     has_sql_query: bool = False
     content: str
     smart_replies: list[str] | None = None
@@ -64,10 +66,12 @@ class UserMessage(BaseModel):
 
 class AssistantMessage(BaseModel):
     conversation_id: str | None = None
+    request_id: str | None = None
     role: Literal["assistant"] = "assistant"
     blocks: list[OutputBlock]
     smart_replies: list[str] | None = None
     files: list[CloudinaryFileAttachment] | None = []
+    is_stopped: bool = False
 
 ChatMessage = Annotated[
     Union[UserMessage, AssistantMessage],
@@ -107,6 +111,7 @@ class OrchestratorResponse(BaseModel):
 class AgentContext(BaseModel):
     user_message: str
     conversation_history: list[dict]
+    is_stopped: bool = False
     file_contents: str | None = None
 
     sql_query_text: str | None = None

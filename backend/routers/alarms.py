@@ -4,8 +4,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 
-from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters, RecentAlarmsFilters, TrendFilters, TrendResponse
-from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated, get_alarms_for_export, get_alarm_trend
+from schemas import AlarmPaginationResponse, AlarmResponse, RequestFilters, AlarmCreate, AlarmUpdate, ChartCategoryFilters, RecentAlarmsFilters, TrendFilters, TrendResponse, HeatmapFilters, HeatmapResponse
+from crud import get_filtered_alarms, create_alarm, get_kpi_stats, update_alarm, get_raw_alarms_by_category, export_data_to_excel, get_recent_alarms_paginated, get_alarms_for_export, get_alarm_trend, get_alarm_heatmap
 from models import Alarm
 from database import get_db
 from auth_utils import get_current_user
@@ -94,3 +94,8 @@ def get_recent_alarms(filters: RecentAlarmsFilters = Depends(), db: Session = De
 @router.get("/stats/alarm-trend", response_model=TrendResponse)
 def read_alarm_trend(filters: TrendFilters=Depends(), db: Session=Depends(get_db)) -> TrendResponse:
     return get_alarm_trend(db, filters)
+
+# Retrieves alarm counts grouped by day of week and hour of day for heatmap visualization with optional filtering by severity and date range
+@router.get("/stats/heatmap", response_model=HeatmapResponse)
+def read_alarm_heatmap(filters: HeatmapFilters=Depends(), db:Session=Depends(get_db)) -> HeatmapResponse:
+    return get_alarm_heatmap(db, filters)

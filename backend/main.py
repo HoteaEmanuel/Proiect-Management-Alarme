@@ -12,8 +12,6 @@ app = FastAPI()
 
 setup_exception_handlers(app)
 
-setup_exception_handlers(app)
-
 # Middleware for backend-frontend connection
 app.add_middleware(
     CORSMiddleware,

@@ -30,6 +30,8 @@ export const useCreateConversation = () => {
         formData.append("file_preserve_flags", String(persist === true));
       });
 
+      formData.append("request_id", message?.request_id);
+
       console.log("FORM DATA NEW");
       console.log(...formData.entries());
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
@@ -195,30 +197,24 @@ export const useReadChatResponse = () => {
       console.log("TEXT TO READ");
       const cleanText = removeMarkdown(text);
       console.log(cleanText);
-      const response = await api.post(`${VITE_URL_APP}/audio/speak`, {
-        text: cleanText,
-      }, {
-         responseType:'arraybuffer'
-      });
+      const response = await api.post(
+        `${VITE_URL_APP}/audio/speak`,
+        {
+          text: cleanText,
+        },
+        {
+          responseType: "arraybuffer",
+        },
+      );
       return response;
     },
     mutationKey: ["read-chat-response"],
   });
 };
-// export const useReadResponse=()=>{
-//   return useMutation({
-//     mutationFn:async()=>{
-//       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/VOICE_ID", {
-//   method: "POST",
-//   headers: {
-//     "xi-api-key": პროცეს.env.ELEVENLABS_API_KEY,
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify({
-//     text: "Hello, this sounds very human.",
-//     model_id: "eleven_multilingual_v2",
-//   }),
-// });
-//     }
-//   })
-// }
+
+export const stopRequest = async (requestId) => {
+  const response = await api.post(
+    `${VITE_URL_APP}/api/chatbot/cancel/${requestId}`,
+  );
+  return response.data;
+};

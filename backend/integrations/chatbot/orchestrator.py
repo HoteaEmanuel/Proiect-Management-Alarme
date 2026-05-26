@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
+import logging
 
+from database import redis_client
 from schemas import MessageCreate, OrchestratorResponse, AgentContext, TextBlock, ChartBlock, RawFileAttachment
 from .client import llm_request
 from .prompt_builder import get_system_prompt
@@ -8,6 +10,8 @@ from .sql_query_agent import get_sql_agent_response
 from .text_agent import get_text_agent_response
 from .graphics_agent import get_graphics_agent_response
 from .excel_agent import get_excel_agent_response
+
+logger = logging.getLogger(__name__)
 
 ORCHESTRATOR_PROMPT = """
 You are an orchestrator that analyzes the user's message and decides which agents are needed and in what order.
@@ -134,8 +138,8 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
 
     orchestrator_response = llm_request(system_prompt, request.message, context_history, OrchestratorResponse)
 
-    print(f"[ORCHESTRATOR] Agents selectati: {[a.agent for a in orchestrator_response.agents]}")
-    print(f"[ORCHESTRATOR] Instructiuni: {[(a.agent, a.instruction) for a in orchestrator_response.agents]}")
+    print(f"[ORCHESTRATOR] Selected agents: {[a.agent for a in orchestrator_response.agents]}")
+    print(f"[ORCHESTRATOR] Instructions: {[(a.agent, a.instruction) for a in orchestrator_response.agents]}")
 
     if request.new_chat:
         conversation_title = orchestrator_response.conversation_title
@@ -155,13 +159,19 @@ def get_orchestrator_response(db: Session, request: MessageCreate, context_histo
                 content = parse_file(file.filename, file.content)
                 parsed.append(f"[{file.filename}]:\n{content}")
             except Exception as e:
-                print(f"[FILES] EROARE la {file.filename}: {str(e)}")
+                logger.error(f"Error while parsing request file {file.filename}: {str(e)}")
                 continue
 
     if parsed:
         agent_context.file_contents = "\n\n".join(parsed)
 
     for agent_call in orchestrator_response.agents:
+        if redis_client.exists(f"cancel:{request.request_id}"):
+            logger.warning(f"[RESPONSE CANCELED] ")
+            agent_context.text_response = "Response was canceled by the user"
+            agent_context.is_stopped = True
+            break
+
         agent = AVAILABLE_AGENTS.get(agent_call.agent)
         if not agent:
             continue

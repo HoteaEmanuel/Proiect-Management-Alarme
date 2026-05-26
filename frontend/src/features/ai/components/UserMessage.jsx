@@ -14,16 +14,16 @@ import { MdExpandMore } from "react-icons/md";
 import "@styles/features/ai/components/UserMessage.css";
 import { useFilePreview } from "@store/filePreviewStore";
 
-const UserMessage = ({ message, showOptions }) => {
+const UserMessage = ({ message }) => {
   const MESSAGE_HEIGHT = 300;
   const hasFiles = message.files?.length > 0;
   const hasText = message?.content.trim().length > 0;
-
+  const [showCopy, setShowCopy] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
   const contentRef = useRef(null);
   const [copied, setCopied] = useState(false);
-  const {file,setFile} = useFilePreview();
+  const { file, setFile } = useFilePreview();
 
   useEffect(() => {
     const el = contentRef.current;
@@ -55,7 +55,11 @@ const UserMessage = ({ message, showOptions }) => {
   };
 
   return (
-    <div className="user-message">
+    <div
+      className="user-message"
+      onMouseEnter={() => setShowCopy(true)}
+      onMouseLeave={() => setShowCopy(false)}
+    >
       <div className="user-message-body">
         {hasFiles && (
           <div className="user-message-files">
@@ -98,7 +102,7 @@ const UserMessage = ({ message, showOptions }) => {
               )}
             </div>
 
-            {showOptions && (
+            {showCopy && (
               <div className="user-message-options">
                 <div className="user-message-options-inner">
                   {!copied && (

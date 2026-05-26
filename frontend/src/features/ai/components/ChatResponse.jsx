@@ -30,7 +30,7 @@ import { FaCheck } from "react-icons/fa";
 import { toast } from "sonner";
 import removeMarkdown from "remove-markdown";
 import File from "./File";
-
+import { TiCancel } from "react-icons/ti";
 import "@styles/features/ai/components/ChatResponse.css";
 import useChatStore from "@store/chatStore";
 import useScrollAnimation from "@hooks/useScrollAnimation.js";
@@ -243,7 +243,6 @@ const Chart = ({ content }) => {
 };
 
 const ChatSuggestions = ({ suggestions }) => {
-
   const ref = useRef(null);
   useScrollAnimation(ref);
 
@@ -252,7 +251,6 @@ const ChatSuggestions = ({ suggestions }) => {
   if (suggestions === null || suggestions?.length === 0) return null;
 
   return (
-    
     <div className="chat-suggestions-wrapper slide-hidden" ref={ref}>
       <ul className="chat-suggestions-list">
         {suggestions.map((item) => (
@@ -273,7 +271,7 @@ const ChatSuggestions = ({ suggestions }) => {
 
 const ChatResponse = ({
   blocks,
-  showOptions,
+  is_stopped,
   smart_replies,
   last_message,
   files = null,
@@ -282,13 +280,15 @@ const ChatResponse = ({
   const { speaking, speak, stop } = useSpeechSynthesis();
   console.log("BLOCKS");
   console.log(blocks);
-  console.log(copied);
+  console.log(smart_replies);
+  console.log(last_message);
+
+  const [showCopy, setShowCopy] = useState(null);
   const { file, setFile } = useFilePreview();
   const handleFileClick = (fileToPreview) => {
     if (file) setFile(null);
     else setFile(fileToPreview);
   };
-
   const handleCopy = async (message) => {
     try {
       const text = removeMarkdown(message); // Copiez mesajul eliminand markdown ul
@@ -304,9 +304,19 @@ const ChatResponse = ({
       toast.error(err?.message || "Failed to copy");
     }
   };
-
   return (
-    <div className="chat-response">
+    <div
+      className="chat-response"
+      onMouseEnter={() => setShowCopy(true)}
+      onMouseLeave={() => setShowCopy(false)}
+    >
+      {is_stopped && (
+        <div className="flex gap-2 items-center">
+          {" "}
+          <p className="whitespace-pre-wrap">Stopped</p>
+          <TiCancel className="size-5" />
+        </div>
+      )}
       {blocks.map((block, index) => (
         <div key={index} className="chat-response-block">
           {block.type === "chart" ? (
@@ -316,17 +326,11 @@ const ChatResponse = ({
           ) : (
             <div className="chat-response-markdown">
               <div className="chat-response-markdown-content">
-                {block?.stopped ? (
-                  <p className="whitespace-pre-wrap text-red-500">
-                    {block.content}
-                  </p>
-                ) : (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {block.content}
-                  </ReactMarkdown>
-                )}
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {block.content}
+                </ReactMarkdown>
               </div>
-              {showOptions && (
+              {showCopy && (
                 <div className="chat-response-options">
                   <div className="chat-response-options-inner">
                     <ToolTip text={speaking ? "Stop" : "Read loud"}>

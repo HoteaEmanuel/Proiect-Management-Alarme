@@ -4,12 +4,13 @@ from sqlalchemy.exc import ProgrammingError, OperationalError
 from datetime import datetime
 from fastapi.responses import StreamingResponse
 from typing import Any
+from collections import defaultdict
 import pandas as pd
 import io
 import logging
 
 from core import InvalidInputError
-from schemas import ChartCategoryFilters, TrendFilters, TrendGranularity
+from schemas import ChartCategoryFilters, TrendFilters, TrendGranularity, HeatmapFilters, HeatmapResponse, HeatmapBucket
 
 logger = logging.getLogger(__name__)
 
@@ -156,3 +157,46 @@ def get_alarm_trend(db: Session, filters: TrendFilters) -> dict:
         ],
         "live_alarms": []
     }
+
+# Fetches alarm heatmap data grouped by day of week and hour of day
+def get_alarm_heatmap(db: Session, filters: HeatmapFilters) -> HeatmapResponse:
+    SEVERITIES = ["Critical", "Major", "Minor", "Warning", "Info"]
+    labels = [filters.severity] if filters.severity else SEVERITIES
+    counts = defaultdict(int)
+    for label in labels:
+        query = text("""
+            EXEC dbo.GetAlarmsByCategory
+                @category = :category,
+                @label = :label,
+                @start_date = :start_date,
+                @end_date= :end_date;
+        """)
+        params = {
+            "category": "Severity",
+            "label": label,
+            "start_date": filters.start_date,
+            "end_date": filters.end_date,
+        }
+        try:
+            result=db.execute(query, params).mappings().all()
+        except (ProgrammingError, OperationalError) as e:
+            db.rollback()
+            logger.error(f"Database error while fetching heatmap: {str(e)}")
+            raise
+        
+        for row in result:
+            dt = row["FIRST_OCCURENCE_DATETIME"]
+            if dt:
+                key = (dt.isoweekday(), dt.hour)
+                counts[key] += 1
+                
+        return HeatmapResponse(
+            data=[
+                HeatmapBucket(
+                    day_of_week=day,
+                    hour_of_day=hour,
+                    alarm_count=count
+                )
+                for (day, hour), count in counts.items()
+            ]
+        )
