@@ -81,7 +81,7 @@ const Dashboard = () => {
       return next;
     });
   };
-  if (isPendingAlarms || isPending)
+  if (isPendingAlarms)
     return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
 
   console.log("RECENT ALARMS");
@@ -353,10 +353,11 @@ const Dashboard = () => {
         </select>
       </div>
 
-      <AlarmChart 
-        data={data.buckets} 
+      <AlarmChart
+        data={data?.buckets ?? []}
         granularity={alarmTrendGranularity}
         onGranularityChange={setAlarmTrendGranularity}
+        isLoading={isPending}
       />
     </div>
   );

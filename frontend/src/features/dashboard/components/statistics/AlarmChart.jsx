@@ -63,7 +63,7 @@ const transformData = (raw, granularity) => {
   return Object.values(map);
 };
 
-const AlarmChart = ({ data, granularity, onGranularityChange }) => {
+const AlarmChart = ({ data, granularity, onGranularityChange, isLoading }) => {
   console.log("ALARM DATAA");
   console.log(data);
 
@@ -88,6 +88,11 @@ const AlarmChart = ({ data, granularity, onGranularityChange }) => {
       </div>
 
       <div className="alarm-chart-container">
+        {isLoading && (
+          <div className="alarm-chart-loading">
+            Loading chart...
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
