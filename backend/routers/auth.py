@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
 from typing import Annotated
 from fastapi import Depends, APIRouter, Response, Cookie
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.encoders import jsonable_encoder
 from starlette import status
 
 from database import get_db
-from schemas import CreateUserRequest, LoginRequest, UserResponse, TokenResponse
-from crud import create_user
-from auth_utils import get_current_user, process_user_login, process_token_refresh
+from schemas import CreateUserRequest, LoginRequest, UserResponse, TokenResponse, ChangePasswordRequest
+from crud import create_user, change_user_password
+from auth_utils import get_current_user, process_user_login, process_token_refresh,blacklist_token
 from core import UnauthorizedError
 
 router = APIRouter(
@@ -79,7 +80,7 @@ async def refresh_token(
     }
 
 
-# Pentru a deloga un user
+# For logging a user out
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response) -> dict:
     response.delete_cookie(
@@ -90,3 +91,10 @@ async def logout(response: Response) -> dict:
     )
 
     return {"message": "Logged out successfully"}
+
+
+# Changes the authenticated user's password
+@router.put("/change-password", status_code=status.HTTP_200_OK)
+async def change_password(request: ChangePasswordRequest, user: user_dependency, db: db_dependency) -> dict[str,str]:
+    change_user_password(user["id"], request, db)
+    return {"message": "Password changed successfully"}
