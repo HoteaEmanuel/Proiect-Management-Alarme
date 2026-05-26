@@ -313,7 +313,7 @@ const ChatResponse = ({
       {is_stopped && (
         <div className="flex gap-2 items-center">
           {" "}
-          <p className="whitespace-pre-wrap">Stopped</p>
+          <p className="whitespace-pre-wrap font-semibold">Stopped</p>
           <TiCancel className="size-5" />
         </div>
       )}

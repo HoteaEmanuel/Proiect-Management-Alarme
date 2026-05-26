@@ -216,86 +216,92 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       return [...prev, ...unique];
     });
   };
+  const reqStatus = requests.get(conversation?.conversation_id)?.status;
+  const isLoading = reqStatus === "loading";
 
-  const isLoading =
-    requests.get(conversation?.conversation_id)?.status === "loading";
+  const isStopped = reqStatus === "stopping";
 
   return (
-    <div className="chat-input">
-      {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
+    <div className={`chat-input ${isLoading && "chat-input-active"}`}>
+      {/* <div></div> */}
+      <div className="chat-input-inner">
+        {files?.length > 0 && <FileList files={files} setFiles={setFiles} />}
+        <div className="chat-input-row">
+          <input
+            type="file"
+            ref={fileInput}
+            onChange={handleFilesUpload}
+            className="chat-input-file"
+            multiple="yes"
+            accept=".pdf,.xlsx,.csv,.docx"
+          />
 
-      <div className="chat-input-row">
-        <input
-          type="file"
-          ref={fileInput}
-          onChange={handleFilesUpload}
-          className="chat-input-file"
-          multiple="yes"
-          accept=".pdf,.xlsx,.csv,.docx"
-        />
+          <Tooltip text={"Add files"}>
+            <Button
+              className="chat-input-icon-button chat-input-add-button"
+              onClick={() => fileInput.current.click()}
+            >
+              <IoAdd className="chat-input-icon" />
+            </Button>
+          </Tooltip>
 
-        <Tooltip text={"Add files"}>
-          <Button
-            className="chat-input-icon-button chat-input-add-button"
-            onClick={() => fileInput.current.click()}
-          >
-            <IoAdd className="chat-input-icon" />
-          </Button>
-        </Tooltip>
+          <textarea
+            placeholder={placeholder}
+            ref={input}
+            onChange={handleOnChange}
+            rows={1}
+            maxLength={MESSAGE_LIMIT}
+            onKeyDown={handleKeyDown}
+            onInput={handleInput}
+            className="chat-input-textarea"
+          />
 
-        <textarea
-          placeholder={placeholder}
-          ref={input}
-          onChange={handleOnChange}
-          rows={1}
-          maxLength={MESSAGE_LIMIT}
-          onKeyDown={handleKeyDown}
-          onInput={handleInput}
-          className="chat-input-textarea"
-        />
-
-        <div className="chat-input-actions-right">
-          {!recording && isEmpty ? (
-            <Tooltip text={"Dictate"}>
-              <Button className="chat-input-icon-button" onClick={handleStart}>
-                <MdKeyboardVoice className="chat-input-icon" />
-              </Button>
-            </Tooltip>
-          ) : (
-            recording && (
-              <Tooltip text={"Stop recording"}>
+          <div className="chat-input-actions-right">
+            {!recording && isEmpty ? (
+              <Tooltip text={"Dictate"}>
                 <Button
-                  className={`chat-input-icon-button ${
-                    isSpeaking ? "chat-input-icon-button-speaking" : ""
-                  }`}
-                  onClick={stop}
+                  className="chat-input-icon-button"
+                  onClick={handleStart}
                 >
                   <MdKeyboardVoice className="chat-input-icon" />
                 </Button>
               </Tooltip>
-            )
-          )}
+            ) : (
+              recording && (
+                <Tooltip text={"Stop recording"}>
+                  <Button
+                    className={`chat-input-icon-button ${
+                      isSpeaking ? "chat-input-icon-button-speaking" : ""
+                    }`}
+                    onClick={stop}
+                  >
+                    <MdKeyboardVoice className="chat-input-icon" />
+                  </Button>
+                </Tooltip>
+              )
+            )}
 
-          {!isLoading && (
-            <Button
-              className="chat-input-send-button"
-              onClick={handleSubmit}
-              disabled={isEmpty && files.length === 0}
-            >
-              <FaArrowUp className="chat-input-send-icon" />
-            </Button>
-          )}
-
-          {isLoading && (
-            <Tooltip text={"Stop"}>
+            {!isLoading && !isStopped && (
               <Button
-                className="cursor-pointer hover:scale-105"
-                onClick={stopResponse}
+                className="chat-input-send-button"
+                onClick={handleSubmit}
+                disabled={isEmpty && files.length === 0}
               >
-                <FaRegStopCircle className="size-5" />
+                <FaArrowUp className="chat-input-send-icon" />
               </Button>
-            </Tooltip>
-          )}
+            )}
+
+            {isLoading && (
+              <Tooltip text={"Stop"}>
+                <Button
+                  className="cursor-pointer hover:scale-105"
+                  onClick={stopResponse}
+                >
+                  <FaRegStopCircle className="size-5" />
+                </Button>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
     </div>

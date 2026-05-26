@@ -1,6 +1,7 @@
 import useChatStore from "@store/chatStore";
 import React from "react";
 import { TextShimmerBasic } from "./TextShimmerBasic";
+import Tooltip from "@components/ToolTip";
 
 const RequestStatus = () => {
   const requests = useChatStore((state) => state.requests);
@@ -10,7 +11,7 @@ const RequestStatus = () => {
   if (requestStatus === "stopping")
     return (
       <div className="flex gap-2 items-center">
-        <img src="/images/Nyx.png" alt="Assistant image" className="h-8" />
+        {/* <img src="/images/Nyx.png" alt="Assistant image" className="h-8" /> */}
         <p className="shimmer-text">Stopping...</p>
       </div>
     );
@@ -18,11 +19,14 @@ const RequestStatus = () => {
   if (requestStatus === "loading")
     return (
       <div className="flex gap-2 items-center">
-        <img
-          src="/images/Nyx-Ganditor.png"
-          alt="Assistant image"
-          className="h-10"
-        />
+        <Tooltip text={"Hmm..."} textSize={10}>
+          <img
+            src="/images/Nyx-Ganditor.png"
+            alt="Assistant image"
+            className="h-8"
+          />
+        </Tooltip>
+
         <p className="shimmer-text">Thinking...</p>
       </div>
     );

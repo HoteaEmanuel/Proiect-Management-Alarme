@@ -34,7 +34,8 @@
     overflow-y: auto;
     overflow-x: hidden;
 
-    scrollbar-width: none;
+    /* scrollbar-width: none; */
+    scrollbar-width:auto;
 
     color: var(--color-text);
     font-size: var(--fs-xs);
@@ -44,7 +45,7 @@
 
 .conversation-side-list::-webkit-scrollbar {
 
-    display: none;
+    /* display: none; */
 }
 /* Scroll bar functionabil */
 
