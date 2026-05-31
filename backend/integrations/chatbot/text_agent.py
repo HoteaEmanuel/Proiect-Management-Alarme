@@ -23,7 +23,9 @@ Format your responses using Markdown to ensure clarity and visual appeal:
 - Use *italic* for emphasis or secondary information
 - Use ## or ### for headings in longer responses to separate sections clearly
 - Use `inline code` for technical terms, identifiers, or exact values
-- Use Markdown tables for structured or comparative data — always include a header row and align columns
+- Use Markdown tables for structured data, but LIMIT tables to a maximum of 4 or 5 essential columns 
+    (e.g., Alarm ID, Severity, Server, Summary) to prevent UI overflow. 
+    If the SQL result has more columns, ignore the less important ones in the table representation.
 - Use bullet points or numbered lists for sequences, steps, or enumerations
 - Add spacing between sections to improve readability
 - Avoid walls of text — break long paragraphs into shorter, focused ones
@@ -41,7 +43,7 @@ These will be rendered as clickable buttons to help the user continue the conver
 
 CRITICAL — Output separation:
 - Place these 3 suggestions EXCLUSIVELY in the `smart_replies` array.
-- DO NOT include any "Recommendations", "Next steps", "Suggested actions", or "Recomandări rapide" section in the main `text` response. 
+- DO NOT include any "Recommendations", "Next steps", "Suggested actions", or "Quick Suggestions" section in the main `text` response. 
 - The main `text` must strictly answer the user's question and interpret the data, ending immediately after the conclusion or the file export mention.
 
 CRITICAL — System Capabilities Constraints for Smart Replies:
@@ -84,27 +86,31 @@ def get_text_agent_response(db: Session, context: AgentContext, call: AgentCall)
     if context.file_export:
         system_prompt += FILE_EXPORT_PROMPT
 
-    instruction = call.instruction
+    internal_context = f"--- INTERNAL CONTEXT & ORCHESTRATOR INSTRUCTION ---\n{call.instruction}\n"
+    
     if context.sql_result is not None:
         total_rows = len(context.sql_result)
         
         if total_rows > 30:
             preview_data = context.sql_result[:15]
-            instruction += (
-                f"\n\nSQL Query Results (Preview of first 15 rows out of {total_rows} total):\n"
+            internal_context += (
+                f"\nSQL Query Results (Preview of first 15 rows out of {total_rows} total):\n"
                 f"{preview_data}\n"
                 f"\nNOTE: There are {total_rows - 30} more rows not shown here to save space. "
                 f"Base your summary on the total count and the preview patterns."
             )
         else:
-            instruction += f"\n\nSQL Query Results ({total_rows} rows):\n{context.sql_result}"
+            internal_context += f"\nSQL Query Results ({total_rows} rows):\n{context.sql_result}"
 
     if context.file_contents is not None:
-        instruction += f"\n\nFile contents:\n{context.file_contents}"
+        internal_context += f"\nFile contents:\n{context.file_contents}"
+        
+    internal_context += "\n-------------------------------------------------\n\n"
+
+    final_prompt = f"{internal_context}USER'S ORIGINAL QUESTION:\n{context.user_message}"
 
 
-
-    response = llm_request(system_prompt, instruction, context.conversation_history, TextAgentResponse)
+    response = llm_request(system_prompt, final_prompt, context.conversation_history, TextAgentResponse)
 
     context.text_response = response.text
     context.smart_replies = response.smart_replies
