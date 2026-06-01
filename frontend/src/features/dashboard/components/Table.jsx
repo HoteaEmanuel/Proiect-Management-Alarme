@@ -85,6 +85,7 @@ export const AlarmsTable = ({
 
   const alarms = data;
 
+  console.log("ALARME", data);
   const table = useReactTable({
     data: alarms,
     columns,
@@ -151,8 +152,8 @@ export const AlarmsTable = ({
 
         <tbody className="alarm-table-body">
           {table.getRowModel().rows.map((row) => (
-            <tr 
-              key={row.id} 
+            <tr
+              key={row.id}
               className="alarm-table-row"
               onClick={() => onRowClick?.(row.original)}
             >

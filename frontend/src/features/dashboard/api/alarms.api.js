@@ -45,7 +45,8 @@ export const alarmsApi = {
     console.log(url);
     const response = await api.get(url);
 
-    console.log(response);
+    console.log("ALARME DIN RESPONSE");
+    console.log(response.data);
     return response.data;
   },
 

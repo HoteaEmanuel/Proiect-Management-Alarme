@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useTransition } from "react";
+import React, { useEffect, useMemo, useRef, useTransition } from "react";
 import {
   useGetAlarmsTrend,
   useGetAllAlarms,
@@ -59,12 +59,17 @@ const Dashboard = () => {
   // pentru selectare weekly daily hourly monthly
   const [alarmTrendGranularity, setAlarmTrendGranularity] = useState("monthly");
 
+  console.log("FILTERS", filters);
   // Apeleaza api ul care returneaza alarmele pentru fiecare modificare a filtrelor
   useEffect(() => {
     const fetchAlarms = async () => {
       const data = await alarmsApi.getFilteredAlarms({
         filters,
       });
+      console.log("FILTERS HERE");
+      console.log(filters);
+      console.log("MATCHING DATA");
+      console.log(data);
       setFilteredAlarms(data);
     };
 
@@ -75,7 +80,6 @@ const Dashboard = () => {
     granularity: alarmTrendGranularity,
     group_by: "severity",
   });
-
 
   // const { data: heapMapData, isPending: isPendingHeatMap } = useGetHeapMap({
   //   start_date: formatDate(sevenDaysAgo),
@@ -93,9 +97,6 @@ const Dashboard = () => {
       return next;
     });
   };
-  
-  if (isPendingAlarms || isPending )
-    return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
 
   console.log("RECENT ALARMS");
   console.log(data);
@@ -127,6 +128,26 @@ const Dashboard = () => {
     }
   };
 
+  const useDebounceCallback = (fn, delay) => {
+    const timerRef = useRef(null);
+    return (...args) => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => fn(...args), delay);
+    };
+  };
+
+  const handleDescriptionChange = useDebounceCallback(
+    (value) => handleFilterChange("description_like", value),
+    500,
+  );
+
+  const handleServerChange = useDebounceCallback(
+    (value) => handleFilterChange("server_like", value),
+    500,
+  );
+
+  if (isPendingAlarms || isPending)
+    return <RiLoader2Fill className="w-full mx-auto animate-spin size-10" />;
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
@@ -239,7 +260,7 @@ const Dashboard = () => {
             onChange={(e) => {
               const timeOut = setTimeout(
                 () => handleFilterChange("summary_like", e.target.value),
-                500,
+                100,
               );
 
               return () => clearTimeout(timeOut);
@@ -252,14 +273,7 @@ const Dashboard = () => {
           <input
             className="dashboard-filter-input"
             placeholder="Server name"
-            onChange={(e) => {
-              const timeOut = setTimeout(
-                () => handleFilterChange("server_like", e.target.value),
-                500,
-              );
-
-              return () => clearTimeout(timeOut);
-            }}
+            onChange={(e) => handleServerChange(e.target.value)}
           />
         </div>
 
@@ -268,14 +282,7 @@ const Dashboard = () => {
           <input
             className="dashboard-filter-input"
             placeholder="Description"
-            onChange={(e) => {
-              const timeOut = setTimeout(
-                () => handleFilterChange("description_like", e.target.value),
-                500,
-              );
-
-              return () => clearTimeout(timeOut);
-            }}
+            onChange={(e) => handleDescriptionChange(e.target.value)}
           />
         </div>
       </div>
@@ -376,7 +383,7 @@ const Dashboard = () => {
         isLoading={isPending}
       />
 
-      <HeatMap/>
+      <HeatMap />
     </div>
   );
 };
