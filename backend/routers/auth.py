@@ -44,7 +44,7 @@ async def login(response: Response, login_request: LoginRequest, db: db_dependen
         )
     
     # Return the access token and user payload
-    userResponse = UserResponse(user_id=user.id, username=user.username)
+    userResponse = UserResponse(user_id=user.id, username=user.username, email=user.email)
 
     return {
         "access_token": acces_token,
