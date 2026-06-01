@@ -46,7 +46,7 @@ def get_filtered_alarms(db: Session, filters: RequestFilters) -> tuple[int, int,
         raise
 
     if not result:
-        return 0, [], []
+        return 0, 0, []
 
     # Retrieves the total number of alarms from the first row
     total_alarms = result[0]["TotalAlarms"]
