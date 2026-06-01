@@ -13,7 +13,7 @@ const NewChat = () => {
   const { user } = useAuthStore();
 
   const { file } = useFilePreview();
-  const [chatBotGreeting, setChatBotGreeting] = useState(greeting());
+  const [chatBotGreeting] = useState(greeting());
   console.log("GREETING")
   console.log(chatBotGreeting)
   return (

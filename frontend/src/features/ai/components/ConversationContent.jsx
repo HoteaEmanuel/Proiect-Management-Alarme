@@ -55,8 +55,6 @@ const ConversationContent = ({ chatEnd }) => {
                 ? "conversation-content-item-assistant"
                 : "conversation-content-item-user"
             }`}
-            // onMouseLeave={() => setShowCopy(undefined)}
-            // onMouseEnter={() => setShowCopy(index)}
           >
             <div
               className={`conversation-content-message ${
@@ -64,19 +62,14 @@ const ConversationContent = ({ chatEnd }) => {
                   ? "conversation-content-message-assistant"
                   : "conversation-content-message-user"
               }`}
-              // onMouseEnter={() => setShowCopy(index)}
             >
               {message.role === "user" ? (
-                <UserMessage
-                  message={message}
-                  // showOptions={showCopy === index}
-                />
+                <UserMessage message={message} />
               ) : (
                 <ChatResponse
                   blocks={message?.blocks}
                   files={message?.files}
                   smart_replies={message?.smart_replies}
-                  // showOptions={showCopy === index}
                   is_stopped={message?.is_stopped}
                   index={index}
                   last_message={index === messages.length - 1}
