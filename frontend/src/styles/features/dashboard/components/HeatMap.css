@@ -1,0 +1,120 @@
+.heatmap-card {
+  background: #111827;
+  border-radius: 12px;
+  padding:1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+.heatmap-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.heatmap-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.heatmap-filter-btn {
+  padding: 0.5rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #1f2a3d;
+  background: #162033;
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.heatmap-filter-btn.is-active {
+  border-color: #06b6d4;
+  background: rgba(6, 182, 212, 0.12);
+  color: #06b6d4;
+}
+
+.heatmap-container {
+  height: 260px;
+  /* width: 100%; */
+  max-width: 60rem;
+}
+
+.heatmap-axis-top {
+  fill: #94a3b8;
+  font-size: 11px;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  text-anchor: middle;
+}
+
+.heatmap-axis-left {
+  fill: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  text-anchor: end;
+  dominant-baseline: central;
+}
+
+.heatmap-tooltip {
+  background: #1a2235;
+  border: 1px solid #1f2a3d;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  color: #e5e7eb;
+  line-height: 1.7;
+}
+
+.heatmap-tooltip-title {
+  font-weight: 700;
+}
+
+.heatmap-tooltip-sub {
+  color: #94a3b8;
+}
+
+.heatmap-tooltip-value {
+  margin-top: 4px;
+  color: #06b6d4;
+  font-weight: 600;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 220px;
+  margin-top: 12px;
+  margin-left: 85px;
+}
+
+.heatmap-legend__label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  flex-shrink: 0;
+}
+
+.heatmap-legend__gradient {
+  flex: 1;
+  height: 10px;
+  margin: 0 10px;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    to right,
+    #162033,
+    #0d3d52,
+    #0e6e8c,
+    #09819f,
+    #0b9bb4,
+    #0e95d3
+  );
+}

@@ -11,6 +11,7 @@
     border-radius: var(--radius-lg);
 
     background-color: var(--color-surface);
+    align-items: center;
 }
 
 .alarm-chart-header {
@@ -18,6 +19,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  width: 100%;
 }
 
 .alarm-chart-select {
@@ -43,9 +45,9 @@
 }
 
 .alarm-chart-container {
-    width: 100%;
-    height: 27rem;
-    min-height: 22rem;
+    width: 80%;
+    height: 30rem;
+    min-height: 25rem;
 }
 
 .alarm-chart-axis .recharts-cartesian-axis-tick-value {
@@ -99,4 +101,13 @@
   z-index: 2;
   color: var(--color-text-muted);
   font-size: var(--fs-sm);
+}
+
+
+@media (max-width:768px) {
+    .alarm-chart-container {
+    width: 100%;
+    min-height: 22rem;
+}
+
 }

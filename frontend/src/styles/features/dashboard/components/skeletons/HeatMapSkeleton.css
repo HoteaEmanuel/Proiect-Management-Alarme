@@ -1,0 +1,90 @@
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+.sk {
+  background: linear-gradient(
+    90deg,
+    #162033 25%,
+    #1e2a40 50%,
+    #162033 75%
+  );
+
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+
+.heatmap-skeleton-wrapper {
+  background: #111827;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 400px;
+}
+
+
+.heatmap-skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.heatmap-skeleton-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.heatmap-skeleton-pill {
+  border-radius: 6px;
+}
+
+.heatmap-skeleton-grid {
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  gap: 6px;
+  margin:0 auto;
+  width: 70%;
+}
+
+.heatmap-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.heatmap-skeleton-cells {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  flex: 1;
+}
+
+.heatmap-skeleton-cell {
+  height: 12px;
+  border-radius: 2px;
+}
+
+.heatmap-skeleton-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  margin:0 auto;
+  width: 50%;
+}
+
+.heatmap-skeleton-gradient {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+}

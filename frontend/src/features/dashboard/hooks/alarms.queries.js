@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { alarmsApi } from "../api/alarms.api";
 export const useGetAllAlarms = () => {
   const { getAllAlerts } = alarmsApi;
-  return useQuery({
+  return useSuspenseQuery({
     queryFn: () => getAllAlerts(),
     queryKey: ["alarms"],
   });
@@ -30,16 +30,16 @@ export const useGetAlarmsTrend = (filters) => {
   console.log("TREND FILETERS");
   console.log(filters);
   const { getAlarmsTrend } = alarmsApi;
-  return useQuery({
+  return useSuspenseQuery({
     queryFn: async () => getAlarmsTrend(filters),
     queryKey: ["alarms-trend", filters],
   });
 };
 
-export const useGetHeapMap = (filters) => {
-  const { getHeapMeap } = alarmsApi;
-  return useQuery({
-    queryFn: async () => getHeapMeap(filters),
+export const useGetHeatMap = (filters) => {
+  const { getHeatMap } = alarmsApi;
+  return useSuspenseQuery({
+    queryFn: async () => getHeatMap(filters),
     queryKey: ["alarms-heapmap", filters],
   });
 };

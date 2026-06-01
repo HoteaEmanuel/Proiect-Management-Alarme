@@ -1,85 +1,79 @@
 :root {
+  --font-main:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Colors */
+  --color-bg: #0b1220;
+  --color-surface: #111827;
+  --color-surface-muted: #162033;
+  --color-surface-raised: #1a2436;
+  --color-border: #1f2a3d;
+  --color-bg-active: #081e49;
 
-    /* Colors */
-    --color-bg: #0b1220;
-    --color-surface: #111827;
-    --color-surface-muted: #162033;
-    --color-border: #1f2a3d;
-    --color-bg-active: #081e49;
+  --color-text: #e5e7eb;
+  --color-text-muted: #94a3b8;
 
-    --color-text: #e5e7eb;
-    --color-text-muted: #94a3b8;
+  --color-accent: #06b6d4;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
 
-    --color-accent: #06b6d4;
-    --color-success: #10b981;
-    --color-danger: #ef4444;
-    --color-warning: #f59e0b;
+  /* Chat input  colors*/
+  --color-chat-input-bg: #0f1726;
+  --color-chat-input-bg-focus: #0f1829;
+  --color-chat-input-border: #243149;
+  --color-chat-input-border-focus: #3f5272;
+  --color-chat-input-text: #e7eef8;
+  --color-chat-input-placeholder: #8ea0b8;
+  --color-chat-control-bg: transparent;
+  --color-chat-control-bg-hover: #1b2638;
+  --color-chat-send-bg: #233b65;
+  --color-chat-send-bg-hover: #2d4a7a;
 
-    /* Chat input  colors*/
-    --color-chat-input-bg: #0f1726;
-    --color-chat-input-bg-focus: #0f1829;
-    --color-chat-input-border: #243149;
-    --color-chat-input-border-focus: #3f5272;
-    --color-chat-input-text: #e7eef8;
-    --color-chat-input-placeholder: #8ea0b8;
-    --color-chat-control-bg: transparent;
-    --color-chat-control-bg-hover: #1b2638;
-    --color-chat-send-bg: #233b65;
-    --color-chat-send-bg-hover: #2d4a7a;
+  /* Font sizes */
+  --fs-2xs: clamp(0.6rem, 0.65rem + 0.1vw, 0.65rem);
+  --fs-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.85rem);
+  --fs-sm: clamp(0.875rem, 0.82rem + 0.2vw, 1rem);
+  --fs-md: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --fs-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.35rem);
+  --fs-xl: clamp(1.4rem, 1.25rem + 0.8vw, 1.8rem);
+  --fs-2xl: clamp(2rem, 1.6rem + 1.4vw, 2.4rem);
 
+  /* Font weights */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
 
-
-    /* Font sizes */
-    --fs-2xs: clamp(0.6rem, 0.65rem + 0.1vw, 0.65rem);
-    --fs-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.85rem);
-    --fs-sm: clamp(0.875rem, 0.82rem + 0.2vw, 1rem);
-    --fs-md: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-    --fs-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.35rem);
-    --fs-xl: clamp(1.4rem, 1.25rem + 0.8vw, 1.8rem);
-    --fs-2xl: clamp(2rem, 1.6rem + 1.4vw, 2.4rem);
-
-    /* Font weights */
-    --fw-regular: 400;
-    --fw-medium: 500;
-    --fw-semibold: 600;
-    --fw-bold: 700;
-
-    /* Radius */
-    --radius-sm: 4px;
-    --radius-md: 6px;
-    --radius-lg: 8px;
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 
 * {
-
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 button,
 input,
 textarea,
 select {
-
-    font: inherit;
+  font: inherit;
 }
 
 body {
-    
-    font-family: var(--font-main);
+  font-family: var(--font-main);
 }
-.background{
-    background-color: #0b1220;
+.background {
+  background-color: #0b1220;
 }
-.container{
-    background-color: var(--color-bg);
-    width: 100%;
+.container {
+  background-color: var(--color-bg);
+  width: 100%;
 }
-
-
 
 /* The scrollbar track (background) */
 ::-webkit-scrollbar {
@@ -100,7 +94,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
 }
-
 
 button:disabled {
   opacity: 0.4;

@@ -132,7 +132,7 @@ export const alarmsApi = {
     }
   },
 
-  getHeatMeap: async (filters) => {
+  getHeatMap: async (filters) => {
     try {
       const response = await api.get(`${VITE_URL_APP}/alarms/stats/heatmap`, {
         params: {

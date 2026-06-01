@@ -9,6 +9,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import { useState } from "react";
+import Loading from "@features/ai/components/Loading";
+import { useGetAlarmsTrend } from "@features/dashboard/hooks/alarms.queries";
+
 import "@styles/features/dashboard/components/AlarmChart.css";
 
 const COLORS = {
@@ -18,6 +22,8 @@ const COLORS = {
   Warning: "#a855f7",
   Info: "#22c55e",
 };
+
+const CATEGORIES = ["Critical", "Major", "Minor", "Warning", "Info"];
 
 const GRANULARITY_OPTIONS = [
   { value: "monthly", label: "Monthly" },
@@ -33,51 +39,62 @@ const TITLES = {
   hourly: "Alarms in the last hour",
 };
 
-const formatBucketLabel = (timeBucket, granularity) => {
-  const normalizedBucket = timeBucket.replace("T", " ");
+const formatBucketLabel = (bucket, granularity) => {
+  const date = bucket.replace("T", " ");
 
-  if (granularity === "daily") {
-    return normalizedBucket.slice(11, 16);
+  switch (granularity) {
+    case "daily":
+    case "hourly":
+      return date.slice(11, 16); // HH:mm
+
+    default:
+      return date.slice(0, 10); // YYYY-MM-DD
   }
-
-  if (granularity === "hourly") {
-    return normalizedBucket.slice(11, 16);
-  }
-
-  return normalizedBucket.slice(0, 10);
 };
 
-const transformData = (raw, granularity) => {
-  const map = {};
+const transformData = (buckets = [], granularity) => {
+  const grouped = {};
 
-  raw.forEach(({ time_bucket, group_label, alarm_count }) => {
-    const bucketLabel = formatBucketLabel(time_bucket, granularity);
+  buckets.forEach(({ time_bucket, group_label, alarm_count }) => {
+    const label = formatBucketLabel(time_bucket, granularity);
 
-    if (!map[bucketLabel]) {
-      map[bucketLabel] = { date: bucketLabel };
-    }
-
-    map[bucketLabel][group_label] = alarm_count;
+    grouped[label] ??= { date: label };
+    grouped[label][group_label] = alarm_count;
   });
 
-  return Object.values(map);
+  return Object.values(grouped);
 };
 
-const AlarmChart = ({ data, granularity, onGranularityChange, isLoading }) => {
-  console.log("ALARM DATAA");
-  console.log(data);
+const buildTickInterval = (length, maxTicks = 8) => {
+  if (length <= maxTicks) return 0;
+  return Math.ceil(length / maxTicks) - 1;
+};
 
-  const chartData = transformData(data, granularity);
-  const categories = ["Critical", "Major", "Minor", "Warning", "Info"];
+export const AlarmChart = () => {
+  const [granularity, setGranularity] = useState("monthly");
+
+  const { data, isPending } = useGetAlarmsTrend({
+    granularity,
+    group_by: "severity",
+  });
+
+  if (isPending) return <Loading />;
+
+  const chartData = transformData(data?.buckets, granularity);
+
+  const tickInterval = buildTickInterval(chartData.length);
+
+  const angledLabels = granularity === "monthly" || granularity === "weekly";
 
   return (
     <div className="alarm-chart-wrapper">
       <div className="alarm-chart-header">
         <p className="alarm-chart-title">{TITLES[granularity]}</p>
+
         <select
           className="alarm-chart-select"
           value={granularity}
-          onChange={(e) => onGranularityChange(e.target.value)}
+          onChange={(e) => setGranularity(e.target.value)}
         >
           {GRANULARITY_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -88,43 +105,61 @@ const AlarmChart = ({ data, granularity, onGranularityChange, isLoading }) => {
       </div>
 
       <div className="alarm-chart-container">
-        {isLoading && (
-          <div className="alarm-chart-loading">
-            Loading chart...
-          </div>
-        )}
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
-            margin={{ top: 20, right: 10, left: 0, bottom: 28 }}
+            margin={{
+              top: 24,
+              right: 24,
+              left: 12,
+              bottom: angledLabels ? 70 : 40,
+            }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#333"
+            />
 
             <XAxis
               dataKey="date"
-              className="alarm-chart-axis alarm-chart-x-axis"
+              interval={tickInterval}
+              angle={angledLabels ? -35 : 0}
+              textAnchor={angledLabels ? "end" : "middle"}
+              tick={{ fontSize: 11 }}
+              height={angledLabels ? 60 : 35}
+              dy={10}
+              padding={{
+                left: 20,
+                right: 20,
+              }}
             />
 
-            <YAxis
-              width={60}
-              className="alarm-chart-axis"
-            />
+            <YAxis width={50} tick={{ fontSize: 11 }} tickCount={6} />
 
-            <Tooltip wrapperClassName="alarm-chart-tooltip" />
+            <Tooltip offset={15} />
 
             <Legend
-              height={64}
-              className="alarm-chart-legend"
+              height={50}
+              iconType="circle"
+              wrapperStyle={{
+                paddingTop: 12,
+              }}
             />
 
-            {categories.map((cat) => (
+            {CATEGORIES.map((category) => (
               <Line
-                key={cat}
+                key={category}
                 type="monotone"
-                dataKey={cat}
-                stroke={COLORS[cat]}
-                strokeWidth={2}
-                dot={{ r: 3 }}
+                dataKey={category}
+                stroke={COLORS[category]}
+                strokeWidth={2.5}
+                dot={{
+                  r: 4,
+                }}
+                activeDot={{
+                  r: 7,
+                }}
                 connectNulls
               />
             ))}
@@ -134,5 +169,3 @@ const AlarmChart = ({ data, granularity, onGranularityChange, isLoading }) => {
     </div>
   );
 };
-
-export default AlarmChart;

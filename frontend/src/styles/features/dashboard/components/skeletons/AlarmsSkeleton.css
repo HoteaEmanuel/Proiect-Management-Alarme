@@ -1,0 +1,26 @@
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+.sk {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    #1e2a40 50%,
+    var(--color-surface) 75%
+  );
+
+  background-color: red;
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 4px;
+}
+
+.sk-pill {
+  border-radius: 99px;
+}
