@@ -31,6 +31,9 @@ export const ChangePasswordModal = ({ onClose }) => {
         new_password: data.newPassword,
         old_password: data.oldPassword,
       });
+
+      toast.success('Successfully changed the password');
+      onClose();
     } catch (e) {
       console.log(e);
       toast.error("Failed to change password");
