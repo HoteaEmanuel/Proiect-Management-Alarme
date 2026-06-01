@@ -15,9 +15,9 @@ const UserProfile = () => {
     <div className="profile-wrapper">
       <div className="profile-card">
         <div className="profile-card__avatar-section">
-          {user.avatar_key ? (
+          {user?.avatar_key ? (
             <img
-              src={user.avatar_key}
+              src={user?.avatar_key}
               alt="avatar"
               className="profile-card__avatar"
             />
