@@ -21,31 +21,24 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
-    setError,
     reset,
     formState: { errors, isSubmitting },
   } = useForm();
 
   const [passwordVisible, setPasswordVisible] = useState(false);
-  // const [error, setError] = useState(undefined);
+  const [error, setError] = useState(undefined);
   const { setAuth } = useAuthStore();
   const onSubmit = async (data) => {
-
-    console.log("LOGIN DATA");
-    console.log(data);
+    setError(null);
     try {
       const response = await login(data);
-      console.log(response);
       setAuth(response.user, response.access_token);
       reset();
       navigate("/dashboard");
-    } catch (err) {
-      console.log("EROARE LOGIN");
-      console.log(err);
-      setError("server", {
-        message: err.message,
-      });
-      toast.error(err.message);
+    } catch (e) {
+      console.log(e);
+      setError("Invalid username or password");
+      toast.error("Failed to login - invalid username or password");
     }
   };
 
@@ -53,21 +46,16 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="login-form">
       <h1 className="login-form-title">Log in</h1>
-
-      {errors.server && (
-        <p className="login-form-error"> {errors.server.message}</p>
-      )}
+      {error && <p className="login-form-error">{error}</p>}
+      {errors && <p className="login-form-error"> {errors.message}</p>}
 
       <label htmlFor="username" className="login-form-label">
         Username
       </label>
 
-      {errors.username && (
-        <p className="login-form-error">{errors.username.message}</p>
-      )}
       <Input
         {...register("username", {
-          required: true,
+          required: "Username is required",
           // pattern: { value: /\S+@\S+/, message: "Invalid email" },
           validate: (username) => {
             if (username.length > 100 || username.length < 3)
@@ -88,13 +76,13 @@ const LoginForm = () => {
         <div>
           <Input
             {...register("password", {
-              required: true,
+              required: "Password is required",
               minLength: 7,
               maxLength: 100,
               validate: (value) => {
-                if (value.lenght > 100)
+                if (value.length > 100)
                   return "The password should have less than 100 characters";
-                return;
+                return true;
               },
             })}
             id={"password"}
@@ -115,7 +103,11 @@ const LoginForm = () => {
         )}
       </div>
 
-      <Button className="login-form-button" type="submit">
+      <Button
+        className="login-form-button"
+        type="submit"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? (
           <div className="flex gap-2 items-center">
             <RiLoader2Fill className="size-4 animate-spin" />
