@@ -18,7 +18,6 @@ function App() {
   useCheckAuth();
   return (
     <Routes>
-      
       <Route element={<UnauthRoute />}>
         <Route path="/login" element={<Login />} />
       </Route>
@@ -28,15 +27,14 @@ function App() {
         <Route element={<Rootlayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/statistics" element={<Statistics />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
         <Route element={<Chatlayout />}>
-          <Route path="/chat/:id" element={<ChatWindow/>}  />
+          <Route path="/chat/:id" element={<ChatWindow />} />
           <Route path="/chat/new" element={<NewChat />} />
           <Route path="/chats" element={<Chats />} />
         </Route>
       </Route>
-
-      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

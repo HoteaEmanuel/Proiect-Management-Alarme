@@ -10,6 +10,7 @@ import ChatSkeleton from "./Skeletons/ChatSkeleton";
 
 import "@styles/features/ai/components/ConversationContent.css";
 import RequestStatus from "./RequestStatus";
+import ConversationNotFound from "@pages/ai-chatbot/ConversationNotFound";
 
 const Skeleton = () => {
   return (
@@ -42,6 +43,8 @@ const ConversationContent = ({ chatEnd }) => {
   }, [data, chatEnd]);
 
   if (isPending) return <Skeleton />;
+
+  if (!data) return <ConversationNotFound />;
   console.log("MESSAGES");
   console.log(messages);
   return (

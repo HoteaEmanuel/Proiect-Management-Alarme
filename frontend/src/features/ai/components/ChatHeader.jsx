@@ -13,6 +13,8 @@ import Input from "@components/Input";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { RiLoader2Fill } from "react-icons/ri";
 import { toast } from "sonner";
+import ConversationNotFound from "@pages/ai-chatbot/ConversationNotFound";
+import NotFound from "@pages/NotFound";
 const ChatHeader = () => {
   const { conversation, setConversation } = useChatStore();
   console.log("SHOW THIS");
@@ -83,6 +85,8 @@ const ChatHeader = () => {
     });
     setEditingId(null);
   };
+
+  if (!conversation) return <ConversationNotFound/>;
 
   return (
     <header

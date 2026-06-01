@@ -9,6 +9,8 @@ import useChatStore from "@store/chatStore.js";
 import "@styles/pages/ai-chatbot/ChatWindow.css";
 import { usePageTitle } from "@hooks/usePageTitle";
 import ChatWindowFooter from "@features/ai/components/ChatWindowFooter";
+import NotFound from "@pages/NotFound";
+import ConversationNotFound from "./ConversationNotFound";
 
 const ChatWindow = () => {
   const { id } = useParams();
