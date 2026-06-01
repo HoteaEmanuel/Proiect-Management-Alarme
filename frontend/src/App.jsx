@@ -1,19 +1,20 @@
 import "./styles/App.css";
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound.jsx";
-import Login from "./pages/auth/Login.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+import Home from "@pages/Home";
+import NotFound from "@pages/NotFound.jsx";
+import Login from "@pages/auth/Login.jsx";
+import Dashboard from "@pages/Dashboard.jsx";
 import Rootlayout from "./layouts/Rootlayout.jsx";
 import UnauthRoute from "./components/UnauthRoute.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import useCheckAuth from "./hooks/useCheckAuth.js";
-import { Statistics } from "./pages/Statistics.jsx";
+import useCheckAuth from "@hooks/useCheckAuth.js";
+import { Statistics } from "@pages/Statistics.jsx";
 // import ChatWindow from "./pages/ai-chatbot/ChatWindow.jsx";
 import Chatlayout from "./layouts/Chatlayout.jsx";
-import NewChat from "./pages/ai-chatbot/NewChat.jsx";
-import Chats from "./pages/ai-chatbot/Chats.jsx";
-import ChatWindow from "./pages/ai-chatbot/ChatWindow";
+import NewChat from "@pages/ai-chatbot/NewChat.jsx";
+import Chats from "@pages/ai-chatbot/Chats.jsx";
+import ChatWindow from "@pages/ai-chatbot/ChatWindow";
+import UserProfile from "@pages/UserProfile";
 function App() {
   useCheckAuth();
   return (
@@ -25,6 +26,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<Rootlayout />}>
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="*" element={<NotFound />} />

@@ -7,7 +7,7 @@
   position: absolute;
   top: 100%;
   left: 50%;
-  z-index: 100;
+  z-index: 10;
 
   transform: translateX(-50%);
   margin-top: 0.25rem;
@@ -37,7 +37,7 @@
   position: absolute;
   top: -0.25rem;
   left: 50%;
-  z-index: 100;
+  z-index: 10;
 
   width: 0.5rem;
   height: 0.5rem;
@@ -48,6 +48,6 @@
 
 .tooltip-text {
   position: relative;
-  z-index: 101;
+  z-index: 10;
   font-size: var(--fs-xs);
 }

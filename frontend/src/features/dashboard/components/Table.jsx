@@ -249,25 +249,23 @@ export const AlarmsTable = () => {
     <div>
       <div className="dashboard-header">
         <h1 className="dashboard-title">Alarms</h1>
-        <Tooltip text={"Export as .xlsx "}>
-          <Button
-            className="dashboard-export-button"
-            onClick={handleExport}
-            disabled={isExporting}
-          >
-            {isExporting ? (
-              <>
-                <span>Exporting...</span>
-                <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
-              </>
-            ) : (
-              <>
-                <span>Export</span>
-                <CiExport className="dashboard-export-icon" />
-              </>
-            )}
-          </Button>
-        </Tooltip>
+        <Button
+          className="dashboard-export-button"
+          onClick={handleExport}
+          disabled={isExporting}
+        >
+          {isExporting ? (
+            <>
+              <span>Exporting...</span>
+              <RiLoader2Fill className="dashboard-export-icon dashboard-export-icon-loading" />
+            </>
+          ) : (
+            <>
+              <span>Export</span>
+              <CiExport className="dashboard-export-icon" />
+            </>
+          )}
+        </Button>
       </div>
       <div className="dashboard-filter-toggle-tooltip">
         <Tooltip text={hasFiltersOpen ? "Hide filters" : "Show filters"}>

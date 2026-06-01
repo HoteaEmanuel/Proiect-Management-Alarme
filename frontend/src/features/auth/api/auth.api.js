@@ -10,7 +10,7 @@ export const authApi = {
     console.log(response);
     return response.data;
   },
-   logout: async () => {
+  logout: async () => {
     const response = await api.post(`${VITE_URL_APP}/auth/logout`);
     return response.data;
   },
@@ -21,6 +21,13 @@ export const authApi = {
   },
   me: async () => {
     const response = await api.get(`${VITE_URL_APP}/auth/me`);
+    return response.data;
+  },
+  changePassword: async ({ old_password, new_password }) => {
+    const response = await api.put(`${VITE_URL_APP}/auth/change-password`, {
+      old_password,
+      new_password,
+    });
     return response.data;
   },
 };

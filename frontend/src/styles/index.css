@@ -8,8 +8,10 @@
   --color-surface-muted: #162033;
   --color-surface-raised: #1a2436;
   --color-border: #1f2a3d;
-  --color-bg-active: #081e49;
-
+  --color-bg-active: #07193c;
+  --color-bg-button-active:#222e47;
+  --color-bg-icon:#1d396f;
+  --color-bg-icon-active:#546fa8;
   --color-text: #e5e7eb;
   --color-text-muted: #94a3b8;
 

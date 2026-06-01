@@ -10,8 +10,9 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "@store/authStore";
 import { authApi } from "../api/auth.api";
 
-import "../../../styles/features/auth/components/LoginForm.css";
+import "@styles/features/auth/components/LoginForm.css";
 import { RiLoader2Fill } from "react-icons/ri";
+import { toast } from "sonner";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -29,6 +30,9 @@ const LoginForm = () => {
   // const [error, setError] = useState(undefined);
   const { setAuth } = useAuthStore();
   const onSubmit = async (data) => {
+
+    console.log("LOGIN DATA");
+    console.log(data);
     try {
       const response = await login(data);
       console.log(response);
@@ -36,9 +40,12 @@ const LoginForm = () => {
       reset();
       navigate("/dashboard");
     } catch (err) {
+      console.log("EROARE LOGIN");
+      console.log(err);
       setError("server", {
-        message: err.response.data.detail,
+        message: err.message,
       });
+      toast.error(err.message);
     }
   };
 
@@ -108,16 +115,16 @@ const LoginForm = () => {
         )}
       </div>
 
-      <button className="login-form-button">
+      <Button className="login-form-button" type="submit">
         {isSubmitting ? (
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <RiLoader2Fill className="size-4 animate-spin" />
             Submitting...
           </div>
         ) : (
           "Log in"
         )}
-      </button>
+      </Button>
     </form>
   );
 };

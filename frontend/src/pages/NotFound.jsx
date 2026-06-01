@@ -11,9 +11,9 @@ const NotFound = () => {
       <TbError404 size={200} />
       <h1 className="text-4xl -translate-y-10">Page Not found</h1>
 
-      <button onClick={() => navigate(-1)} className="button">
+      <Button onClick={() => navigate(-1)} className="button">
         Go back to safety
-      </button>
+      </Button>
     </div>
   );
 };
