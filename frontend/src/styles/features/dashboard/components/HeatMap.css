@@ -39,9 +39,8 @@
 }
 
 .heatmap-container {
-  height: 260px;
-  /* width: 100%; */
-  max-width: 60rem;
+  min-height: 300px;
+  width: 100%;
 }
 
 .heatmap-axis-top {
@@ -111,10 +110,10 @@
   background: linear-gradient(
     to right,
     #162033,
-    #0d3d52,
-    #0e6e8c,
+    #092c3b,
+    #0a4a5e,
     #09819f,
-    #0b9bb4,
-    #0e95d3
+    #0d8aa0,
+    #0e82b8
   );
 }

@@ -26,8 +26,6 @@ import AlarmDetailsModal from "./AlarmDetailsModal.jsx";
 import { toast } from "sonner";
 import { useGetAllAlarms } from "../hooks/alarms.queries.js";
 
-// --- outside component ---
-
 const useDebounceCallback = (fn, delay) => {
   const timerRef = useRef(null);
   return useMemo(
@@ -93,7 +91,6 @@ const columns = [
   },
 ];
 
-
 export const AlarmsTable = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filteredAlarms, setFilteredAlarms] = useState(null);
@@ -155,6 +152,15 @@ export const AlarmsTable = () => {
   }, [filters]);
 
   const handleFilterChange = (key, value) => {
+    if (value.trim().length === 0) {
+      // eliminate the empty search param
+      setSearchParams((prev) => {
+        const params = new URLSearchParams(prev);
+        params.delete(key);
+        return params;
+      });
+      return;
+    }
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set(key, value);
