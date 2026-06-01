@@ -13,7 +13,7 @@ def authenticate_user(username: str, password: str, db: Session) -> Users | None
     user = db.query(Users).filter(Users.username == username).first()
     
     if not user or not bcrypt_context.verify(password, user.hashed_password):
-        return UnauthorizedError("Invalid username or password")
+        raise UnauthorizedError("Invalid username or password")
     
     return user
 
