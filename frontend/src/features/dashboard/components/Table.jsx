@@ -10,7 +10,7 @@ import { formatDate } from "../../../utils/formatDate.js";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import "@styles/features/dashboard/components/Table.css";
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { alarmsApi } from "../api/alarms.api.js";
 import {
   AlarmSeverity,
@@ -27,15 +27,22 @@ import { toast } from "sonner";
 import { useGetAllAlarms } from "../hooks/alarms.queries.js";
 
 const useDebounceCallback = (fn, delay) => {
-  const timerRef = useRef(null);
-  return useMemo(
-    () =>
-      (...args) => {
-        clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => fn(...args), delay);
-      },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+  const timerRef = useRef();
+  const fnRef = useRef(fn);
+
+  useEffect(() => {
+    fnRef.current = fn;
+  }, [fn]);
+  
+  return useCallback(
+    (...args) => {
+      clearTimeout(timerRef.current);
+
+      timerRef.current = setTimeout(() => {
+        fnRef.current(...args);
+      }, delay);
+    },
+    [delay],
   );
 };
 
