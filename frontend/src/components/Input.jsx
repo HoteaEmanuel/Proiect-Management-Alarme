@@ -6,7 +6,7 @@ const Input = ({
   id,
   type,
   defaultValue,
-  maxSize,
+  maxSize = 100,
   handleChange,
   handleKeyDown,
   handleBlur,

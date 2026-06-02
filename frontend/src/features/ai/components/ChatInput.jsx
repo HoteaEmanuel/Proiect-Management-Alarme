@@ -152,6 +152,7 @@ const ChatInput = ({ placeholder, chatEnd }) => {
         blocks: response.data.blocks,
         smart_replies: response.data.smart_replies,
         is_stopped: response.data?.is_stopped,
+        files: response.data?.files,
       });
     } catch (e) {
       if (axios.Cancel(e) || e?.name === "CanceledError") return;
