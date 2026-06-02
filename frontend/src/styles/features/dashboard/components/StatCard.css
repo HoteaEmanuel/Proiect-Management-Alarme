@@ -61,7 +61,8 @@
 .stat-card-unit {
 
     color: #a5b4fc;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-md);
+    text-transform: uppercase;
     line-height: 1.2;
 }
 

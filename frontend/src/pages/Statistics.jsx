@@ -214,7 +214,7 @@ export const Statistics = () => {
       ) : (
         <>
           <div className="statistics-kpi-grid">
-            <StatCard label={"Total alarms"} value={statistics.General.Total} />
+            <StatCard label={"Total alarms"} value={statistics.General.Total}  />
 
             <StatCard
               label={"Active alarms"}
@@ -225,13 +225,13 @@ export const Statistics = () => {
             <StatCard
               label={"Average Resolution Time"}
               value={statistics.TimeKPI.Avg_Resolution_Time_Minutes}
-              unit={"minutes"}
+              unit={true}
             />
 
             <StatCard
               label={"Average Time Between Occurrences"}
               value={statistics.TimeKPI.Avg_Time_Between_Occurrences_Minutes}
-              unit={"minutes"}
+              unit={true}
             />
           </div>
 
