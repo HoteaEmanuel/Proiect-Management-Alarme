@@ -23,7 +23,7 @@ const Header = ({ onToggle, isSideBarOpen }) => {
         src="/images/logo-alb-2.png"
         alt="logo-image"
         id="logo-image"
-        className="object-cover w-fit h-6  brightness-85 hover:brightness-90 cursor-pointer"
+        className="hidden lg:block object-cover w-fit h-6 brightness-85 hover:brightness-90 cursor-pointer"
         onClick={() => navigate("/dashboard")}
       />
       <Button
