@@ -20,7 +20,22 @@ class CloudinaryFileAttachment(BaseModel):
 
 class ConversationFileList(BaseModel):
     user_files: list[CloudinaryFileAttachment]
-    assistant_files: list[CloudinaryFileAttachment]   
+    assistant_files: list[CloudinaryFileAttachment]
+
+class LibraryFile(BaseModel):
+    filename: str
+    url: str
+    public_id: str
+    resource_type: str
+    file_format: str
+    file_size: int
+    role: str | None = None
+    created_at: datetime
+    conversation_id: str
+    conversation_title: str | None = None
+
+class LibraryFileList(BaseModel):
+    files: list[LibraryFile]
 
 class ExcelStructure(BaseModel):
     filename: str

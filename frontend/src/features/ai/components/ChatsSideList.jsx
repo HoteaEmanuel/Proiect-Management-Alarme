@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import {
   useGetUserConversations,
-  useRenameConversation,
 } from "../api/chatBot.api";
 import OptionsModal from "./OptionsModal";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { SlOptions } from "react-icons/sl";
 import Input from "@components/Input";
 import "@styles/features/ai/components/ConversationSideList.css";
-import { toast } from "sonner";
-import useChatStore from "@store/chatStore";
+
 import { ChatSideListItem } from "./ChatSideListItem";
 
 const ChatsSideList = ({ onNavigate }) => {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const { data: conversations } = useGetUserConversations();
  
@@ -49,6 +46,7 @@ const ChatsSideList = ({ onNavigate }) => {
             setEditValue={setEditValue}
             setEditingId={setEditingId}
             onOpenOptions={openOptionsModal}
+            onNavigate={onNavigate}
           />
         ))}
       </div>

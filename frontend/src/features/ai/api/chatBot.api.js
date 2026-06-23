@@ -195,6 +195,18 @@ export const useGetConversationFiles = (conversationId, options = {}) => {
   });
 };
 
+export const useGetLibraryFiles = (filters = {}) => {
+  return useQuery({
+    queryFn: async () => {
+      const response = await api.get(`${VITE_URL_APP}/api/files`, {
+        params: filters,
+      });
+      return response.data.files;
+    },
+    queryKey: ["libraryFiles", filters],
+  });
+};
+
 export const useReadChatResponse = () => {
   return useMutation({
     mutationFn: async ({ text }) => {

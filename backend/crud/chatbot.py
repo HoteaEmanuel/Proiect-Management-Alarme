@@ -8,9 +8,10 @@ import fitz
 import json
 import requests
 import logging
+from datetime import datetime
 
 from models import MessageModel, ConversationModel, ConversationFileModel
-from schemas import MessageCreate, CloudinaryFileAttachment
+from schemas import MessageCreate, CloudinaryFileAttachment, LibraryFile
 from integrations.cloudinary import get_signed_url, delete_files_from_cloudinary
 from core import EntityNotFoundError, FileProcessingError, EmptyContentError, InvalidFilenameError, UnsupportedFileFormatError
 from core import BaseAppException, DatabaseOperationError, LLMQueryExecutionError
@@ -202,6 +203,54 @@ def get_file_history(db: Session, user_id: str, conversation_id: str) -> list[Cl
             role=role
         )
         for f, role in files
+    ]
+
+# Retrieves all files generated/uploaded across every conversation belonging to a user, with optional filters
+def get_library_files(
+    db: Session,
+    user_id: str,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    file_format: str | None = None,
+    conversation_id: str | None = None,
+) -> list[LibraryFile]:
+    stmt = (
+        select(ConversationFileModel, MessageModel.role, ConversationModel.conversation_id, ConversationModel.conversation_title)
+        .join(MessageModel, MessageModel.id == ConversationFileModel.message_id)
+        .join(ConversationModel, ConversationModel.conversation_id == MessageModel.conversation_id)
+        .where(
+            ConversationModel.user_id == user_id,
+            ConversationFileModel.is_deleted == False
+        )
+    )
+
+    if date_from is not None:
+        stmt = stmt.where(ConversationFileModel.created_at >= date_from)
+    if date_to is not None:
+        stmt = stmt.where(ConversationFileModel.created_at <= date_to)
+    if file_format is not None:
+        stmt = stmt.where(ConversationFileModel.file_format == file_format)
+    if conversation_id is not None:
+        stmt = stmt.where(ConversationModel.conversation_id == conversation_id)
+
+    stmt = stmt.order_by(ConversationFileModel.created_at.desc())
+
+    rows = db.execute(stmt).all()
+
+    return [
+        LibraryFile(
+            filename=f.filename,
+            url=f.file_url,
+            public_id=f.public_id or "",
+            resource_type=f.resource_type or "",
+            file_format=f.file_format or "",
+            file_size=f.file_size or 0,
+            role=role,
+            created_at=f.created_at,
+            conversation_id=conv_id,
+            conversation_title=conv_title
+        )
+        for f, role, conv_id, conv_title in rows
     ]
 
 # Fetches a specific conversation record for a given user

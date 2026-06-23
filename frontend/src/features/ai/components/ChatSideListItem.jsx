@@ -13,6 +13,7 @@ export const ChatSideListItem = ({
   setEditValue,
   setEditingId,
   onOpenOptions,
+  onNavigate,
 }) => {
   const [hovered, setHovered] = useState(false);
 
@@ -21,6 +22,7 @@ export const ChatSideListItem = ({
   const navigate = useNavigate();
   const handleNavigateToConversation = (conversation) => {
     navigate(`/chat/${conversation.conversation_id}`);
+    onNavigate?.();
   };
 
   const { mutateAsync: renameConversation } = useRenameConversation();

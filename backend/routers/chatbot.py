@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 
 from database import get_db, redis_client
-from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment 
-from schemas import UpdateTitleRequest, CloudinaryFileAttachment, ConversationResponse, ConversationFileList
+from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment
+from schemas import UpdateTitleRequest, CloudinaryFileAttachment, ConversationResponse, ConversationFileList, LibraryFileList
 from integrations.chatbot import user_chat_request, parse_raw_files
-from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, get_file_history, get_conversation_data
+from crud import get_user_conversations, get_full_conversation, delete_conversation, update_conversation_title, get_file_history, get_conversation_data, get_library_files
 from auth_utils import get_current_user
 
 router = APIRouter(
@@ -65,6 +66,27 @@ def get_conversation_files(conversation_id: str, user_id: str = Depends(get_curr
     return ConversationFileList(
         user_files=[f for f in all_files if f.role == "user"],
         assistant_files=[f for f in all_files if f.role == "assistant"]
+    )
+
+# Retrieves all files generated/uploaded across every conversation belonging to the current user
+@router.get("/files", response_model=LibraryFileList)
+def get_files_library(
+    user_id: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    file_format: str | None = None,
+    conversation_id: str | None = None,
+):
+    return LibraryFileList(
+        files=get_library_files(
+            db=db,
+            user_id=user_id["id"],
+            date_from=date_from,
+            date_to=date_to,
+            file_format=file_format,
+            conversation_id=conversation_id,
+        )
     )
 
 @router.delete("/conversations/{conversation_id}", status_code=204)

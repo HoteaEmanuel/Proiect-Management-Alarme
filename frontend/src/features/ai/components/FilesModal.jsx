@@ -2,38 +2,15 @@ import React, { useRef, useState } from "react";
 import { useGetConversationFiles } from "../api/chatBot.api";
 import useChatStore from "@store/chatStore";
 import { RiLoader2Fill } from "react-icons/ri";
-import { FaRegFileExcel, FaFilePdf, FaFileCsv, FaFile } from "react-icons/fa";
 import { TbFilesOff } from "react-icons/tb";
 import { CiCircleList, CiCircleRemove, CiFileOff } from "react-icons/ci";
 import Button from "@components/Button";
 import FilePreview from "./FilePreview";
+import FileTypeIcon from "@components/FileTypeIcon";
+import { getFileTypeVariant } from "../../../utils/fileType";
 
 import "@styles/features/ai/components/FilesModal.css";
 import { useFilePreview } from "@store/filePreviewStore";
-
-const FileIcon = ({ type }) => {
-  console.log("TYPE");
-  console.log(type);
-  if (type.toLowerCase() === "pdf") return <FaFilePdf />;
-  if (type.toLowerCase() === "xlsx") return <FaRegFileExcel />;
-  if (type.toLowerCase() === "csv") return <FaFileCsv />;
-  return <FaFile />;
-};
-
-const fileTypeColor = (fileType) => {
-  console.log(fileType);
-  const extension = fileType.toUpperCase();
-  switch (extension) {
-    case "PDF":
-      return "files-modal-type-pdf";
-    case "XLSX":
-      return "files-modal-type-xlsx";
-    case "CSV":
-      return "files-modal-type-csv";
-    default:
-      return "files-modal-type-default";
-  }
-};
 
 const FilesModal = ({ close }) => {
   console.log("FILES MODAL Active");
@@ -92,9 +69,9 @@ const FilesModal = ({ close }) => {
                     onClick={() => setFile(file)}
                   >
                     <div
-                      className={`files-modal-type ${fileTypeColor(file.filename.split(".").pop())}`}
+                      className={`files-modal-type files-modal-type-${getFileTypeVariant(file.filename.split(".").pop())}`}
                     >
-                      <FileIcon type={file.filename.split(".").pop()} />
+                      <FileTypeIcon type={file.filename.split(".").pop()} />
                     </div>
 
                     <div className="files-modal-file-content">
@@ -122,9 +99,9 @@ const FilesModal = ({ close }) => {
                     onClick={() => setFile(file)}
                   >
                     <div
-                      className={`files-modal-type ${fileTypeColor(file.filename.split(".").pop())}`}
+                      className={`files-modal-type files-modal-type-${getFileTypeVariant(file.filename.split(".").pop())}`}
                     >
-                      <FileIcon type={file.filename.split(".").pop()} />
+                      <FileTypeIcon type={file.filename.split(".").pop()} />
                     </div>
 
                     <div className="files-modal-file-content">
