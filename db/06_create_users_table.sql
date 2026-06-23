@@ -4,5 +4,6 @@ CREATE TABLE Users (
     username NVARCHAR(50) UNIQUE NOT NULL,
     first_name NVARCHAR(50),
     last_name NVARCHAR(50),
-    hashed_password NVARCHAR(255) NOT NULL
+    hashed_password NVARCHAR(255) NOT NULL,
+    avatar_url NVARCHAR(255)
 );

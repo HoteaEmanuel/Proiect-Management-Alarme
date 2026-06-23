@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 
 from models import Users
 from schemas import CreateUserRequest, ChangePasswordRequest
-from core import UnauthorizedError, DuplicateResourceError
+from core import UnauthorizedError, DuplicateResourceError, EntityNotFoundError
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -55,4 +55,11 @@ def change_user_password(user_id: str, request: ChangePasswordRequest, db: Sessi
         raise UnauthorizedError("Current password is incorrect.")
     user.hashed_password = bcrypt_context.hash(request.new_password)
     db.commit()
-    
+
+# Fetches a user by id, raising EntityNotFoundError if not found
+def get_user_by_id(user_id: str, db: Session) -> Users:
+    user = db.query(Users).filter(Users.id == user_id).first()
+    if not user:
+        raise EntityNotFoundError("User", user_id)
+    return user
+

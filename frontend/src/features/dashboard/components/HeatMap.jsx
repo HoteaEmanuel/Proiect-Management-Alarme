@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { ResponsiveHeatMap } from "@nivo/heatmap";
 import { formatDate } from "@lib/formatDate";
 import { alarmsApi } from "../api/alarms.api";
@@ -29,7 +29,6 @@ const transformData = (rawData) =>
   }));
 
 export const HeatMap = () => {
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 

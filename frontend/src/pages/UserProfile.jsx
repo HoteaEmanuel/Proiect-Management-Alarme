@@ -41,7 +41,7 @@ const UserProfile = () => {
           </Button>
           <Button className="profile-card__action-btn profile-card__action-btn--danger">
             <MdLogout className="size-8" />
-            Sign out
+            Logout
           </Button>
         </div>
       </div>

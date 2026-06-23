@@ -7,7 +7,7 @@ from starlette import status
 
 from database import get_db
 from schemas import CreateUserRequest, LoginRequest, UserResponse, TokenResponse, ChangePasswordRequest
-from crud import create_user, change_user_password
+from crud import create_user, change_user_password, get_user_by_id
 from auth_utils import get_current_user, process_user_login, process_token_refresh,blacklist_token
 from core import UnauthorizedError
 
@@ -65,18 +65,20 @@ async def read_current_user(user: user_dependency) -> dict:
 @router.post("/refresh")
 async def refresh_token(
     response: Response,
+    db: db_dependency,
     refresh_token: Annotated[str | None, Cookie()] = None
 ):
     if not refresh_token:
         raise UnauthorizedError("No refresh token provided in cookies.")
 
-    new_access_token, user_id, username = process_token_refresh(refresh_token)
+    new_access_token, user_id, _ = process_token_refresh(refresh_token)
 
-    user_response = UserResponse(user_id=user_id, username=username)
+    user = get_user_by_id(user_id, db)
+    user_response = UserResponse(user_id=user.id, username=user.username, email=user.email)
 
     return {
         "accessToken": new_access_token,
-        "user": user_response
+        "user": jsonable_encoder(user_response)
     }
 
 

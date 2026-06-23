@@ -3,13 +3,9 @@ import useAuthStore from "@store/authStore.js";
 import { authApi } from "../features/auth/api/auth.api";
 
 const useCheckAuth = () => {
-  const { setUser, clearAuth } = useAuthStore();
+  const { clearAuth } = useAuthStore();
   useEffect(() => {
-    try {
-      authApi.me();
-    } catch (err) {
-      clearAuth();
-    }
+    authApi.me().catch(() => clearAuth());
   }, []);
 };
 

@@ -1,16 +1,17 @@
 import { formatDuration } from "@features/dashboard/lib/formatDuration";
+import useCountUp from "@hooks/useCountUp";
 import "@styles/features/dashboard/components/StatCard.css";
 
 const StatCard = ({ label, value, unit = false, active }) => {
-  const formatted = unit ? formatDuration(value) : null;
+  const animatedValue = useCountUp(value);
+  const formatted = unit ? formatDuration(Math.round(animatedValue)) : null;
 
-  // Funcție ajutătoare care separă cifrele de litere și colorează doar literele
   const renderStyledDuration = (durationStr) => {
     if (!durationStr) return null;
 
     return durationStr.split(" ").map((part, index, arr) => {
-      const number = part.replace(/[a-z]/g, ""); // Extrage doar cifrele (ex: "5")
-      const unitLetter = part.replace(/[0-9]/g, ""); // Extrage doar litera (ex: "h")
+      const number = part.replace(/[a-z]/g, ""); // Extrage doar cifrele
+      const unitLetter = part.replace(/[0-9]/g, ""); // Extrage doar litera
 
       return (
         <span key={index} className="stat-card-duration-part">
@@ -18,7 +19,7 @@ const StatCard = ({ label, value, unit = false, active }) => {
           <span className="stat-card-duration-unit stat-card-unit" >
             {unitLetter}
           </span>
-          {/* Adăugăm spațiul înapoi între grupuri, mai puțin după ultimul */}
+    
           {index < arr.length - 1 ? " " : ""}
         </span>
       );
@@ -39,13 +40,12 @@ const StatCard = ({ label, value, unit = false, active }) => {
       </div>
 
       <div className="stat-card-value-row">
-        {/* Dacă unit e true, afișăm durata stilizată. Dacă nu, valoarea simplă */}
         {unit ? (
           <span className="stat-card-value">
             {renderStyledDuration(formatted)}
           </span>
         ) : (
-          <span className="stat-card-value">{value}</span>
+          <span className="stat-card-value">{Math.round(animatedValue)}</span>
         )}
       </div>
     </div>

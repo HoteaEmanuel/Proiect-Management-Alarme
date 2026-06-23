@@ -12,12 +12,12 @@ const User = ({ showName = false }) => {
   const initial = user.username?.[0].toUpperCase();
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2">  
       {showName && <span>{user.username}</span>}
       <Button onClick={() => setIsOpen((prev) => !prev)}>
         {user?.avatar_key ? (
           <img
-            src={user?.avatar_key}
+            src={user.avatar_key}
             alt="avatar"
             className="user-modal__avatar"
           />

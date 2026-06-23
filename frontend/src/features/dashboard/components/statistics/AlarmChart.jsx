@@ -48,7 +48,7 @@ const formatBucketLabel = (bucket, granularity) => {
       return date.slice(11, 16); // HH:mm
 
     default:
-      return date.slice(0, 10); // YYYY-MM-DD
+      return date.slice(0, 10); // 
   }
 };
 
