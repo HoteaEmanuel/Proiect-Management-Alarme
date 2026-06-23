@@ -42,12 +42,10 @@ const LoginForm = () => {
     }
   };
 
-  console.log(errors);
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="login-form">
       <h1 className="login-form-title">Log in</h1>
       {error && <p className="login-form-error">{error}</p>}
-      {errors && <p className="login-form-error"> {errors.message}</p>}
 
       <label htmlFor="username" className="login-form-label">
         Username
@@ -66,7 +64,12 @@ const LoginForm = () => {
         })}
         placeholder={"johndoe"}
         id={"username"}
+        autoFocus
+        invalid={!!errors.username}
       />
+      {errors.username && (
+        <p className="login-form-error">{errors.username.message}</p>
+      )}
 
       <label htmlFor="password" className="login-form-label">
         Password
@@ -87,21 +90,23 @@ const LoginForm = () => {
             })}
             id={"password"}
             type={passwordVisible ? "text" : "password"}
+            invalid={!!errors.password}
           />
         </div>
 
-        {passwordVisible ? (
-          <FaEyeSlash
-            className="login-form-password-icon"
-            onClick={() => setPasswordVisible(passwordVisible ? false : true)}
-          />
-        ) : (
-          <FaEye
-            className="login-form-password-icon"
-            onClick={() => setPasswordVisible(passwordVisible ? false : true)}
-          />
-        )}
+        <button
+          type="button"
+          className="login-form-password-icon"
+          aria-label={passwordVisible ? "Hide password" : "Show password"}
+          aria-pressed={passwordVisible}
+          onClick={() => setPasswordVisible(!passwordVisible)}
+        >
+          {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+        </button>
       </div>
+      {errors.password && (
+        <p className="login-form-error">{errors.password.message}</p>
+      )}
 
       <Button
         className="login-form-button"

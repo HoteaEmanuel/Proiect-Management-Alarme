@@ -7,8 +7,19 @@
   color: var(--color-text);
 
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  
+  gap: 1.5rem;
+
   padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.login-page-brand {
+  line-height: 0;
+}
+
+.login-page-logo {
+  height: 2rem;
+  width: auto;
 }

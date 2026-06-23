@@ -10,6 +10,7 @@ const Input = ({
   handleChange,
   handleKeyDown,
   handleBlur,
+  invalid,
   ...rest
 }) => {
   return (
@@ -22,7 +23,8 @@ const Input = ({
       onKeyDown={handleKeyDown}
       onChange={handleChange}
       onBlur={handleBlur}
-      className="input"
+      aria-invalid={invalid || undefined}
+      className={invalid ? "input input-invalid" : "input"}
       {...rest}
     ></input>
   );

@@ -23,6 +23,11 @@
         border-color: var(--color-accent);
     }
 
+    &.input-invalid {
+
+        border-color: var(--color-danger);
+    }
+
     :disabled {
 
         cursor: not-allowed;

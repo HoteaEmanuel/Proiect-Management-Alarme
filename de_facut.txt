@@ -1,8 +1,0 @@
--mai multe tipuri de erori, avem AppError, dar ne trebuie:
-    APIError (pentru ce tine de api calls)
-    AuthError (pentru ce tine de autentificare)
-    DatabaseError (pentru ce tine de baza de date)
-
--de generat mai multe alarme
-
--de pus o limita pe export

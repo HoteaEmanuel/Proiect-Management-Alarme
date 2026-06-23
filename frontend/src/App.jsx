@@ -1,13 +1,12 @@
 import "./styles/App.css";
 import { Route, Routes } from "react-router-dom";
-import Home from "@pages/Home";
+import Landing from "@pages/Landing";
 import NotFound from "@pages/NotFound.jsx";
 import Login from "@pages/auth/Login.jsx";
 import Dashboard from "@pages/Dashboard.jsx";
 import Rootlayout from "./layouts/Rootlayout.jsx";
 import UnauthRoute from "./components/UnauthRoute.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import useCheckAuth from "@hooks/useCheckAuth.js";
 import { Statistics } from "@pages/Statistics.jsx";
 // import ChatWindow from "./pages/ai-chatbot/ChatWindow.jsx";
 import Chatlayout from "./layouts/Chatlayout.jsx";
@@ -16,14 +15,13 @@ import Chats from "@pages/ai-chatbot/Chats.jsx";
 import ChatWindow from "@pages/ai-chatbot/ChatWindow";
 import UserProfile from "@pages/UserProfile";
 function App() {
-  useCheckAuth();
   return (
     <Routes>
       <Route element={<UnauthRoute />}>
         <Route path="/login" element={<Login />} />
       </Route>
 
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Landing />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<Rootlayout />}>
           <Route path="/profile" element={<UserProfile />} />
