@@ -175,6 +175,14 @@ export const Statistics = () => {
       value,
     }));
 
+  const topRecurringAlarms = Object.entries(statistics?.AlertKey ?? {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([name, value]) => ({
+      name,
+      value,
+    }));
+
   return (
     // <div className="app">
     <div className="statistics-page" ref={containerRef}>
@@ -343,6 +351,42 @@ export const Statistics = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="statistics-section">
+            <h2 className="statistics-section-title">
+              Most frequent alarms (recurring)
+            </h2>
+
+            <div className="statistics-chart-card statistics-large-chart">
+              <div className="statistics-large-chart-body">
+                <ResponsiveContainer width="92%" height={300}>
+                  <BarChart
+                    data={topRecurringAlarms}
+                    layout="vertical"
+                    margin={{
+                      top: 8,
+                      right: 40,
+                      bottom: 8,
+                      left: 0,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis type="category" dataKey="name" width={120} />
+                    <Tooltip formatter={(v) => `${v} occurrences`} />
+                    <Bar
+                      dataKey="value"
+                      fill="#378ADD"
+                      radius={[0, 4, 4, 0]}
+                      onClick={(entry) => {
+                        handleChartClick("AlertKey", entry.name);
+                      }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </section>

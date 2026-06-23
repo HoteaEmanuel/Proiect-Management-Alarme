@@ -253,7 +253,7 @@ export const AlarmsTable = () => {
 
   console.log("RENDERED");
   return (
-    <div>
+    <div className="dashboard-table-wrapper">
       <div className="dashboard-header">
         <h1 className="dashboard-title">Alarms</h1>
         <Button

@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { MdDashboard } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
 import { IoIosStats } from "react-icons/io";
-import { IoIosChatboxes } from "react-icons/io";
-import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -110,14 +108,14 @@ const Side = ({ isOpen, onNavigate }) =>
               Cancel
             </button>
 
-            <button
+            <Button
               type="button"
               className="logout-modal-confirm"
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
               {isLoggingOut ? "Logging out..." : "Log out"}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

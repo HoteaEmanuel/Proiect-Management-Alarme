@@ -9,7 +9,7 @@ import dashboardImg from "../assets/landing-screenshots/dashboard.png";
 import statisticsImg from "../assets/landing-screenshots/statistics.png";
 import chatWindowImg from "../assets/landing-screenshots/chat-window.png";
 
-const Reveal = ({ as: Tag = "div", className = "", children }) => {
+const Reveal = ({className = "", children }) => {
   const ref = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
