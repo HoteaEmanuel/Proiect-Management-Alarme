@@ -167,11 +167,6 @@
     color: var(--color-text-muted);
 }
 
-.library-group {
-
-    margin-bottom: 1.5rem;
-}
-
 .library-group-title {
 
     margin: 0 0 0.6rem;
@@ -186,7 +181,6 @@
 
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
 
     list-style: none;
 }

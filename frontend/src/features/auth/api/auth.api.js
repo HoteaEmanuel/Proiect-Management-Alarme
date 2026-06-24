@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+
 import { api } from "../../../lib/axios";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const authApi = {

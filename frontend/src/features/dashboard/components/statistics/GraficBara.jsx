@@ -9,7 +9,7 @@ import {
   Bar,
 } from "recharts";
 
-const GraficBara = ({ data, direction, vertical, onBarClick }) => {
+const GraficBara = ({ data, direction, onBarClick }) => {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart

@@ -8,7 +8,7 @@ import Rootlayout from "./layouts/Rootlayout.jsx";
 import UnauthRoute from "./components/UnauthRoute.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { Statistics } from "@pages/Statistics.jsx";
-import Library from "@pages/Library.jsx";
+import Library from "@pages/ai-chatbot/Library.jsx";
 // import ChatWindow from "./pages/ai-chatbot/ChatWindow.jsx";
 import Chatlayout from "./layouts/Chatlayout.jsx";
 import NewChat from "@pages/ai-chatbot/NewChat.jsx";
