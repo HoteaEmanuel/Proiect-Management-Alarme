@@ -1,6 +1,6 @@
-# Local-only Claude Code config/context — never pushed
 /CLAUDE.md
 /claude/
 /context/
 /prototypes/*
 /.claude/*
+docker-compose.yml
