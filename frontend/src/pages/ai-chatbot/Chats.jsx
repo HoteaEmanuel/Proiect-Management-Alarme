@@ -1,6 +1,5 @@
 import React, { useState, Suspense } from "react";
 import Input from "../../components/Input.jsx";
-import LoadingCircle from "../../components/LoadingCircle.jsx";
 
 import { CiSearch } from "react-icons/ci";
 
@@ -11,6 +10,7 @@ import ChatsListSkeleton from "@features/ai/components/Skeletons/ChatsListSkelet
 import { usePageTitle } from "@hooks/usePageTitle.js";
 import useDebounce from "@hooks/useDebounce.js";
 
+
 const Chats = () => {
   usePageTitle("Chats");
   const [search, setSearch] = useState("");
@@ -19,11 +19,6 @@ const Chats = () => {
   return (
     <div className="chats-page">
       <div className="chats-container">
-        {/* {chats.conversations?.length === 0 ? (
-          <p className="chats-empty-message"> No chats yet </p>
-        ) : (
-          <h1 className="chats-title">Search your chats</h1>
-        )} */}
         <h1 className="chats-title">Search your chats</h1>
         <div className="chats-search-wrapper">
           <Input

@@ -25,8 +25,6 @@ const subtitles = [
 // construiesc un mesaj de greeting random bazat pe momentul zilei
 export const greeting = () => {
   const time = timeOfDay();
-  console.log("GREET BASED ON TIME");
-  console.log(greetings[time]);
   return {
     greeting:
       greetings[time][Math.floor(Math.random() * greetings[time].length)],

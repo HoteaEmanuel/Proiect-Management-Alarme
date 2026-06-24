@@ -22,7 +22,6 @@ const MAX_ALLOWED_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const ChatInput = ({ placeholder, chatEnd }) => {
-  console.log("CHAT INPUT RENDERED");
   const input = useRef();
   const fileInput = useRef();
   const [isEmpty, setIsEmpty] = useState(true);

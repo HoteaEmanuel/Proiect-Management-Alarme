@@ -41,15 +41,10 @@ api.interceptors.response.use(
         const refreshResponse = await refreshClient.post("/auth/refresh");
         const newToken = refreshResponse.data.accessToken;
         const user = refreshResponse.data.user;
-        console.log("REFRESH OK : ", newToken, user);
         useAuthStore.getState().setAuth(user, newToken);
-        console.log("AICEA");
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        console.log("AICI S A AJUNS");
         return api(originalRequest);
       } catch (err) {
-        // Refresh failed => log the user out
-        // Refresh token expired or other problem
         toast.error(err?.message || "Eroare la intercept");
         useAuthStore.getState().clearAuth();
       }
