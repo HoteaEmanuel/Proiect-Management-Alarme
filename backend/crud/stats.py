@@ -189,14 +189,14 @@ def get_alarm_heatmap(db: Session, filters: HeatmapFilters) -> HeatmapResponse:
             if dt:
                 key = (dt.isoweekday(), dt.hour)
                 counts[key] += 1
-                
-        return HeatmapResponse(
-            data=[
-                HeatmapBucket(
-                    day_of_week=day,
-                    hour_of_day=hour,
-                    alarm_count=count
-                )
-                for (day, hour), count in counts.items()
-            ]
-        )
+
+    return HeatmapResponse(
+        data=[
+            HeatmapBucket(
+                day_of_week=day,
+                hour_of_day=hour,
+                alarm_count=count
+            )
+            for (day, hour), count in counts.items()
+        ]
+    )
