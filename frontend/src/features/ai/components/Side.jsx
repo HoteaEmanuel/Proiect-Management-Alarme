@@ -26,13 +26,6 @@ import ChatsListSkeleton from "./Skeletons/ChatsListSkeleton";
 const Side = ({ isOpen, onNavigate }) =>
 {
   const { pathname } = useLocation();
-  const { id } = useParams();
-  console.log("ID CONV");
-  console.log(id);
-  console.log("IS OPEN?");
-  console.log(isOpen);
-  console.log("NAVIGATIN");
-  console.log(onNavigate);
 
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");

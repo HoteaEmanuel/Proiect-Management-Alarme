@@ -156,6 +156,8 @@ const ChatInput = ({ placeholder, chatEnd }) => {
       });
     } catch (e) {
       if (axios.Cancel(e) || e?.name === "CanceledError") return;
+      deleteRequest(conversation?.conversation_id);
+      if (e?.response?.status === 429) return;
       toast.error(e.message);
     }
 

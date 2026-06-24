@@ -18,9 +18,6 @@ const FileList = ({ files, setFiles }) => {
     e.stopPropagation();
     setFiles((prev) => prev.filter((f) => f.file.name !== file.file.name));
   };
-
-  console.log("FILES HERE");
-  console.log(files);
   if (!files || files?.length == 0) return;
 
   return (

@@ -141,7 +141,6 @@ export const AlarmsTable = () => {
         a.href = url;
         a.download = "export.xlsx";
         a.click();
-        console.log(url);
       });
     } catch (e) {
       toast.error(e?.message || "Export failed");
@@ -249,9 +248,6 @@ export const AlarmsTable = () => {
   } = table;
 
   const [isExporting, startExporting] = useTransition();
-  // if (isPending || isPendingAlarms) return <Loading />;
-
-  console.log("RENDERED");
   return (
     <div className="dashboard-table-wrapper">
       <div className="dashboard-header">

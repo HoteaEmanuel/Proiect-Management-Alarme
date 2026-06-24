@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { useGetConversationFiles } from "../api/chatBot.api";
 import useChatStore from "@store/chatStore";
 import { RiLoader2Fill } from "react-icons/ri";
@@ -13,8 +13,6 @@ import "@styles/features/ai/components/FilesModal.css";
 import { useFilePreview } from "@store/filePreviewStore";
 
 const FilesModal = ({ close }) => {
-  console.log("FILES MODAL Active");
-
   const { conversation } = useChatStore();
   // const [selectedFile, setSelectedFile] = useState(null);
   const { setFile } = useFilePreview();
@@ -43,13 +41,7 @@ const FilesModal = ({ close }) => {
           </div>
         </div>
       )}
-      { /* Verificare in caz de siguranta  */}
-      {/* {data.user_files.length === 0 && data.assistant_files.length === 0 && (
-        <div className="files-modal-header">
-          <p className="font-semibold">No files found</p>
-          <CiFileOff className="size-4"/>
-        </div>
-      )} */}
+
       {(data.user_files.length > 0 || data.assistant_files.length > 0) && (
         <>
           <div className="files-modal-header">
@@ -64,8 +56,6 @@ const FilesModal = ({ close }) => {
                   <li
                     key={file?.url}
                     className="files-modal-item"
-                    // onMouseOver={() => setSelectedFile(file.filename)}
-                    // onMouseLeave={() => setSelectedFile(null)}
                     onClick={() => setFile(file)}
                   >
                     <div
@@ -94,8 +84,6 @@ const FilesModal = ({ close }) => {
                   <li
                     key={file?.url}
                     className="files-modal-item"
-                    // onMouseOver={() => setSelectedFile(file.filename)}
-                    // onMouseLeave={() => setSelectedFile(null)}
                     onClick={() => setFile(file)}
                   >
                     <div
@@ -120,10 +108,6 @@ const FilesModal = ({ close }) => {
           </ul>
         </>
       )}
-
-      {/* {previewFile && (
-        <FilePreview file={previewFile} onClose={() => setPreviewFile(null)} />
-      )} */}
     </div>
   );
 };

@@ -46,9 +46,6 @@ const UserMessage = ({ message }) => {
     }
   };
 
-  console.log("CLAMPED");
-  console.log(isClamped);
-
   const handleFileClick = (f) => {
     if (file) setFile(null);
     else setFile(f);

@@ -2,8 +2,6 @@ import axios from "axios";
 
 const cloud_name = "dtyszphgc";
 const uploadFile = async (file) => {
-  console.log("FILE SENT TO UPLOAD");
-  console.log(file);
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", "Public_Images"); // din dashboard
@@ -14,8 +12,6 @@ const uploadFile = async (file) => {
     formData,
   );
 
-  console.log("RESPONSE AFTER FILE UPLOAD");
-  console.log(response.data);
   return {
     url: response.data.secure_url,
     public_id: response.data.public_id,

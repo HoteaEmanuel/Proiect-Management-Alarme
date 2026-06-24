@@ -36,7 +36,7 @@ const LoginForm = () => {
       reset();
       navigate("/dashboard");
     } catch (e) {
-      console.log(e);
+      if (e?.response?.status === 429) return;
       setError("Invalid username or password");
       toast.error("Failed to login - invalid username or password");
     }

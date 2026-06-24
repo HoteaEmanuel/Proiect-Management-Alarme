@@ -14,18 +14,14 @@ import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { RiLoader2Fill } from "react-icons/ri";
 import { toast } from "sonner";
 import ConversationNotFound from "@pages/ai-chatbot/ConversationNotFound";
-import NotFound from "@pages/NotFound";
 const ChatHeader = () => {
   const { conversation, setConversation } = useChatStore();
-  console.log("SHOW THIS");
-  console.log(conversation);
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
   const { mutateAsync: renameConversation } = useRenameConversation(
     conversation?.conversation_id,
   );
 
-  // const [showOptionsButton, setShowOptionsButton] = useState(false);
   const [showFilesModal, setShowFilesModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const { id } = useParams();
@@ -43,11 +39,8 @@ const ChatHeader = () => {
   useEffect(() => {
     setShowFilesModal(false);
   }, [id]);
-  // if (id === undefined || id === null) return <></>;
   if (isPending) return <RiLoader2Fill className="chat-header-loader" />;
 
-  console.log("SHOW OPTIONS");
-  console.log(showOptionsModal);
 
   const handleRename = async (e) => {
     if (editValue === "" || editValue?.trim()?.length === 0) {
@@ -67,14 +60,12 @@ const ChatHeader = () => {
   };
 
   const handleBlur = async () => {
-    console.log("BLURING");
-    console.log(editValue);
+
     const newTitle =
       editValue.trim().length !== 0
         ? editValue
         : conversation.conversation_title;
     if (newTitle.trim() === conversation.conversation_title.trim()) {
-      console.log("STOP THE REQUEST");
       setEditingId(null);
       setEditValue("");
       return;
@@ -91,8 +82,6 @@ const ChatHeader = () => {
   return (
     <header
       className="chat-header"
-      // onMouseEnter={() => setShowOptionsButton(true)}
-      // onMouseLeave={() => setShowOptionsButton(false)}
     >
       <div className="chat-header-content">
         <div className="chat-header-options-wrapper">

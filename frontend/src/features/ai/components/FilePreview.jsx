@@ -8,17 +8,13 @@ import { useFilePreview } from "@store/filePreviewStore";
 const FilePreview = ({ ...props }) => {
   const { file, setFile } = useFilePreview();
   if (!file) return null;
-  console.log("FILE HERE");
-  console.log(file);
   const fileItem = file?.file;
-  console.log(file);
   const type = fileItem?.type || file.file_format;
   const isXlsx =
     type ===
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     type.toLowerCase() === "xlsx";
 
-  console.log("FILE TYPE", type);
   const handleClose = () => setFile(null);
   return createPortal(
     <div className="file-preview-backdrop" onClick={handleClose} {...props}>

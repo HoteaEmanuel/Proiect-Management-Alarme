@@ -45,8 +45,6 @@ const ConversationContent = ({ chatEnd }) => {
   if (isPending) return <Skeleton />;
 
   if (!data) return <ConversationNotFound />;
-  console.log("MESSAGES");
-  console.log(messages);
   return (
     <ol className="conversation-content-list">
       {messages?.length > 0 &&

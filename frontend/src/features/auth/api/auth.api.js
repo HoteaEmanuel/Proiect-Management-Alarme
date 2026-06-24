@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { api } from "../../../lib/axios";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const authApi = {
@@ -7,7 +8,6 @@ export const authApi = {
   },
   login: async (credentials) => {
     const response = await api.post(`${VITE_URL_APP}/auth/login`, credentials);
-    console.log(response);
     return response.data;
   },
   logout: async () => {
@@ -16,7 +16,6 @@ export const authApi = {
   },
   refresh: async () => {
     const response = await api.get(`${VITE_URL_APP}/auth/refresh`);
-    console.log(response);
     return response.data;
   },
   me: async () => {

@@ -24,7 +24,6 @@ const MAX_ALLOWED_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const ChatInputNewChat = ({ placeholder }) => {
-  console.log("NEW CHAT INPUT RENDERED");
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const input = useRef();
@@ -64,12 +63,9 @@ const ChatInputNewChat = ({ placeholder }) => {
       input.current.value = "";
 
       const result = await sendMessage(mesaj);
-      console.log("NEW CONV");
-      console.log(result);
       const requestStatus = useChatStore
         .getState()
         .requests.get("new conversation")?.status;
-      console.log(requestStatus);
       if (requestStatus === "stopping") {
         await deleteChat(result?.conversation_id);
       }
@@ -77,7 +73,9 @@ const ChatInputNewChat = ({ placeholder }) => {
         return navigate(`/chat/${result.conversation_id}`);
       }
     } catch (e) {
-      toast.error(e?.message || "Could not send message");
+      if (e?.response?.status !== 429) {
+        toast.error(e?.message || "Could not send message");
+      }
     } finally {
       deleteRequest("new conversation");
     }

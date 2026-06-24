@@ -46,8 +46,6 @@ const COLORS = [
 ];
 
 const Chart = ({ content }) => {
-  console.log("CHART CONTENT ");
-  console.log(content);
   const chartRef = useRef(null);
 
   const downloadPNG = async () => {
@@ -278,10 +276,6 @@ const ChatResponse = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const { speaking, speak, stop } = useSpeechSynthesis();
-  console.log("BLOCKS");
-  console.log(blocks);
-  console.log(smart_replies);
-  console.log(last_message);
 
   const [showCopy, setShowCopy] = useState(null);
   const { file, setFile } = useFilePreview();

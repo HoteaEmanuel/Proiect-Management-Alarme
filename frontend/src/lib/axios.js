@@ -26,7 +26,10 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
+    if (error.response?.status === 429) {
+      toast.error("Too many requests - try again later");
+      return Promise.reject(error);
+    }
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&

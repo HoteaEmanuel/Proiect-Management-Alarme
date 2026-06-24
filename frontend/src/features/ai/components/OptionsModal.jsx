@@ -33,8 +33,6 @@ const OptionsModal = ({
   },
 );
 
-  console.log("CONVERSATION TO BE");
-  console.log(conversation);
 
   const modalRef = useRef(null);
 

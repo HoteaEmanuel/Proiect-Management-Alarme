@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ResponsiveHeatMap } from "@nivo/heatmap";
 import { formatDate } from "@lib/formatDate";
-import { alarmsApi } from "../api/alarms.api";
 
 import "@styles/features/dashboard/components/HeatMap.css";
 import { useGetHeatMap } from "../hooks/alarms.queries";
@@ -61,9 +60,6 @@ export const HeatMap = () => {
 
   if (!mapData) return null;
   if (isPending) return <Loading />;
-
-  console.log("HEAP MAP DATA");
-  console.log(mapData);
 
   return (
     <div className="heatmap-card">

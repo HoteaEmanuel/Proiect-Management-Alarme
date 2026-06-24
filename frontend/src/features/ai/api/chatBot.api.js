@@ -11,13 +11,10 @@ import { useNavigate } from "react-router-dom";
 import removeMarkdown from "remove-markdown";
 const VITE_URL_APP = import.meta.env.VITE_API_URL;
 export const useCreateConversation = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (message) => {
-      console.log("MESSAGE TO SENT HERE");
-      console.log(message);
       const formData = new FormData();
       formData.append("message", message.message);
       formData.append("new_chat", "true");
@@ -31,9 +28,6 @@ export const useCreateConversation = () => {
       });
 
       formData.append("request_id", message?.request_id);
-
-      console.log("FORM DATA NEW");
-      console.log(...formData.entries());
       const response = await api.post(`${VITE_URL_APP}/api/chatbot`, formData, {
         headers: {
           "Content-Type": "multipart/formdata",
@@ -42,19 +36,14 @@ export const useCreateConversation = () => {
       return response.data;
     },
     mutationKey: ["conversations"],
-    onError: () => {
+    onError: (error) => {
+      if (error?.response?.status === 429) return;
       toast.error("Could not send the message");
     },
     onSuccess: (response) => {
-      console.log("NEW CHAT RESPONSE");
-      console.log(response);
-      // toast.success("Yey");
       queryClient.invalidateQueries({
         queryKey: ["conversations", user.user_id],
       });
-      // if (response.conversation_id) {
-      //   return navigate(`/chat/${response.conversation_id}`);
-      // }
 
       return response;
     },
@@ -63,11 +52,8 @@ export const useCreateConversation = () => {
 
 export const useSendMessage = ({ id }) => {
   const { user } = useAuthStore();
-  // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ message }) => {
-      console.log("MESS HERE: ", message);
-      console.log(id);
       await api.post(`${VITE_URL_APP}/api/chatbot`, {
         user_id: user.user_id,
         conversation_id: id,
@@ -78,11 +64,6 @@ export const useSendMessage = ({ id }) => {
     onError: () => {
       toast.error("Could not send the message!");
     },
-    // onSuccess: () => {
-    //   queryClient.invalidateQueries({
-    //     queryKey: ["conversation", user.user_id, id],
-    //   });
-    // },
   });
 };
 export const useGetUserConversations = () => {
@@ -90,10 +71,6 @@ export const useGetUserConversations = () => {
   return useSuspenseQuery({
     queryFn: async () => {
       const response = await api.get(`${VITE_URL_APP}/api/conversations`);
-      console.log("CALLING API CHATS");
-      console.log(response);
-      // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      // await delay(1000);
       return response.data.conversations;
     },
     queryKey: ["conversations", user.user_id],
@@ -101,14 +78,11 @@ export const useGetUserConversations = () => {
 };
 
 export const useGetConversationBaseData = (chatId) => {
-  const { user } = useAuthStore();
   return useQuery({
     queryFn: async () => {
       const response = await api.get(
         `${VITE_URL_APP}/api/conversations/${chatId}/info`,
       );
-      console.log("CADOUL PRIMIT");
-      console.log(response.data);
       return response.data;
     },
     enabled: !!chatId,
@@ -158,12 +132,8 @@ export const useDeleteConversation = (conversationId) => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  console.log("DELETING HERE");
-  console.log(conversationId);
   return useMutation({
     mutationFn: async (conversation_id = conversationId) => {
-      console.log("CONV ID HEREE:");
-      console.log(conversation_id);
       await api.delete(`${VITE_URL_APP}/api/conversations/${conversation_id}`);
     },
     mutationKey: ["conversations", user.user_id],
@@ -210,9 +180,7 @@ export const useGetLibraryFiles = (filters = {}) => {
 export const useReadChatResponse = () => {
   return useMutation({
     mutationFn: async ({ text }) => {
-      console.log("TEXT TO READ");
       const cleanText = removeMarkdown(text);
-      console.log(cleanText);
       const response = await api.post(
         `${VITE_URL_APP}/audio/speak`,
         {

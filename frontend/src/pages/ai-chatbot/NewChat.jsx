@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {  useState } from "react";
 import useAuthStore from "@store/authStore.js";
 import ChatInputNewChat from "@features/ai/components/ChatInputNewChat";
 import { greeting } from "@features/ai/lib/greetings";
@@ -14,8 +14,6 @@ const NewChat = () => {
 
   const { file } = useFilePreview();
   const [chatBotGreeting] = useState(greeting());
-  console.log("GREETING")
-  console.log(chatBotGreeting)
   return (
     <div className="new-chat-page">
       <main className="new-chat-hero">

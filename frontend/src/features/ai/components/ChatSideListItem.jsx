@@ -48,8 +48,7 @@ export const ChatSideListItem = ({
         conversationId: conversation.conversation_id,
         new_title: editValue,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (_error) {
       toast.error("Renaming failed");
     }
 
