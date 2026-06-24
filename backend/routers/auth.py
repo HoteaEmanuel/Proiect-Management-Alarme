@@ -4,6 +4,7 @@ from fastapi import Depends, APIRouter, Response, Cookie
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.encoders import jsonable_encoder
 from starlette import status
+from fastapi_limiter.depends import RateLimiter
 
 from database import get_db
 from schemas import CreateUserRequest, LoginRequest, UserResponse, TokenResponse, ChangePasswordRequest
@@ -28,7 +29,7 @@ async def register_user(create_user_request: CreateUserRequest, db: db_dependenc
 
 
 # Authenticates the user credentials and returns an access token along with an HTTP-only refresh token cookie
-@router.post("/login", response_model= TokenResponse , status_code=status.HTTP_200_OK)
+@router.post("/login", response_model= TokenResponse , status_code=status.HTTP_200_OK, dependencies=[Depends(RateLimiter(times=5, seconds=60))])
 async def login(response: Response, login_request: LoginRequest, db: db_dependency):
 
     acces_token, refresh_token, user = process_user_login(login_request, db)

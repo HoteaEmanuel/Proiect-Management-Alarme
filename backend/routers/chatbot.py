@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from typing import List
 from datetime import datetime
+from fastapi_limiter.depends import RateLimiter
 
 from database import get_db, redis_client
 from schemas import MessageRequest, AssistantMessage, ConversationListresponse, ConversationHistory, RawFileAttachment
@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 # Processes a user message and uploaded files, forwards them to the AI orchestrator, and returns the assistant's response
-@router.post("/chatbot", response_model=AssistantMessage)
+@router.post("/chatbot", response_model=AssistantMessage, dependencies=[Depends(RateLimiter(times=15, seconds=60))])
 def send_message_to_chatbot(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
