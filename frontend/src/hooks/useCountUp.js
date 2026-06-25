@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-// Starts fast and settles into the target value
+// Creste rapid doar la inceput dar apoi incetineste
 const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 // Animates a number from its previous value to `target` whenever `target` changes

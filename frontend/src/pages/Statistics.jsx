@@ -58,8 +58,6 @@ export const Statistics = () => {
         start_date: filters.start_date,
         end_date: filters.end_date,
       });
-      console.log("Chart details data:", data);
-      console.log("First alarm:", data[0]);
 
       setChartDetails(data);
     } finally {
